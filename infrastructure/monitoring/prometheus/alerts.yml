@@ -1,0 +1,188 @@
+groups:
+  - name: almokhtabar-api
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m]))
+          * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High error rate ({{ $value | humanizePercentage }})"
+          description: "API error rate is {{ $value | humanizePercentage }} for the last 5 minutes."
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High p99 latency ({{ $value }}s)"
+          description: "p99 latency is {{ $value }}s, above 1s threshold."
+
+      - alert: APIErrorBudgetBurn
+        expr: |
+          (1 - (sum(rate(http_requests_total{status=~"5.."}[30d])) / sum(rate(http_requests_total[30d]))))
+          < 0.999
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "SLO 99.9% breached"
+          description: "API availability SLO of 99.9% has been breached over the 30d window."
+
+      - alert: BackupFailed
+        expr: time() - max(postgres_last_backup_timestamp) > 86400
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Backup not completed in 24h"
+          description: "No successful database backup in the last 24 hours."
+
+  - name: almokhtabar-infrastructure
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[10m])) < 0.2
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage on {{ $labels.node }}"
+          description: "CPU usage is above 80% for more than 10 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage on {{ $labels.node }}"
+          description: "Memory usage is above 85% for more than 10 minutes."
+
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Low disk space on {{ $labels.node }}"
+          description: "Disk usage is above 80% on {{ $labels.mountpoint }}."
+
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 1
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping."
+
+      - alert: PodPending
+        expr: kube_pod_status_phase{phase="Pending"} > 0
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} pending"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is pending for >10m."
+
+      - alert: OOMKilled
+        expr: increase(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Container OOM killed: {{ $labels.pod }}"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} was OOM killed."
+
+      - alert: DeploymentFailed
+        expr: kube_deployment_status_condition{condition="Available",status="false"} > 0
+        for: 10m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} not progressing"
+          description: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has been unavailable for 10m."
+
+  - name: almokhtabar-database
+    interval: 30s
+    rules:
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_activity_count{datname="almokhtabar"} > 150
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High database connections"
+          description: "Database has {{ $value }} active connections (threshold: 150)."
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Redis memory high ({{ $value | humanizePercentage }})"
+          description: "Redis memory usage is at {{ $value | humanizePercentage }}."
+
+      - alert: PostgreSQLReplicationLag
+        expr: pg_replication_lag_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "PostgreSQL replication lag"
+          description: "Replication lag is {{ $value }}s."
+
+  - name: almokhtabar-security
+    interval: 5m
+    rules:
+      - alert: CertificateExpiry
+        expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 2592000
+        for: 1h
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "SSL certificate expires in < 30 days"
+          description: "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}."
+
+      - alert: SuspiciousLoginRate
+        expr: rate(login_attempts_total{status="failed"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: "Suspicious login rate detected"
+          description: "Failed login rate is {{ $value | humanize }} per second."
+
+      - alert: RateLimitHits
+        expr: rate(rate_limit_hits_total[5m]) > 50
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High rate limiting activity"
+          description: "Rate limit hits at {{ $value | humanize }} per second."

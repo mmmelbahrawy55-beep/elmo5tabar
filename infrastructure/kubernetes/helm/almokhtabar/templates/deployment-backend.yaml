@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-backend
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+  annotations:
+    {{- with .Values.global.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "almokhtabar.labels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- if .Values.monitoring.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{ .Values.backend.port }}"
+        {{- end }}
+        {{- with .Values.global.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "almokhtabar.imagePullSecrets" . | indent 6 }}
+      serviceAccountName: {{ include "almokhtabar.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.backend.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: backend
+                topologyKey: kubernetes.io/hostname
+        {{- with .Values.backend.affinity }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.backend.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          image: {{ .Values.global.imageRegistry }}{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "almokhtabar.fullname" . }}-config
+            - secretRef:
+                name: {{ include "almokhtabar.fullname" . }}-secrets
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.configmap.nodeEnv | quote }}
+            - name: PORT
+              value: {{ .Values.backend.port | quote }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.backend.probe.liveness.path }}
+              port: {{ .Values.backend.port }}
+            initialDelaySeconds: {{ .Values.backend.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.backend.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.backend.probe.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.backend.probe.readiness.path }}
+              port: {{ .Values.backend.port }}
+            initialDelaySeconds: {{ .Values.backend.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.probe.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.backend.probe.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.backend.probe.readiness.failureThreshold }}
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: uploads
+              mountPath: /app/uploads
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "almokhtabar.fullname" . }}-logs
+            readOnly: false
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ include "almokhtabar.fullname" . }}-uploads
+            readOnly: false
+        - name: tmp
+          emptyDir:
+            medium: Memory
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}

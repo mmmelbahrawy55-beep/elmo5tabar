@@ -1,0 +1,293 @@
+export const mockUpcomingAppointment = {
+  id: 'apt-001',
+  bookingNumber: 'AMB-2026-001234',
+  status: 'confirmed' as const,
+  service: {
+    type: 'analysis' as const,
+    id: 'svc-001',
+    nameAr: 'تحليل شامل',
+    nameEn: 'Comprehensive Analysis',
+    price: 250,
+    discountedPrice: 200,
+    estimatedDuration: 30,
+    description: 'تحليل مخبري شامل',
+    category: 'blood',
+    requiresFasting: true,
+    homeVisitAvailable: false,
+  },
+  branch: {
+    id: 'br-001',
+    nameAr: 'المختبر الرئيسي - الرياض',
+    nameEn: 'Main Lab - Riyadh',
+    address: '123 King Fahd Road, Riyadh',
+    crowdLevel: 'medium' as const,
+    parkingAvailable: true,
+    queueCount: 5,
+    queueWaitTime: '10-15 min',
+    coordinates: { lat: 24.7136, lng: 46.6753 },
+    availableSlots: 12,
+  },
+  date: '2026-08-15',
+  time: '09:30',
+  patient: {
+    firstNameAr: 'محمد',
+    lastNameAr: 'العلي',
+    firstNameEn: 'Mohammed',
+    lastNameEn: 'Al-Ali',
+    phone: '0555123456',
+    email: 'mohammed@example.com',
+    nationalId: '1012345678',
+    gender: 'male' as const,
+    age: 32,
+    dateOfBirth: '1994-03-15',
+    medicalNotes: '',
+    preferredLanguage: 'ar' as const,
+    isExistingPatient: true,
+  },
+  payment: {
+    method: 'visa' as const,
+    amount: 250,
+    currency: 'SAR',
+    discount: 50,
+    tax: 30,
+    total: 230,
+    status: 'completed' as const,
+  },
+  estimatedEndTime: '10:00',
+  createdAt: '2026-08-10T14:30:00Z',
+  calendarUrl: 'data:text/calendar;...',
+  notifications: { sms: true, email: true, whatsapp: false, push: true },
+};
+
+export const mockPastAppointment = {
+  ...mockUpcomingAppointment,
+  id: 'apt-002',
+  bookingNumber: 'AMB-2026-001100',
+  status: 'completed' as const,
+  date: '2026-07-20',
+  time: '10:00',
+};
+
+export const mockCancelledAppointment = {
+  ...mockUpcomingAppointment,
+  id: 'apt-003',
+  bookingNumber: 'AMB-2026-001050',
+  status: 'cancelled' as const,
+  date: '2026-07-15',
+  time: '11:00',
+};
+
+export const mockLabResultNormal = {
+  id: 'res-001',
+  testName: 'Complete Blood Count',
+  testNameAr: 'صورة الدم الكاملة',
+  status: 'completed' as const,
+  severity: 'normal' as const,
+  date: '2026-07-22',
+  value: 5.2,
+  unit: 'x10^9/L',
+  referenceRange: { min: 4.0, max: 11.0 },
+  isAbnormal: false,
+  notes: '',
+  pdfUrl: '/results/cbc-001.pdf',
+};
+
+export const mockLabResultAbnormal = {
+  id: 'res-002',
+  testName: 'Vitamin D',
+  testNameAr: 'فيتامين د',
+  status: 'completed' as const,
+  severity: 'abnormal' as const,
+  date: '2026-07-22',
+  value: 18,
+  unit: 'ng/mL',
+  referenceRange: { min: 30, max: 100 },
+  isAbnormal: true,
+  notes: 'Low vitamin D levels detected. Consider supplementation.',
+  pdfUrl: '/results/vitd-002.pdf',
+};
+
+export const mockLabResultCritical = {
+  id: 'res-003',
+  testName: 'Troponin I',
+  testNameAr: 'تروبونين I',
+  status: 'completed' as const,
+  severity: 'critical' as const,
+  date: '2026-07-21',
+  value: 2.5,
+  unit: 'ng/mL',
+  referenceRange: { min: 0, max: 0.04 },
+  isAbnormal: true,
+  notes: 'Critical value - immediate attention required.',
+  pdfUrl: '/results/trop-003.pdf',
+};
+
+export const mockPendingResult = {
+  ...mockLabResultNormal,
+  id: 'res-004',
+  status: 'pending' as const,
+  value: undefined,
+  isAbnormal: false,
+  notes: 'Test in progress',
+};
+
+export const mockPatientUser = {
+  id: 'user-001',
+  email: 'patient@example.com',
+  role: 'patient',
+  profile: {
+    firstNameAr: 'سارة',
+    lastNameAr: 'الأحمد',
+    firstNameEn: 'Sara',
+    lastNameEn: 'Al-Ahmed',
+    avatar: '/avatars/sara.jpg',
+  },
+};
+
+export const mockDoctorUser = {
+  id: 'user-002',
+  email: 'doctor@example.com',
+  role: 'doctor',
+  profile: {
+    firstNameAr: 'أحمد',
+    lastNameAr: 'الزهراني',
+    firstNameEn: 'Ahmed',
+    lastNameEn: 'Al-Zahrani',
+  },
+};
+
+export const mockAdminUser = {
+  id: 'user-003',
+  email: 'admin@example.com',
+  role: 'admin',
+  profile: {
+    firstNameAr: 'خالد',
+    lastNameAr: 'المطيري',
+    firstNameEn: 'Khaled',
+    lastNameEn: 'Al-Mutairi',
+  },
+};
+
+export const mockBranch = {
+  id: 'br-001',
+  slug: 'main-riyadh',
+  nameAr: 'المختبر الرئيسي - الرياض',
+  nameEn: 'Main Lab - Riyadh',
+  address: {
+    street: '123 King Fahd Road',
+    district: 'Al-Olaya',
+    city: 'Riyadh',
+    region: 'Riyadh Region',
+    postalCode: '12211',
+    country: 'Saudi Arabia',
+  },
+  addressAr: '123 طريق الملك فهد، العليا، الرياض',
+  addressEn: '123 King Fahd Road, Al-Olaya, Riyadh',
+  coordinates: { lat: 24.7136, lng: 46.6753 },
+  mapUrl: 'https://maps.google.com/?q=24.7136,46.6753',
+  phone: '0112345678',
+  whatsapp: '966555123456',
+  email: 'main.riyadh@almokhtabar.com',
+  type: 'main' as const,
+  status: 'active' as const,
+  openingHours: [
+    { day: 'saturday', dayAr: 'السبت', open: '08:00', close: '22:00', isClosed: false },
+    { day: 'sunday', dayAr: 'الأحد', open: '08:00', close: '22:00', isClosed: false },
+    { day: 'monday', dayAr: 'الإثنين', open: '08:00', close: '22:00', isClosed: false },
+    { day: 'tuesday', dayAr: 'الثلاثاء', open: '08:00', close: '22:00', isClosed: false },
+    { day: 'wednesday', dayAr: 'الأربعاء', open: '08:00', close: '22:00', isClosed: false },
+    { day: 'thursday', dayAr: 'الخميس', open: '08:00', close: '23:00', isClosed: false },
+    { day: 'friday', dayAr: 'الجمعة', open: '14:00', close: '22:00', isClosed: false },
+  ],
+  is24Hours: false,
+  capacity: { total: 200, current: 145, percentage: 72.5 },
+  queueStatus: { waiting: 12, averageWait: '15 min', walkInAvailable: true, appointmentSlots: 45 },
+  services: [],
+  availableTests: ['cbc', 'lipid', 'vitamin-d'],
+  specialServices: [],
+  departments: ['hematology', 'chemistry'],
+  parking: { available: true, spots: 50, type: 'free' as const, valet: true },
+  accessibility: { wheelchair: true, ramp: true, elevator: true, handicappedParking: true, audioGuide: false },
+  amenities: ['wifi', 'cafe', 'prayer-room'],
+  images: [],
+  coverImage: '/branches/main-riyadh.jpg',
+  established: '1995-01-01',
+  totalPatients: 150000,
+  rating: 4.5,
+  reviewCount: 2340,
+  certifications: ['ISO 15189', 'CAP'],
+  region: 'central',
+  timezone: 'Asia/Riyadh',
+  syncStatus: 'synced' as const,
+  lastSynced: '2026-07-30T06:00:00Z',
+  realtimeEnabled: true,
+  manager: {
+    nameAr: 'د. محمد العلي',
+    nameEn: 'Dr. Mohammed Al-Ali',
+    title: 'مدير المختبر',
+    phone: '0112345679',
+    email: 'manager.main@almokhtabar.com',
+    since: '2020-03-01',
+  },
+  emergencyContact: { phone: '997', available24h: true },
+};
+
+export const mockPaymentTransaction = {
+  id: 'txn-001',
+  bookingNumber: 'AMB-2026-001234',
+  amount: 230,
+  currency: 'SAR',
+  method: 'visa' as const,
+  status: 'completed' as const,
+  cardLast4: '4532',
+  date: '2026-08-10T14:30:00Z',
+  description: 'Comprehensive Analysis - Main Lab Riyadh',
+  invoiceUrl: '/invoices/INV-2026-001234.pdf',
+  receiptUrl: '/receipts/RCT-2026-001234.pdf',
+};
+
+export const mockNotification = {
+  id: 'notif-001',
+  type: 'appointment' as const,
+  title: 'موعد غد',
+  titleEn: 'Appointment Tomorrow',
+  body: 'لديك موعد غداً في المختبر الرئيسي الرياض الساعة 9:30 صباحاً',
+  bodyEn: 'You have an appointment tomorrow at Main Lab Riyadh at 9:30 AM',
+  isRead: false,
+  createdAt: '2026-08-14T10:00:00Z',
+  data: { appointmentId: 'apt-001' },
+};
+
+export const mockBlogPost = {
+  id: 'post-001',
+  title: 'أهمية تحليل فيتامين د',
+  titleEn: 'The Importance of Vitamin D Testing',
+  excerpt: 'تعرف على أهمية فيتامين د ومتى يجب إجراء التحليل',
+  excerptEn: 'Learn about Vitamin D importance and when to get tested',
+  content: '...',
+  author: 'د. أحمد الزهراني',
+  authorEn: 'Dr. Ahmed Al-Zahrani',
+  publishedAt: '2026-07-15T08:00:00Z',
+  tags: ['vitamin-d', 'nutrition', 'prevention'],
+  imageUrl: '/blog/vitamin-d.jpg',
+  readTime: 5,
+};
+
+export const mockQueuePosition = {
+  queueNumber: 42,
+  estimatedWait: 15,
+  positionsAhead: 5,
+  status: 'waiting' as const,
+  branchName: 'المختبر الرئيسي - الرياض',
+};
+
+export const mockDashboardStats = {
+  totalAppointments: 245,
+  pendingResults: 18,
+  completedToday: 32,
+  averageWaitTime: 12,
+  monthlyGrowth: 8.5,
+  revenue: 45600,
+  patientSatisfaction: 94.2,
+  activeBranches: 12,
+};

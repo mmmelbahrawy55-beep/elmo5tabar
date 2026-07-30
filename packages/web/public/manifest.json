@@ -1,0 +1,58 @@
+{
+  "name": "Al Mokhtabar Laboratory - المختبر للتحاليل الطبية",
+  "short_name": "المختبر",
+  "description": "Al Mokhtabar Laboratory offers over 1,000 medical laboratory tests with accurate results, home visit services, and digital health solutions across Saudi Arabia.",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait-primary",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0077B6",
+  "scope": "/",
+  "lang": "ar-SA",
+  "dir": "rtl",
+  "categories": ["medical", "health", "laboratory", "diagnostics"],
+  "screenshots": [],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Appointment",
+      "short_name": "Book",
+      "description": "Schedule a lab test appointment",
+      "url": "/book-appointment"
+    },
+    {
+      "name": "View Results",
+      "short_name": "Results",
+      "description": "Check your lab test results",
+      "url": "/results"
+    },
+    {
+      "name": "حجز موعد",
+      "short_name": "حجز",
+      "description": "حجز موعد للتحاليل",
+      "url": "/book-appointment"
+    },
+    {
+      "name": "النتائج",
+      "short_name": "نتائج",
+      "description": "عرض نتائج التحاليل",
+      "url": "/results"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.almokhtabar.lab"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/sa/app/almokhtabar/id000000000"
+    }
+  ],
+  "prefer_related_applications": true
+}

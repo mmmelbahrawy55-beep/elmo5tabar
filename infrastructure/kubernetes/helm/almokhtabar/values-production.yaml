@@ -1,0 +1,135 @@
+global:
+  environment: production
+  podAnnotations:
+    ad.datadoghq.com/backend.logs: '[{"source": "nodejs", "service": "almokhtabar-backend"}]'
+    ad.datadoghq.com/web.logs: '[{"source": "nodejs", "service": "almokhtabar-web"}]'
+    ad.datadoghq.com/ai-service.logs: '[{"source": "python", "service": "almokhtabar-ai"}]'
+
+backend:
+  replicaCount: 5
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 4
+      memory: 4Gi
+  autoscaling:
+    minReplicas: 5
+    maxReplicas: 30
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 75
+  podDisruptionBudget:
+    minAvailable: 3
+  terminationGracePeriodSeconds: 120
+  nodeSelector:
+    node-type: compute-optimized
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - backend
+          topologyKey: kubernetes.io/hostname
+
+web:
+  replicaCount: 5
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
+  autoscaling:
+    minReplicas: 5
+    maxReplicas: 30
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 75
+  podDisruptionBudget:
+    minAvailable: 3
+  nodeSelector:
+    node-type: general-purpose
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - web
+          topologyKey: kubernetes.io/hostname
+
+aiService:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 2
+      memory: 2Gi
+    limits:
+      cpu: 8
+      memory: 16Gi
+  autoscaling:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 75
+  podDisruptionBudget:
+    minAvailable: 2
+  nodeSelector:
+    node-type: gpu-accelerated
+  gpu:
+    enabled: true
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "200"
+    nginx.ingress.kubernetes.io/limit-burst: "400"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Permissions-Policy: camera=(), microphone=(), geolocation=()";
+
+monitoring:
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      interval: 15s
+      scrapeTimeout: 10s
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/path: /metrics
+      prometheus.io/port: "3001"
+
+postgresql:
+  internal: false
+  external:
+    host: almokhtabar-db.cluster-xxxxxxxxxxxx.us-east-1.rds.amazonaws.com
+    port: 5432
+    database: almokhtabar_prod
+    user: almokhtabar_admin
+
+redis:
+  internal: false
+  external:
+    host: almokhtabar-redis.xxxxxxxxxx.cache.amazonaws.com
+    port: 6379
+
+persistence:
+  uploads:
+    size: 50Gi
+    storageClassName: gp3
+  logs:
+    size: 20Gi
+    storageClassName: gp3

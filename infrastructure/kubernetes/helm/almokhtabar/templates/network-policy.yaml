@@ -1,0 +1,220 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-default-deny
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-ingress-controller
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressController.namespace }}
+          podSelector:
+            matchLabels:
+              {{- toYaml .Values.networkPolicy.ingressController.podSelector | nindent 14 }}
+      ports:
+        - port: {{ .Values.backend.port }}
+          protocol: TCP
+        - port: {{ .Values.web.port }}
+          protocol: TCP
+        - port: {{ .Values.aiService.port }}
+          protocol: TCP
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-backend-to-db
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+  egress:
+    - ports:
+        - port: 5432
+          protocol: TCP
+      to:
+        - ipBlock:
+            cidr: {{ .Values.postgresql.external.host | default "0.0.0.0/0" | quote }}
+            {{- if .Values.postgresql.external.host }}
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+            {{- end }}
+  policyTypes:
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-backend-to-redis
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+  egress:
+    - ports:
+        - port: {{ .Values.redis.external.port | default 6379 }}
+          protocol: TCP
+      to:
+        - ipBlock:
+            cidr: {{ .Values.redis.external.host | default "0.0.0.0/0" | quote }}
+            {{- if .Values.redis.external.host }}
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+            {{- end }}
+  policyTypes:
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-web-to-backend
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: web
+      ports:
+        - port: {{ .Values.backend.port }}
+          protocol: TCP
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-ai-to-backend
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: ai-service
+      ports:
+        - port: {{ .Values.backend.port }}
+          protocol: TCP
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-prometheus
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.monitoringNamespace }}
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: {{ .Values.backend.port }}
+          protocol: TCP
+        - port: {{ .Values.aiService.port }}
+          protocol: TCP
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-egress-internet
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - port: 443
+          protocol: TCP
+        - port: 80
+          protocol: TCP
+  policyTypes:
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-allow-dns
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+      to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+  policyTypes:
+    - Egress
+{{- end }}

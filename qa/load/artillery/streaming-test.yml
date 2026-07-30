@@ -1,0 +1,220 @@
+config:
+  target: "https://almokhtabar.com"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 100
+      name: "Warm up connections"
+    - duration: 120
+      arrivalRate: 100
+      rampTo: 500
+      name: "Scale connections"
+    - duration: 300
+      arrivalRate: 500
+      rampTo: 1000
+      name: "Peak concurrent connections"
+    - duration: 60
+      arrivalRate: 100
+      name: "Sustained load"
+  engines:
+    socketio-v3:
+      transports: ["websocket"]
+      path: "/socket.io"
+      extraHeaders:
+        Origin: "https://almokhtabar.com"
+        Accept-Language: "ar-SA,en;q=0.9"
+  processor: "./streaming-handlers.js"
+
+scenarios:
+  - name: "Queue position updates"
+    engine: socketio-v3
+    flow:
+      - think: 1
+      - emit:
+          channel: "join"
+          data: {
+            room: "queue:{{ $randomString(8) }}",
+            userId: "pat-{{ $randomString(12) }}",
+            token: ""
+          }
+      - think: 2
+      - emit:
+          channel: "subscribe:queue"
+          data: {
+            branchId: "BR-{{ $randomNumber(1, 50) }}",
+            serviceId: "{{ $randomString(6) }}",
+            date: "{{ $randomDate(2026, 2026, '%Y-%m-%d') }}"
+          }
+      - think: 5
+      - expect:
+          channel: "queue:update"
+          data:
+            - hasKey: "position"
+            - hasKey: "estimatedWait"
+            - hasKey: "peopleAhead"
+      - think: 3
+
+  - name: "Notification events"
+    engine: socketio-v3
+    flow:
+      - think: 1
+      - emit:
+          channel: "join"
+          data: {
+            room: "notifications:{{ $randomString(8) }}",
+            userId: "pat-{{ $randomString(12) }}"
+          }
+      - think: 2
+      - expect:
+          channel: "notification:appointment"
+          data:
+            - hasKey: "type"
+            - hasKey: "message"
+            - hasKey: "timestamp"
+      - think: 2
+      - expect:
+          channel: "notification:result"
+          data:
+            - hasKey: "resultId"
+            - hasKey: "status"
+            - hasKey: "patientName"
+      - think: 3
+
+  - name: "Reconnection behavior"
+    engine: socketio-v3
+    flow:
+      - emit:
+          channel: "join"
+          data: {
+            room: "reconnect:{{ $randomString(8) }}",
+            userId: "pat-{{ $randomString(12) }}"
+          }
+      - think: 3
+      - disconnect
+      - think: 2
+      - connect:
+          reconnection: true
+          reconnectionAttempts: 5
+          reconnectionDelay: 1000
+      - expect:
+          channel: "reconnect"
+          data:
+            - hasKey: "recovered"
+            - hasValue: true
+      - think: 2
+      - log: "Reconnection successful for {{ $uid }}"
+
+  - name: "Mixed real-time operations"
+    engine: socketio-v3
+    flow:
+      - think: 1
+      - emit:
+          channel: "join"
+          data: {
+            room: "patient:{{ $randomString(8) }}",
+            userId: "pat-{{ $randomString(12) }}"
+          }
+      - think: 1
+      - emit:
+          channel: "check:status"
+          data: {
+            appointmentId: "apt-{{ $randomString(12) }}"
+          }
+      - think: 3
+      - expect:
+          channel: "status:update"
+          data:
+            - hasKey: "status"
+            - hasKey: "updatedAt"
+      - think: 2
+      - emit:
+          channel: "typing:indicator"
+          data: {
+            room: "chat:{{ $randomString(8) }}",
+            isTyping: true
+          }
+      - think: 1
+      - emit:
+          channel: "ping"
+      - expect:
+          channel: "pong"
+          data:
+            - hasKey: "serverTime"
+
+  - name: "Error handling and edge cases"
+    engine: socketio-v3
+    flow:
+      - emit:
+          channel: "join"
+          data: {
+            room: "invalid:room:id",
+            userId: ""
+          }
+      - think: 2
+      - expect:
+          channel: "error"
+          data:
+            - hasValue: true
+      - think: 1
+      - emit:
+          channel: "subscribe:queue"
+          data: {}
+      - think: 2
+      - expect:
+          channel: "error"
+          data:
+            - hasKey: "code"
+            - hasKey: "message"
+      - think: 1
+      - emit:
+          channel: "action:unauthorized"
+          data: {
+            action: "admin:deleteAppointment"
+          }
+      - think: 2
+      - expect:
+          channel: "error"
+          data:
+            - hasValue: "unauthorized"
+
+  - name: "Performance benchmark connections"
+    engine: socketio-v3
+    flow:
+      - connect:
+          transports: ["websocket"]
+          extraHeaders:
+            X-Perf-Test: "true"
+            X-Benchmark-Run: "{{ $randomString(8) }}"
+      - think: 0.1
+      - loop:
+          - emit:
+              channel: "benchmark:ping"
+              data: { t: "{{ $timestamp }}" }
+          - expect:
+              channel: "benchmark:pong"
+              data:
+                - hasKey: "t"
+                - hasKey: "serverT"
+          - think: 0.5
+        count: 20
+      - log: "Benchmark complete for {{ $uid }}"
+
+  - name: "Connection stress with immediate disconnect"
+    engine: socketio-v3
+    flow:
+      - connect
+      - emit:
+          channel: "join"
+          data: {
+            room: "stress:{{ $randomString(8) }}"
+          }
+      - disconnect
+      - think: 0.1
+      - connect
+      - emit:
+          channel: "join"
+          data: {
+            room: "stress:{{ $randomString(8) }}"
+          }
+      - think: 1
+      - disconnect

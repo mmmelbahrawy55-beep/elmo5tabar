@@ -1,0 +1,216 @@
+{
+  "title": "Al Mokhtabar Security Dashboard",
+  "uid": "almokhtabar-security",
+  "tags": ["production", "security", "almokhtabar"],
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "Asia/Riyadh",
+  "editable": false,
+  "refresh": "1m",
+  "panels": [
+    {
+      "title": "Failed Logins Over Time",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(login_attempts_total{status=\"failed\"}[5m])",
+          "legendFormat": "Failed/min"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 20 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "MFA Usage Rate",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(mfa_attempts_total{status=\"success\"}[5m]) / rate(login_attempts_total[5m]) * 100",
+          "legendFormat": "MFA %"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "Rate Limit Hits",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(rate_limit_hits_total[5m])",
+          "legendFormat": "Rate Limited Requests"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Suspicious IPs Blocked",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 4, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(waf_blocked_requests_total[24h]))",
+          "legendFormat": "Blocked/24h"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "SIEM Events by Severity",
+      "type": "piechart",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "count(siem_events_total) by (severity)",
+          "legendFormat": "{{ severity }}"
+        }
+      ],
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "values": true, "calcs": ["sum"] }
+      }
+    },
+    {
+      "title": "Auth Provider Distribution",
+      "type": "piechart",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 6 },
+      "targets": [
+        {
+          "expr": "rate(login_attempts_total[24h])",
+          "legendFormat": "{{ provider }}"
+        }
+      ],
+      "options": {
+        "pieType": "pie",
+        "reduceOptions": { "values": true, "calcs": ["sum"] }
+      }
+    },
+    {
+      "title": "Token Refresh Rate",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 6 },
+      "targets": [
+        {
+          "expr": "rate(token_refresh_total[5m])",
+          "legendFormat": "Token Refreshes"
+        }
+      ]
+    },
+    {
+      "title": "Brute Force Attempts Blocked",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 6 },
+      "targets": [
+        {
+          "expr": "sum(rate(brute_force_blocks_total[1h]))",
+          "legendFormat": "Blocks/hr"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 200 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Active Security Alerts",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "ALERTS{alertstate=\"firing\", severity=\"critical\"}",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "renameByName": {
+              "alertname": "Alert",
+              "severity": "Severity",
+              "alertstate": "State",
+              "instance": "Source"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" }
+      },
+      {
+        "name": "severity",
+        "type": "query",
+        "query": "label_values(ALERTS, severity)",
+        "includeAll": true,
+        "multi": true
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Security Events",
+        "type": "grafana_annotation",
+        "query": "type:security",
+        "iconColor": "red"
+      }
+    ]
+  }
+}

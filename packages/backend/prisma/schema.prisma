@@ -1,0 +1,2903 @@
+// ============================================================================
+// AL MOKHTABAR LABORATORY - Enterprise PostgreSQL Schema
+// ============================================================================
+// Version: 2.0.0
+// Target: Millions of patients, billions of records
+// ORM: Prisma with PostgreSQL
+// Features: UUID PKs, soft deletes, audit trails, partitioning-ready
+// ============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "multiSchema", "postgresqlExtensions"]
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [uuid_ossp, pgcrypto, pg_trgm]
+}
+
+// ============================================================================
+// SECTION 1: AUTHENTICATION, ROLES & PERMISSIONS
+// ============================================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  BRANCH_MANAGER
+  DOCTOR
+  LAB_TECHNICIAN
+  PHLEBOTOMIST
+  NURSE
+  RECEPTIONIST
+  BILLING_STAFF
+  MARKETING_STAFF
+  PATIENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  LOCKED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+// --- ROLES ---
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  nameAr      String?
+  description String?
+  isSystem    Boolean  @default(false) // System roles cannot be deleted
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  permissions RolePermission[]
+  users       User[]
+
+  @@index([isActive])
+  @@map("roles")
+}
+
+// --- PERMISSIONS ---
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  module      String   // e.g., "patients", "orders", "reports"
+  action      String   // e.g., "create", "read", "update", "delete", "export"
+  resource    String?  // Optional specific resource within module
+  name        String   @unique // e.g., "patients:create", "reports:export"
+  nameAr      String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  roles       RolePermission[]
+
+  @@index([module])
+  @@index([module, action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid()) @db.Uuid
+  roleId       String     @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String     @db.Uuid
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  granted      Boolean    @default(true)
+  createdAt    DateTime   @default(now()) @db.Timestamptz
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// --- USERS ---
+model User {
+  id                   String    @id @default(uuid()) @db.Uuid
+  email                String    @unique
+  phone                String?   @unique
+  passwordHash         String
+  role                 UserRole  @default(PATIENT)
+  status               UserStatus @default(PENDING_VERIFICATION)
+  emailVerified        Boolean   @default(false)
+  phoneVerified        Boolean   @default(false)
+  twoFactorEnabled     Boolean   @default(false)
+  twoFactorSecret      String?
+  lastLoginAt          DateTime? @db.Timestamptz
+  lastLoginIp          String?
+  failedLoginAttempts  Int       @default(0)
+  lockedUntil          DateTime? @db.Timestamptz
+  passwordChangedAt    DateTime? @db.Timestamptz
+  preferredLanguage    String    @default("ar")
+  timezone             String    @default("Asia/Riyadh")
+  isActive             Boolean   @default(true)
+  createdBy            String?   @db.Uuid
+  updatedBy            String?   @db.Uuid
+  createdAt            DateTime  @default(now()) @db.Timestamptz
+  updatedAt            DateTime  @updatedAt @db.Timestamptz
+  deletedAt            DateTime? @db.Timestamptz
+
+  profile              UserProfile?
+  refreshToken         RefreshToken[]
+  sessions             Session[]
+  loginHistory         LoginHistory[]
+  roleRelation         Role?        @relation(fields: [roleId], references: [id])
+  roleId               String?      @db.Uuid
+  doctorProfile        DoctorProfile?
+  employeeProfile      EmployeeProfile?
+  phlebotomistProfile  PhlebotomistProfile?
+  ownedOrders          Order[]          @relation("OrderedBy")
+  reviewedReports      Report[]         @relation("ReviewedBy")
+  verifiedResults      Report[]         @relation("VerifiedBy")
+  auditLogs            AuditLog[]
+  activityLogs         ActivityLog[]
+  notifications        Notification[]
+  sentSmsLogs          SmsLog[]         @relation("SentBySms")
+  sentEmailLogs        EmailLog[]       @relation("SentByEmail")
+  sentWhatsAppLogs     WhatsAppLog[]    @relation("SentByWhatsApp")
+  apiKeys              ApiKey[]
+  managedBranches      Branch[]         @relation("BranchManager")
+  assignedAppointments Appointment[]    @relation("AssignedPhlebotomist")
+  queueServicePoints   QueueServicePoint[]
+  createdEntities      SystemLog[]      @relation("SystemLogCreatedBy")
+  patient              Patient?
+
+  @@index([email])
+  @@index([phone])
+  @@index([role, status])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  ip        String?
+  isActive  Boolean  @default(true)
+  expiresAt DateTime @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model UserProfile {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @unique @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstNameAr String
+  lastNameAr  String
+  firstNameEn String?
+  lastNameEn  String?
+  dateOfBirth DateTime? @db.Date
+  gender      Gender?
+  nationality String?
+  nationalId  String?   @unique
+  avatar      String?
+  address     String?
+  city        String?
+  region      String?
+  country     String    @default("SA")
+  bio         String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+
+  @@index([nationalId])
+  @@map("user_profiles")
+}
+
+// ============================================================================
+// SECTION 2: SESSIONS, DEVICES & LOGIN TRACKING
+// ============================================================================
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  ipAddress    String?
+  userAgent    String?
+  deviceInfo   Json?
+  location     String?
+  isActive     Boolean  @default(true)
+  lastActivityAt DateTime @db.Timestamptz
+  expiresAt    DateTime @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([token])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Device {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  name         String   // e.g., "iPhone 15 Pro"
+  type         String   // mobile, desktop, tablet
+  os           String?  // iOS, Android, Windows, macOS
+  browser      String?
+  fingerprint  String?  @unique
+  isTrusted    Boolean  @default(false)
+  lastUsedAt   DateTime? @db.Timestamptz
+  createdAt    DateTime  @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([fingerprint])
+  @@map("devices")
+}
+
+model LoginHistory {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress    String?
+  userAgent    String?
+  deviceType   String?
+  location     String?
+  success      Boolean
+  failureReason String?
+  createdAt    DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([success])
+  @@index([createdAt])
+  @@map("login_history")
+}
+
+// ============================================================================
+// SECTION 3: PATIENTS & FAMILY MEMBERS
+// ============================================================================
+
+model Patient {
+  id                String    @id @default(uuid()) @db.Uuid
+  patientNumber     String    @unique // Sequential: P-2024000001
+  userId            String?   @unique @db.Uuid
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  firstNameAr       String
+  lastNameAr        String
+  firstNameEn       String?
+  lastNameEn        String?
+  dateOfBirth       DateTime  @db.Date
+  gender            Gender
+  phone             String
+  email             String?
+  nationalId        String?   @unique
+  passportNumber    String?
+  nationality       String?
+  bloodType         BloodType?
+  allergies         String?
+  chronicDiseases   String?
+  medicalNotes      String?
+  guardianName      String?
+  guardianPhone     String?
+  guardianRelation  String?
+  referralSource    String?   // walk-in, online, doctor-referral, corporate
+  isActive          Boolean   @default(true)
+  isVip             Boolean   @default(false)
+  vipTier           String?   // silver, gold, platinum, diamond
+  totalVisits       Int       @default(0)
+  lastVisitAt       DateTime? @db.Timestamptz
+  createdBy         String?   @db.Uuid
+  updatedBy         String?   @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamptz
+  updatedAt         DateTime  @updatedAt @db.Timestamptz
+  deletedAt         DateTime? @db.Timestamptz
+
+  // Relations
+  orders            Order[]
+  reports           Report[]
+  appointments      Appointment[]
+  invoices          Invoice[]
+  medicalHistory    MedicalHistory[]
+  familyMembers     Patient[]          @relation("PatientFamily")
+  parentPatient     Patient?           @relation("PatientFamily", fields: [parentPatientId], references: [id])
+  parentPatientId   String?            @db.Uuid
+  insurancePolicies InsurancePolicy[]
+  queueEntries      QueueEntry[]
+  homeVisits        HomeVisitRequest[]
+  emergencyCases    EmergencyCase[]
+  transfers         BranchTransfer[]
+  supportTickets    SupportTicket[]
+  barcodeJobs       BarcodePrintJob[]
+  notifications     Notification[]
+  insuranceVerifications InsuranceVerification[]
+  vipMember         VipMember?
+
+  @@index([patientNumber])
+  @@index([nationalId])
+  @@index([phone])
+  @@index([email])
+  @@index([dateOfBirth])
+  @@index([gender])
+  @@index([isActive, deletedAt])
+  @@index([parentPatientId])
+  @@index([createdAt])
+  @@index([lastVisitAt])
+  @@map("patients")
+}
+
+// ============================================================================
+// SECTION 4: DOCTORS, EMPLOYEES & STAFF
+// ============================================================================
+
+model DoctorProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber     String   @unique
+  specialtyAr       String
+  specialtyEn       String?
+  departmentId      String?  @db.Uuid
+  department        Department? @relation(fields: [departmentId], references: [id])
+  subSpecialty      String?
+  consultationFee   Float?
+  experience        Int?     // years
+  education         String?
+  certifications    String?
+  bio               String?
+  rating            Float    @default(0)
+  totalRatings      Int      @default(0)
+  consultationDuration Int  @default(15) // minutes
+  acceptingPatients Boolean  @default(true)
+  isConsultant      Boolean  @default(false)
+  createdAt         DateTime @default(now()) @db.Timestamptz
+  updatedAt         DateTime @updatedAt @db.Timestamptz
+
+  schedule          DoctorSchedule[]
+  appointments      Appointment[]
+  issuedOrders      Order[]       @relation("IssuedByDoctor")
+
+  @@index([licenseNumber])
+  @@index([departmentId])
+  @@index([specialtyAr])
+  @@index([acceptingPatients])
+  @@map("doctor_profiles")
+}
+
+model DoctorSchedule {
+  id            String   @id @default(uuid()) @db.Uuid
+  doctorId      String   @db.Uuid
+  doctor        DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  branchId      String   @db.Uuid
+  branch        Branch   @relation(fields: [branchId], references: [id])
+  dayOfWeek     Int      // 0=Sunday, 6=Saturday
+  startTime     String   // "09:00"
+  endTime       String   // "17:00"
+  slotDuration  Int      @default(15) // minutes
+  maxPatients   Int      @default(20)
+  isAvailable   Boolean  @default(true)
+  breakStart    String?
+  breakEnd      String?
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+
+  @@unique([doctorId, branchId, dayOfWeek])
+  @@index([doctorId])
+  @@index([branchId, dayOfWeek])
+  @@map("doctor_schedules")
+}
+
+model EmployeeProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeNumber  String   @unique
+  departmentId    String?  @db.Uuid
+  department      Department? @relation(fields: [departmentId], references: [id])
+  branchId        String?  @db.Uuid
+  branch          Branch?  @relation(fields: [branchId], references: [id])
+  positionAr      String
+  positionEn      String?
+  hireDate        DateTime @db.Date
+  contractType    String   @default("full_time") // full_time, part_time, contract
+  salary          Float?
+  bankAccount     String?
+  gosiNumber      String?
+  emergencyContact String?
+  emergencyPhone  String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  payrollEntries  PayrollEntry[]
+
+  @@index([employeeNumber])
+  @@index([departmentId])
+  @@index([branchId])
+  @@index([isActive])
+  @@map("employee_profiles")
+}
+
+model PhlebotomistProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certification   String?
+  maxDailyVisits  Int      @default(10)
+  currentDailyCount Int    @default(0)
+  assignedBranchId String? @db.Uuid
+  assignedBranch  Branch?  @relation(fields: [assignedBranchId], references: [id])
+  isAvailable     Boolean  @default(true)
+  rating          Float    @default(0)
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  homeVisits      HomeVisitRequest[]
+
+  @@index([userId])
+  @@index([isAvailable])
+  @@map("phlebotomist_profiles")
+}
+
+// ============================================================================
+// SECTION 5: BRANCHES & DEPARTMENTS
+// ============================================================================
+
+model Branch {
+  id              String   @id @default(uuid()) @db.Uuid
+  nameAr          String
+  nameEn          String
+  code            String   @unique
+  phone           String
+  email           String?
+  addressAr       String
+  addressEn       String?
+  city            String
+  region          String
+  country         String   @default("SA")
+  latitude        Float?
+  longitude       Float?
+  timezone        String   @default("Asia/Riyadh")
+  operatingHours  Json?
+  maxCapacity     Int?
+  isActive        Boolean  @default(true)
+  managerId       String?  @db.Uuid
+  manager         User?    @relation("BranchManager", fields: [managerId], references: [id])
+  createdBy       String?  @db.Uuid
+  updatedBy       String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+  deletedAt       DateTime? @db.Timestamptz
+
+  orders          Order[]
+  appointments    Appointment[]
+  labTests        LabTest[]
+  queueSettings   QueueSettings?
+  queueEntries    QueueEntry[]
+  queueServicePoints QueueServicePoint[]
+  insuranceVerifications InsuranceVerification[]
+  transfersFrom   BranchTransfer[] @relation("TransferFrom")
+  transfersTo     BranchTransfer[] @relation("TransferTo")
+  homeVisits      HomeVisitRequest[]
+  emergencyCases  EmergencyCase[]
+  barcodeJobs     BarcodePrintJob[]
+  departments    Department[]
+  receptionLogs   ReceptionAuditLog[]
+  invoice         Invoice[]
+  doctorSchedules DoctorSchedule[]
+  employeeProfiles EmployeeProfile[]
+  phlebotomistProfiles PhlebotomistProfile[]
+  testBranchPricing TestBranchPricing[]
+
+  @@index([code])
+  @@index([city, region])
+  @@index([isActive, deletedAt])
+  @@index([managerId])
+  @@map("branches")
+}
+
+model Department {
+  id          String   @id @default(uuid()) @db.Uuid
+  nameAr      String
+  nameEn      String
+  code        String   @unique
+  description String?
+  headId      String?  @db.Uuid
+  branchId    String?  @db.Uuid
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  parentId    String?  @db.Uuid
+  parent      Department? @relation("DeptTree", fields: [parentId], references: [id])
+  children    Department[] @relation("DeptTree")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  budget      Float?
+  createdBy   String?  @db.Uuid
+  updatedBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  doctors     DoctorProfile[]
+  employees   EmployeeProfile[]
+  testCategories TestCategory[]
+
+  @@index([code])
+  @@index([branchId])
+  @@index([parentId])
+  @@index([isActive, deletedAt])
+  @@map("departments")
+}
+
+// ============================================================================
+// SECTION 6: LAB TESTS, CATEGORIES & PACKAGES
+// ============================================================================
+
+model TestCategory {
+  id              String   @id @default(uuid()) @db.Uuid
+  nameAr          String
+  nameEn          String
+  slug            String   @unique
+  descriptionAr   String?
+  descriptionEn   String?
+  icon            String?
+  color           String?
+  departmentId    String?  @db.Uuid
+  department      Department? @relation(fields: [departmentId], references: [id])
+  parentId        String?  @db.Uuid
+  parent          TestCategory? @relation("TestCategoryTree", fields: [parentId], references: [id])
+  children        TestCategory[] @relation("TestCategoryTree")
+  sortOrder       Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdBy       String?  @db.Uuid
+  updatedBy       String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+  deletedAt       DateTime? @db.Timestamptz
+
+  subcategories   TestSubcategory[]
+  labTests        LabTest[]
+  testPackages    TestPackage[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@index([isActive, deletedAt])
+  @@map("test_categories")
+}
+
+model TestSubcategory {
+  id          String       @id @default(uuid()) @db.Uuid
+  categoryId  String       @db.Uuid
+  category    TestCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  nameAr      String
+  nameEn      String
+  slug        String       @unique
+  sortOrder   Int          @default(0)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now()) @db.Timestamptz
+  updatedAt   DateTime     @updatedAt @db.Timestamptz
+  deletedAt   DateTime?    @db.Timestamptz
+
+  labTests    LabTest[]
+
+  @@index([categoryId])
+  @@index([isActive, deletedAt])
+  @@map("test_subcategories")
+}
+
+model LabTest {
+  id                  String          @id @default(uuid()) @db.Uuid
+  nameAr              String
+  nameEn              String
+  code                String          @unique
+  categoryId          String          @db.Uuid
+  category            TestCategory    @relation(fields: [categoryId], references: [id])
+  subcategoryId       String?         @db.Uuid
+  subcategory         TestSubcategory? @relation(fields: [subcategoryId], references: [id])
+  descriptionAr       String?
+  descriptionEn       String?
+  shortInfoAr         String?
+  shortInfoEn         String?
+  sampleType          String
+  tubeType            String?
+  tubeColor           String?
+  fastingRequired     Boolean         @default(false)
+  fastingHours        Int?
+  turnaroundTimeHours Int             @default(24)
+  price               Float
+  discountedPrice     Float?
+  currency            String          @default("SAR")
+  referenceRange      Json?           // {male: {low, high}, female: {low, high}}
+  units               String?
+  methodology         String?
+  homeCollection      Boolean         @default(true)
+  popular             Boolean         @default(false)
+  featured            Boolean         @default(false)
+  sortOrder           Int             @default(0)
+  isActive            Boolean         @default(true)
+  preparationNotesAr  String?
+  preparationNotesEn  String?
+  clinicalSignificance String?
+  metadata            Json?
+  createdBy           String?         @db.Uuid
+  updatedBy           String?         @db.Uuid
+  createdAt           DateTime        @default(now()) @db.Timestamptz
+  updatedAt           DateTime        @updatedAt @db.Timestamptz
+  deletedAt           DateTime?       @db.Timestamptz
+
+  branchId            String?         @db.Uuid
+  branch              Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  orderItems          OrderItem[]
+  reportItems         ReportItem[]
+  samples             Sample[]
+  branchPricing       TestBranchPricing[]
+  packageItems        TestPackageItem[]
+
+  @@index([code])
+  @@index([categoryId, isActive])
+  @@index([popular, featured])
+  @@index([sampleType])
+  @@index([isActive, deletedAt])
+  @@index([nameAr])
+  @@index([nameEn])
+  @@map("lab_tests")
+}
+
+model TestBranchPricing {
+  id              String   @id @default(uuid()) @db.Uuid
+  labTestId       String   @db.Uuid
+  labTest         LabTest  @relation(fields: [labTestId], references: [id], onDelete: Cascade)
+  branchId        String   @db.Uuid
+  branch          Branch   @relation(fields: [branchId], references: [id])
+  price           Float
+  discountedPrice Float?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  @@unique([labTestId, branchId])
+  @@index([branchId])
+  @@map("test_branch_pricing")
+}
+
+model TestPackage {
+  id            String           @id @default(uuid()) @db.Uuid
+  nameAr        String
+  nameEn        String
+  descriptionAr String?
+  descriptionEn String?
+  categoryId    String?          @db.Uuid
+  category      TestCategory?    @relation(fields: [categoryId], references: [id])
+  originalPrice Float
+  packagePrice  Float
+  discount      Float            @default(0)
+  discountType  String           @default("percentage") // percentage, fixed
+  isPopular     Boolean          @default(false)
+  isActive      Boolean          @default(true)
+  usageCount    Int              @default(0)
+  createdBy     String?          @db.Uuid
+  updatedBy     String?          @db.Uuid
+  createdAt     DateTime         @default(now()) @db.Timestamptz
+  updatedAt     DateTime         @updatedAt @db.Timestamptz
+  deletedAt     DateTime?        @db.Timestamptz
+
+  items         TestPackageItem[]
+  orderItems    OrderItem[]
+
+  @@index([isActive, deletedAt])
+  @@index([isPopular])
+  @@map("test_packages")
+}
+
+model TestPackageItem {
+  id          String      @id @default(uuid()) @db.Uuid
+  packageId   String      @db.Uuid
+  package     TestPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  labTestId   String      @db.Uuid
+  labTest     LabTest     @relation(fields: [labTestId], references: [id])
+  quantity    Int         @default(1)
+  createdAt   DateTime    @default(now()) @db.Timestamptz
+
+  @@unique([packageId, labTestId])
+  @@index([packageId])
+  @@map("test_package_items")
+}
+
+// ============================================================================
+// SECTION 7: ORDERS, SAMPLES & RESULTS
+// ============================================================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SAMPLE_COLLECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum CollectionType {
+  HOME_VISIT
+  BRANCH_WALK_IN
+  BRANCH_APPOINTMENT
+}
+
+enum OrderPriority {
+  NORMAL
+  URGENT
+  STAT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  REFUNDED
+  FAILED
+  INSURANCE_PENDING
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  MADA
+  STC_PAY
+  APPLE_PAY
+  GOOGLE_PAY
+  TABBY
+  TAMARA
+  CASH
+  INSURANCE
+  BANK_TRANSFER
+  WALLET
+}
+
+enum SampleStatus {
+  PENDING
+  COLLECTED
+  IN_TRANSIT
+  RECEIVED
+  ACCEPTED
+  REJECTED
+  PROCESSING
+  COMPLETED
+}
+
+model Order {
+  id                    String          @id @default(uuid()) @db.Uuid
+  orderNumber           String          @unique // ORD-2024000001
+  patientId             String          @db.Uuid
+  patient               Patient         @relation(fields: [patientId], references: [id])
+  doctorId              String?         @db.Uuid
+  doctor                User?           @relation("OrderedBy", fields: [doctorId], references: [id])
+  issuedById            String?         @db.Uuid
+  issuedByDoctor        DoctorProfile?  @relation("IssuedByDoctor", fields: [issuedById], references: [id], onDelete: SetNull)
+  branchId              String?         @db.Uuid
+  branch                Branch?         @relation(fields: [branchId], references: [id])
+  status                OrderStatus     @default(PENDING)
+  collectionType        CollectionType  @default(BRANCH_WALK_IN)
+  collectionDate        DateTime?       @db.Timestamptz
+  collectionAddress     String?
+  collectionLat         Float?
+  collectionLng         Float?
+  priority              OrderPriority   @default(NORMAL)
+  subtotal              Float
+  discount              Float           @default(0)
+  discountType          String?         // percentage, fixed
+  couponId              String?         @db.Uuid
+  coupon                Coupon?         @relation(fields: [couponId], references: [id])
+  tax                   Float           @default(0)
+  taxRate               Float           @default(15) // ZATCA VAT
+  total                 Float
+  currency              String          @default("SAR")
+  paymentStatus         PaymentStatus   @default(PENDING)
+  paymentMethod         PaymentMethod?
+  paymentReference      String?
+  insuranceClaim        Boolean         @default(false)
+  insuranceProvider     String?
+  insuranceNumber       String?
+  insuranceApprovalCode String?
+  insuranceCoverage     Float?
+  notes                 String?
+  cancelReason          String?
+  cancelReasonAr        String?
+  completedAt           DateTime?       @db.Timestamptz
+  createdBy             String?         @db.Uuid
+  updatedBy             String?         @db.Uuid
+  createdAt             DateTime        @default(now()) @db.Timestamptz
+  updatedAt             DateTime        @updatedAt @db.Timestamptz
+  deletedAt             DateTime?       @db.Timestamptz
+
+  items                 OrderItem[]
+  samples               Sample[]
+  reports               Report[]
+  appointment           Appointment?
+  invoice               Invoice?
+  refund                Refund?
+  barcodeJobs           BarcodePrintJob[]
+  notifications         Notification[]
+
+  @@index([orderNumber])
+  @@index([patientId, createdAt(sort: Desc)])
+  @@index([status])
+  @@index([branchId, status])
+  @@index([paymentStatus])
+  @@index([doctorId])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@index([priority])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  orderId     String   @db.Uuid
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  labTestId   String?  @db.Uuid
+  labTest     LabTest? @relation(fields: [labTestId], references: [id])
+  packageId   String?  @db.Uuid
+  package     TestPackage? @relation(fields: [packageId], references: [id])
+  name        String   // Denormalized for fast display
+  price       Float
+  quantity    Int      @default(1)
+  discount    Float    @default(0)
+  total       Float
+  notes       String?
+
+  @@index([orderId])
+  @@index([labTestId])
+  @@map("order_items")
+}
+
+model Sample {
+  id              String       @id @default(uuid()) @db.Uuid
+  sampleCode      String       @unique // S-2024000001
+  orderId         String       @db.Uuid
+  order           Order        @relation(fields: [orderId], references: [id])
+  labTestId       String       @db.Uuid
+  labTest         LabTest      @relation(fields: [labTestId], references: [id])
+  sampleType      String
+  tubeType        String?
+  tubeColor       String?
+  quantity        Int          @default(1)
+  status          SampleStatus @default(PENDING)
+  collectedAt     DateTime?    @db.Timestamptz
+  collectedById   String?      @db.Uuid
+  receivedAt      DateTime?    @db.Timestamptz
+  receivedById    String?      @db.Uuid
+  rejectedAt      DateTime?    @db.Timestamptz
+  rejectionReason String?
+  temperature     Float?
+  notes           String?
+  qrCode          String?
+  barcode         String?
+  location        String?       // Physical storage location
+  expiresAt       DateTime?     @db.Timestamptz
+  createdBy       String?       @db.Uuid
+  updatedBy       String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @db.Timestamptz
+
+  trackingEvents  SampleTrackingEvent[]
+
+  @@index([sampleCode])
+  @@index([orderId])
+  @@index([status])
+  @@index([collectedAt])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("samples")
+}
+
+model SampleTrackingEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  sampleId    String   @db.Uuid
+  sample      Sample   @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  status      String   // From SampleStatus enum
+  location    String?
+  temperature Float?
+  notes       String?
+  performedById String? @db.Uuid
+  performedAt DateTime @default(now()) @db.Timestamptz
+  ipAddress   String?
+
+  @@index([sampleId, performedAt])
+  @@index([performedAt])
+  @@map("sample_tracking_events")
+}
+
+enum ReportStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  RELEASED
+  AMENDED
+  CANCELLED
+}
+
+model Report {
+  id              String        @id @default(uuid()) @db.Uuid
+  reportNumber    String        @unique // RPT-2024000001
+  orderId         String        @db.Uuid
+  order           Order         @relation(fields: [orderId], references: [id])
+  patientId       String        @db.Uuid
+  patient         Patient       @relation(fields: [patientId], references: [id])
+  reviewedById    String?       @db.Uuid
+  reviewer        User?         @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  approvedById    String?       @db.Uuid
+  status          ReportStatus  @default(DRAFT)
+  summary         String?
+  conclusions     String?
+  recommendations String?
+  aiInsight       Json?
+  aiConfidence    Float?
+  pdfUrl          String?
+  pdfSize         Int?
+  digitalSignature String?
+  signatureAlgorithm String?
+  verifiedById    String?       @db.Uuid
+  verifiedBy      User?         @relation("VerifiedBy", fields: [verifiedById], references: [id], onDelete: SetNull)
+  verifiedAt      DateTime?     @db.Timestamptz
+  releasedAt      DateTime?     @db.Timestamptz
+  amendedAt       DateTime?     @db.Timestamptz
+  amendReason     String?
+  version         Int           @default(1)
+  isCritical      Boolean       @default(false)
+  viewCount       Int           @default(0)
+  downloadCount   Int           @default(0)
+  createdBy       String?       @db.Uuid
+  updatedBy       String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @db.Timestamptz
+  deletedAt       DateTime?     @db.Timestamptz
+
+  items           ReportItem[]
+  attachments     ResultAttachment[]
+
+  @@index([reportNumber])
+  @@index([patientId, createdAt(sort: Desc)])
+  @@index([orderId])
+  @@index([status])
+  @@index([reviewedById])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@index([releasedAt])
+  @@map("reports")
+}
+
+model ReportItem {
+  id                  String   @id @default(uuid()) @db.Uuid
+  reportId            String   @db.Uuid
+  report              Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  labTestId           String   @db.Uuid
+  labTest             LabTest  @relation(fields: [labTestId], references: [id])
+  value               String?
+  numericValue        Float?
+  unit                String?
+  referenceRangeLow   Float?
+  referenceRangeHigh  Float?
+  referenceRangeText  String?
+  isAbnormal          Boolean  @default(false)
+  abnormalityType     String?  // high, low, critical_high, critical_low
+  flags               String?  // H, L, HH, LL
+  methodology         String?
+  notes               String?
+  displayOrder        Int      @default(0)
+
+  @@index([reportId])
+  @@index([labTestId])
+  @@map("report_items")
+}
+
+model ResultAttachment {
+  id          String   @id @default(uuid()) @db.Uuid
+  reportId    String   @db.Uuid
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fileName    String
+  fileUrl     String
+  fileType    String   // image/png, application/pdf
+  fileSize    Int
+  description String?
+  uploadedBy  String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([reportId])
+  @@map("result_attachments")
+}
+
+// ============================================================================
+// SECTION 8: APPOINTMENTS & QUEUE MANAGEMENT
+// ============================================================================
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+model Appointment {
+  id              String            @id @default(uuid()) @db.Uuid
+  patientId       String            @db.Uuid
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  branchId        String            @db.Uuid
+  branch          Branch            @relation(fields: [branchId], references: [id])
+  orderId         String?           @unique @db.Uuid
+  order           Order?            @relation(fields: [orderId], references: [id])
+  doctorId        String?           @db.Uuid
+  doctorProfile   DoctorProfile?    @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  phlebotomistId  String?           @db.Uuid
+  phlebotomist    User?             @relation("AssignedPhlebotomist", fields: [phlebotomistId], references: [id])
+  scheduledAt     DateTime          @db.Timestamptz
+  durationMinutes Int               @default(15)
+  status          AppointmentStatus @default(SCHEDULED)
+  type            String            @default("LAB_TEST")
+  notes           String?
+  cancelReason    String?
+  reminderSent    Boolean           @default(false)
+  reminderSentAt  DateTime?         @db.Timestamptz
+  checkedInAt     DateTime?         @db.Timestamptz
+  completedAt     DateTime?         @db.Timestamptz
+  noShowAt        DateTime?         @db.Timestamptz
+  createdBy       String?           @db.Uuid
+  updatedBy       String?           @db.Uuid
+  createdAt       DateTime          @default(now()) @db.Timestamptz
+  updatedAt       DateTime          @updatedAt @db.Timestamptz
+  deletedAt       DateTime?         @db.Timestamptz
+
+  @@index([branchId, scheduledAt])
+  @@index([patientId, scheduledAt(sort: Desc)])
+  @@index([status])
+  @@index([phlebotomistId, scheduledAt])
+  @@index([scheduledAt])
+  @@index([deletedAt])
+  @@index([branchId, status, scheduledAt])
+  @@map("appointments")
+}
+
+// --- Queue Management (from reception-schema, adapted for Prisma) ---
+
+enum QueueServiceType {
+  WALK_IN
+  APPOINTMENT
+  HOME_VISIT
+  CONSULTATION
+}
+
+enum QueuePriority {
+  NORMAL
+  PRIORITY
+  VIP
+  EMERGENCY
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  SERVING
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+  TRANSFERRED
+}
+
+enum ServicePointType {
+  COUNTER
+  DESK
+  VIP
+  EMERGENCY
+  CONSULTATION
+}
+
+enum ServicePointStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+model QueueSettings {
+  id                  String   @id @default(uuid()) @db.Uuid
+  branchId            String   @unique @db.Uuid
+  branch              Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  maxWaitTargetMinutes Int     @default(30)
+  autoAssignEnabled   Boolean  @default(true)
+  priorityBoostMinutes Int     @default(10)
+  vipMaxWaitMinutes   Int      @default(5)
+  emergencyOverride   Boolean  @default(true)
+  announceOnScreen    Boolean  @default(true)
+  announceAudio       Boolean  @default(true)
+  ticketPrinterEnabled Boolean @default(true)
+  operatingHours      Json?
+  createdBy           String?  @db.Uuid
+  updatedBy           String?  @db.Uuid
+  createdAt           DateTime @default(now()) @db.Timestamptz
+  updatedAt           DateTime @updatedAt @db.Timestamptz
+
+  @@map("queue_settings")
+}
+
+model QueueServicePoint {
+  id                String            @id @default(uuid()) @db.Uuid
+  branchId          String            @db.Uuid
+  branch            Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name              String
+  type              ServicePointType  @default(COUNTER)
+  status            ServicePointStatus @default(ACTIVE)
+  currentEntryId    String?           @unique @db.Uuid
+  currentEntry      QueueEntry?       @relation(fields: [currentEntryId], references: [id], onDelete: SetNull)
+  assignedUserId    String?           @db.Uuid
+  assignedUser      User?             @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+  maxConcurrent     Int               @default(1)
+  averageServiceMinutes Int           @default(15)
+  createdBy         String?           @db.Uuid
+  updatedBy         String?           @db.Uuid
+  createdAt         DateTime          @default(now()) @db.Timestamptz
+  updatedAt         DateTime          @updatedAt @db.Timestamptz
+
+  @@index([branchId, status])
+  @@index([assignedUserId])
+  @@map("queue_service_points")
+}
+
+model QueueEntry {
+  id                  String          @id @default(uuid()) @db.Uuid
+  ticketNumber        String          @unique // Q-001, O-001, P-001, V-001, E-001
+  branchId            String          @db.Uuid
+  branch              Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  patientId           String?         @db.Uuid
+  patient             Patient?        @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  patientName         String
+  patientPhone        String?
+  patientNationalId   String?
+  serviceType         QueueServiceType @default(WALK_IN)
+  priority            QueuePriority   @default(NORMAL)
+  status              QueueStatus     @default(WAITING)
+  servicePoint        String?
+  phlebotomistId      String?         @db.Uuid
+  calledAt            DateTime?       @db.Timestamptz
+  startedServingAt    DateTime?       @db.Timestamptz
+  completedAt         DateTime?       @db.Timestamptz
+  estimatedWaitMinutes Int?
+  actualWaitMinutes   Int?
+  notes               String?
+  createdBy           String?         @db.Uuid
+  updatedBy           String?         @db.Uuid
+  createdAt           DateTime        @default(now()) @db.Timestamptz
+  updatedAt           DateTime        @updatedAt @db.Timestamptz
+
+  servicePointEntry   QueueServicePoint?
+
+  @@index([branchId, status])
+  @@index([branchId, createdAt(sort: Desc)])
+  @@index([patientId])
+  @@index([priority, createdAt])
+  @@index([status, branchId, priority])
+  @@index([ticketNumber])
+  @@map("queue_entries")
+}
+
+model QueueHistory {
+  id              String   @id @default(uuid()) @db.Uuid
+  queueEntryId    String   @db.Uuid
+  fromStatus      String
+  toStatus        String
+  servicePoint    String?
+  performedById   String?  @db.Uuid
+  notes           String?
+  durationSeconds Int?
+  createdAt       DateTime @default(now()) @db.Timestamptz
+
+  @@index([queueEntryId, createdAt])
+  @@index([createdAt])
+  @@map("queue_history")
+}
+
+// ============================================================================
+// SECTION 9: INSURANCE
+// ============================================================================
+
+model InsuranceCompany {
+  id                String   @id @default(uuid()) @db.Uuid
+  nameAr            String
+  nameEn            String
+  code              String   @unique
+  contactPhone      String
+  contactEmail      String?
+  claimsEmail       String?
+  website           String?
+  totalPatients     Int      @default(0)
+  totalClaims       Int      @default(0)
+  approvedClaims    Int      @default(0)
+  rejectedClaims    Int      @default(0)
+  avgProcessingDays Int      @default(7)
+  isActive          Boolean  @default(true)
+  createdBy         String?  @db.Uuid
+  updatedBy         String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz
+  updatedAt         DateTime @updatedAt @db.Timestamptz
+  deletedAt         DateTime? @db.Timestamptz
+
+  policies          InsurancePolicy[]
+  verifications     InsuranceVerification[]
+  claims            InsuranceClaim[]
+
+  @@index([code])
+  @@index([isActive, deletedAt])
+  @@map("insurance_companies")
+}
+
+model InsurancePolicy {
+  id                String            @id @default(uuid()) @db.Uuid
+  patientId         String            @db.Uuid
+  patient           Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  insuranceCompanyId String           @db.Uuid
+  insuranceCompany  InsuranceCompany  @relation(fields: [insuranceCompanyId], references: [id])
+  policyNumber      String
+  cardNumber        String?
+  groupNumber       String?
+  planType          String?
+  coveragePercentage Float           @default(80)
+  maxCoverage       Float?
+  deductible        Float?            @default(0)
+  startDate         DateTime          @db.Date
+  endDate           DateTime          @db.Date
+  isActive          Boolean           @default(true)
+  isPrimary         Boolean           @default(true)
+  dependents        Json?             // {spouse, children: [...]}
+  notes             String?
+  createdBy         String?           @db.Uuid
+  updatedBy         String?           @db.Uuid
+  createdAt         DateTime          @default(now()) @db.Timestamptz
+  updatedAt         DateTime          @updatedAt @db.Timestamptz
+  deletedAt         DateTime?         @db.Timestamptz
+
+  verifications     InsuranceVerification[]
+  claims            InsuranceClaim[]
+
+  @@index([patientId])
+  @@index([insuranceCompanyId])
+  @@index([policyNumber])
+  @@index([isActive, endDate])
+  @@map("insurance_policies")
+}
+
+enum InsuranceVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+  PARTIAL
+}
+
+model InsuranceVerification {
+  id                  String                    @id @default(uuid()) @db.Uuid
+  verificationNumber  String                    @unique
+  branchId            String                    @db.Uuid
+  branch              Branch                    @relation(fields: [branchId], references: [id])
+  patientId           String                    @db.Uuid
+  patient             Patient                   @relation(fields: [patientId], references: [id])
+  policyId            String?                   @db.Uuid
+  policy              InsurancePolicy?          @relation(fields: [policyId], references: [id])
+  insuranceCompanyId  String?                   @db.Uuid
+  insuranceCompany    InsuranceCompany?         @relation(fields: [insuranceCompanyId], references: [id])
+  insuranceNumber     String
+  verificationStatus  InsuranceVerificationStatus @default(PENDING)
+  coveragePercentage  Float?
+  coveredAmount       Float?
+  totalAmount         Float?
+  approvalCode        String?
+  rejectionReason     String?
+  verifiedAt          DateTime?                 @db.Timestamptz
+  verifiedById        String?                   @db.Uuid
+  apiResponse         Json?
+  notes               String?
+  createdBy           String?                   @db.Uuid
+  updatedBy           String?                   @db.Uuid
+  createdAt           DateTime                  @default(now()) @db.Timestamptz
+  updatedAt           DateTime                  @updatedAt @db.Timestamptz
+
+  @@index([branchId, createdAt(sort: Desc)])
+  @@index([patientId])
+  @@index([insuranceCompanyId])
+  @@index([verificationStatus])
+  @@index([verificationNumber])
+  @@map("insurance_verifications")
+}
+
+enum InsuranceClaimStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  PARTIALLY_APPROVED
+  REJECTED
+  APPEALED
+  PAID
+  CLOSED
+}
+
+model InsuranceClaim {
+  id                String                @id @default(uuid()) @db.Uuid
+  claimNumber       String                @unique
+  patientId         String                @db.Uuid
+  policyId          String                @db.Uuid
+  policy            InsurancePolicy       @relation(fields: [policyId], references: [id])
+  insuranceCompanyId String               @db.Uuid
+  insuranceCompany  InsuranceCompany      @relation(fields: [insuranceCompanyId], references: [id])
+  orderId           String?               @db.Uuid
+  invoiceId         String?               @db.Uuid
+  status            InsuranceClaimStatus  @default(DRAFT)
+  submittedAmount   Float
+  approvedAmount    Float?
+  rejectedAmount    Float?
+  rejectionReason   String?
+  diagnosisCode     String?               // ICD-10
+  diagnosisCodeAr   String?
+  submittedAt       DateTime?             @db.Timestamptz
+  reviewedAt        DateTime?             @db.Timestamptz
+  paidAt            DateTime?             @db.Timestamptz
+  documents         Json?
+  notes             String?
+  createdBy         String?               @db.Uuid
+  updatedBy         String?               @db.Uuid
+  createdAt         DateTime              @default(now()) @db.Timestamptz
+  updatedAt         DateTime              @updatedAt @db.Timestamptz
+  deletedAt         DateTime?             @db.Timestamptz
+
+  @@index([claimNumber])
+  @@index([patientId])
+  @@index([policyId])
+  @@index([insuranceCompanyId])
+  @@index([status])
+  @@index([submittedAt])
+  @@index([createdAt])
+  @@map("insurance_claims")
+}
+
+// ============================================================================
+// SECTION 10: BILLING, INVOICES, PAYMENTS & REFUNDS
+// ============================================================================
+
+model Invoice {
+  id              String        @id @default(uuid()) @db.Uuid
+  invoiceNumber   String        @unique // INV-2024000001
+  orderId         String        @unique @db.Uuid
+  order           Order         @relation(fields: [orderId], references: [id])
+  patientId       String        @db.Uuid
+  patient         Patient       @relation(fields: [patientId], references: [id])
+  branchId        String?       @db.Uuid
+  branch          Branch?       @relation(fields: [branchId], references: [id])
+  subtotal        Float
+  discount        Float         @default(0)
+  tax             Float         @default(0)
+  taxRate         Float         @default(15)
+  total           Float
+  paidAmount      Float         @default(0)
+  balanceDue      Float         @default(0)
+  currency        String        @default("SAR")
+  status          PaymentStatus @default(PENDING)
+  dueDate         DateTime?     @db.Date
+  paidAt          DateTime?     @db.Timestamptz
+  notes           String?
+  zatcaQrCode     String?       // ZATCA compliant QR
+  zatcaUuid       String?
+  createdBy       String?       @db.Uuid
+  updatedBy       String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @db.Timestamptz
+  deletedAt       DateTime?     @db.Timestamptz
+
+  payments        Payment[]
+  refund          Refund?
+
+  @@index([invoiceNumber])
+  @@index([patientId, createdAt(sort: Desc)])
+  @@index([status])
+  @@index([branchId])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@map("invoices")
+}
+
+model Payment {
+  id              String        @id @default(uuid()) @db.Uuid
+  paymentNumber   String        @unique // PAY-2024000001
+  invoiceId       String        @db.Uuid
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id])
+  amount          Float
+  currency        String        @default("SAR")
+  method          PaymentMethod
+  transactionId   String?       // Gateway transaction ID
+  gatewayResponse Json?
+  status          PaymentStatus @default(PENDING)
+  paidAt          DateTime?     @db.Timestamptz
+  receiptUrl      String?
+  cardLast4       String?
+  cardBrand       String?
+  bankReference   String?
+  notes           String?
+  createdBy       String?       @db.Uuid
+  updatedBy       String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @db.Timestamptz
+
+  @@index([invoiceId])
+  @@index([transactionId])
+  @@index([paymentNumber])
+  @@index([status])
+  @@index([method])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model Refund {
+  id              String        @id @default(uuid()) @db.Uuid
+  refundNumber    String        @unique // REF-2024000001
+  invoiceId       String        @unique @db.Uuid
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id])
+  orderId         String?       @unique @db.Uuid
+  order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  paymentId       String?       @db.Uuid
+  amount          Float
+  reason          String
+  reasonAr        String?
+  status          PaymentStatus @default(PENDING)
+  transactionId   String?       // Refund gateway transaction
+  gatewayResponse Json?
+  processedAt     DateTime?     @db.Timestamptz
+  approvedById    String?       @db.Uuid
+  notes           String?
+  createdBy       String?       @db.Uuid
+  updatedBy       String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @db.Timestamptz
+
+  @@index([refundNumber])
+  @@index([invoiceId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("refunds")
+}
+
+// ============================================================================
+// SECTION 11: MEDICAL HISTORY
+// ============================================================================
+
+model MedicalHistory {
+  id              String   @id @default(uuid()) @db.Uuid
+  patientId       String   @db.Uuid
+  patient         Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  category        String   // allergy, condition, surgery, medication, family
+  title           String
+  titleAr         String?
+  description     String?
+  diagnosisCode   String?  // ICD-10
+  severity        String?  // mild, moderate, severe
+  onsetDate       DateTime? @db.Date
+  resolvedDate    DateTime? @db.Date
+  isChronic       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  recordedById    String?  @db.Uuid
+  notes           String?
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  @@index([patientId, category])
+  @@index([patientId, isActive])
+  @@index([category])
+  @@map("medical_history")
+}
+
+// ============================================================================
+// SECTION 12: COUPONS & OFFERS
+// ============================================================================
+
+model Coupon {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  nameAr      String?
+  nameEn      String?
+  type        String   @default("percentage") // percentage, fixed
+  value       Float
+  minOrder    Float    @default(0)
+  maxDiscount Float?
+  maxUses     Int      @default(-1) // -1 = unlimited
+  usedCount   Int      @default(0)
+  validFrom   DateTime @db.Timestamptz
+  validTo     DateTime @db.Timestamptz
+  isActive    Boolean  @default(true)
+  applicableTo String  @default("all") // all, tests, packages, specific
+  applicableIds String[] // Specific test/package IDs
+  createdBy   String?  @db.Uuid
+  updatedBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  orders      Order[]
+
+  @@index([code])
+  @@index([isActive, validFrom, validTo])
+  @@index([validTo])
+  @@map("coupons")
+}
+
+// ============================================================================
+// SECTION 13: COMMUNICATIONS (Notifications, SMS, Email, WhatsApp)
+// ============================================================================
+
+enum NotificationType {
+  SMS
+  EMAIL
+  PUSH
+  IN_APP
+  WHATSAPP
+}
+
+enum NotificationChannel {
+  ORDER_CONFIRMED
+  SAMPLE_COLLECTED
+  RESULTS_READY
+  APPOINTMENT_REMINDER
+  APPOINTMENT_CONFIRMED
+  PAYMENT_RECEIVED
+  REPORT_RELEASED
+  SYSTEM_ANNOUNCEMENT
+  MARKETING
+  SECURITY
+}
+
+model Notification {
+  id          String              @id @default(uuid()) @db.Uuid
+  userId      String              @db.Uuid
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  channel     NotificationChannel
+  patientId   String?             @db.Uuid
+  patient     Patient?            @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  orderId     String?             @db.Uuid
+  order       Order?              @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  title       String
+  titleAr     String?
+  body        String
+  bodyAr      String?
+  data        Json?
+  read        Boolean             @default(false)
+  sentAt      DateTime?           @db.Timestamptz
+  deliveredAt DateTime?           @db.Timestamptz
+  readAt      DateTime?           @db.Timestamptz
+  expiresAt   DateTime?           @db.Timestamptz
+  createdAt   DateTime            @default(now()) @db.Timestamptz
+
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@index([userId, channel])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+model SmsLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  recipientNumber String
+  recipientName String?
+  message       String
+  messageAr     String?
+  templateId    String?
+  templateName  String?
+  variables     Json?
+  gatewayId     String?  // Provider message ID
+  gateway       String?  // twilio, unifonic, etc.
+  status        String   @default("queued") // queued, sent, delivered, failed
+  failureReason String?
+  cost          Float?
+  characterCount Int?
+  segmentCount  Int?
+  sentById      String?  @db.Uuid
+  sentBy        User?    @relation("SentBySms", fields: [sentById], references: [id])
+  sentAt        DateTime? @db.Timestamptz
+  deliveredAt   DateTime? @db.Timestamptz
+  failedAt      DateTime? @db.Timestamptz
+  createdAt     DateTime @default(now()) @db.Timestamptz
+
+  @@index([recipientNumber])
+  @@index([status])
+  @@index([sentAt])
+  @@index([createdAt])
+  @@map("sms_logs")
+}
+
+model EmailLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  recipientEmail String
+  recipientName String?
+  subject       String
+  subjectAr     String?
+  body          String
+  bodyAr        String?
+  templateId    String?
+  templateName  String?
+  variables     Json?
+  attachments   Json?    // [{name, url, size}]
+  gatewayId     String?
+  gateway       String?  // sendgrid, ses, etc.
+  status        String   @default("queued") // queued, sent, delivered, opened, clicked, bounced, failed
+  failureReason String?
+  cost          Float?
+  sentById      String?  @db.Uuid
+  sentBy        User?    @relation("SentByEmail", fields: [sentById], references: [id])
+  sentAt        DateTime? @db.Timestamptz
+  deliveredAt   DateTime? @db.Timestamptz
+  openedAt      DateTime? @db.Timestamptz
+  clickedAt     DateTime? @db.Timestamptz
+  bouncedAt     DateTime? @db.Timestamptz
+  failedAt      DateTime? @db.Timestamptz
+  createdAt     DateTime @default(now()) @db.Timestamptz
+
+  @@index([recipientEmail])
+  @@index([status])
+  @@index([sentAt])
+  @@index([createdAt])
+  @@map("email_logs")
+}
+
+model WhatsAppLog {
+  id              String   @id @default(uuid()) @db.Uuid
+  recipientNumber String
+  recipientName   String?
+  messageType     String   @default("text") // text, template, image, document
+  templateName    String?
+  templateId      String?
+  message         String
+  mediaUrl        String?
+  variables       Json?
+  gatewayId       String?
+  gateway         String?  // meta, twilio, etc.
+  status          String   @default("queued") // queued, sent, delivered, read, failed
+  failureReason   String?
+  cost            Float?
+  sentById        String?  @db.Uuid
+  sentBy          User?    @relation("SentByWhatsApp", fields: [sentById], references: [id])
+  sentAt          DateTime? @db.Timestamptz
+  deliveredAt     DateTime? @db.Timestamptz
+  readAt          DateTime? @db.Timestamptz
+  failedAt        DateTime? @db.Timestamptz
+  createdAt       DateTime @default(now()) @db.Timestamptz
+
+  @@index([recipientNumber])
+  @@index([status])
+  @@index([sentAt])
+  @@index([createdAt])
+  @@map("whatsapp_logs")
+}
+
+// ============================================================================
+// SECTION 14: AUDIT, ACTIVITY & SYSTEM LOGS
+// ============================================================================
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String   // CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT, etc.
+  entity      String   // patients, orders, reports, etc.
+  entityId    String?
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?
+  userAgent   String?
+  sessionId   String?
+  severity    String   @default("info") // info, warning, critical
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([entity, entityId])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([severity])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("audit_logs")
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id])
+  type        String   // auth, order, report, patient, system, payment
+  action      String
+  description String?
+  entity      String?
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type, createdAt(sort: Desc)])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model SystemLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  level       String   // debug, info, warn, error, fatal
+  source      String   // api, worker, scheduler, system
+  message     String
+  details     Json?
+  stackTrace  String?
+  requestId   String?
+  duration    Int?     // ms
+  statusCode  Int?
+  method      String?
+  path        String?
+  createdById String?  @db.Uuid
+  createdBy   User?    @relation("SystemLogCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([level, createdAt(sort: Desc)])
+  @@index([source])
+  @@index([createdAt])
+  @@map("system_logs")
+}
+
+// ============================================================================
+// SECTION 15: SETTINGS, MEDIA, CMS, BLOG & FAQ
+// ============================================================================
+
+model SystemConfig {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  value     Json
+  category  String
+  labelAr   String?
+  labelEn   String?
+  isPublic  Boolean  @default(false)
+  updatedBy String?  @db.Uuid
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([category])
+  @@index([isPublic])
+  @@map("system_configs")
+}
+
+model Media {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  fileName    String
+  fileUrl     String
+  fileType    String   // image, video, document, audio
+  mimeType    String
+  fileSize    Int
+  width       Int?
+  height      Int?
+  duration    Float?   // for video/audio in seconds
+  alt         String?
+  caption     String?
+  folder      String   @default("uploads")
+  tags        String[]
+  uploadedById String? @db.Uuid
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([fileType])
+  @@index([folder])
+  @@index([uploadedById])
+  @@index([createdAt])
+  @@map("media")
+}
+
+model PageContent {
+  id              String   @id @default(uuid()) @db.Uuid
+  slug            String   @unique
+  titleAr         String
+  titleEn         String?
+  contentAr       String?
+  contentEn       String?
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  schema          Json?    // JSON-LD structured data
+  template        String   @default("default")
+  status          String   @default("draft") // draft, published, archived
+  authorId        String?  @db.Uuid
+  publishedAt     DateTime? @db.Timestamptz
+  viewCount       Int      @default(0)
+  createdBy       String?  @db.Uuid
+  updatedBy       String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+  deletedAt       DateTime? @db.Timestamptz
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("page_contents")
+}
+
+model BlogPost {
+  id                String          @id @default(uuid()) @db.Uuid
+  slug              String          @unique
+  contentType       String          @default("article") // article, news, health_tip, promotion, offer, success_story, video
+  titleAr           String
+  titleEn           String?
+  excerptAr         String?
+  excerptEn         String?
+  contentAr         String?         @db.Text
+  contentEn         String?         @db.Text
+  featuredImage     String?
+  featuredImageAlt  String?
+  authorId          String?         @db.Uuid
+  author            Author?         @relation(fields: [authorId], references: [id])
+  categoryId        String?         @db.Uuid
+  category          ContentCategory? @relation(fields: [categoryId], references: [id])
+  tags              String[]
+  locale            String          @default("both") // ar, en, both
+  allowComments     Boolean         @default(true)
+  isPinned          Boolean         @default(false)
+  status            String          @default("draft") // draft, review, approved, published, archived, scheduled
+  publishedAt       DateTime?       @db.Timestamptz
+  scheduledAt       DateTime?       @db.Timestamptz
+  viewCount         Int             @default(0)
+  shareCount        Int             @default(0)
+  likeCount         Int             @default(0)
+  commentCount      Int             @default(0)
+  bookmarkCount     Int             @default(0)
+  readingTime       Int?            // minutes
+  isFeatured        Boolean         @default(false)
+
+  // SEO
+  metaTitle         String?
+  metaDescription   String?
+  ogTitle           String?
+  ogDescription     String?
+  ogImage           String?
+  canonicalUrl      String?
+  robots            String?         // index,follow / noindex,nofollow
+  focusKeyphrase    String?
+  seoScore          Int?
+  schemaOrg         Json?           @db.JsonB // JSON-LD structured data
+
+  // Workflow
+  reviewedById      String?         @db.Uuid
+  reviewedAt        DateTime?       @db.Timestamptz
+  reviewNotes       String?         @db.Text
+  approvedById      String?         @db.Uuid
+  approvedAt        DateTime?       @db.Timestamptz
+  createdBy         String?         @db.Uuid
+  updatedBy         String?         @db.Uuid
+  createdAt         DateTime        @default(now()) @db.Timestamptz
+  updatedAt         DateTime        @updatedAt @db.Timestamptz
+  deletedAt         DateTime?       @db.Timestamptz
+
+  relatedTo         BlogPostRelation[] @relation("relatedFrom")
+  relatedFrom       BlogPostRelation[] @relation("relatedTo")
+  revisions         ContentRevision[]
+  comments          ContentComment[]
+  bookmarks         ContentBookmark[]
+  likes             ContentLike[]
+  analytics         ContentAnalytics[]
+
+  @@index([slug])
+  @@index([contentType])
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([isFeatured])
+  @@index([isPinned])
+  @@index([tags])
+  @@index([locale])
+  @@index([scheduledAt])
+  @@index([createdAt])
+  @@map("blog_posts")
+}
+
+model Faq {
+  id          String   @id @default(uuid()) @db.Uuid
+  questionAr  String
+  questionEn  String?
+  answerAr    String
+  answerEn    String?
+  category    String
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  viewCount   Int      @default(0)
+  helpful     Int      @default(0)
+  notHelpful  Int      @default(0)
+  createdBy   String?  @db.Uuid
+  updatedBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  @@index([category, sortOrder])
+  @@index([isPublished])
+  @@map("faqs")
+}
+
+// ============================================================================
+// SECTION 16: SUPPORT TICKETS
+// ============================================================================
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  WAITING_INTERNAL
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model SupportTicket {
+  id            String       @id @default(uuid()) @db.Uuid
+  ticketNumber  String       @unique // TK-2024000001
+  patientId     String?      @db.Uuid
+  patient       Patient?     @relation(fields: [patientId], references: [id])
+  subject       String
+  description   String
+  category      String       // technical, billing, general, complaint, feedback
+  status        TicketStatus @default(OPEN)
+  priority      TicketPriority @default(MEDIUM)
+  assignedToId  String?      @db.Uuid
+  departmentId  String?      @db.Uuid
+  relatedEntity String?      // order, report, appointment
+  relatedEntityId String?
+  satisfactionRating Int?
+  resolvedAt    DateTime?    @db.Timestamptz
+  closedAt      DateTime?    @db.Timestamptz
+  createdBy     String?      @db.Uuid
+  updatedBy     String?      @db.Uuid
+  createdAt     DateTime     @default(now()) @db.Timestamptz
+  updatedAt     DateTime     @updatedAt @db.Timestamptz
+  deletedAt     DateTime?    @db.Timestamptz
+
+  messages      TicketMessage[]
+
+  @@index([ticketNumber])
+  @@index([patientId])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedToId])
+  @@index([category])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model TicketMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  ticketId    String   @db.Uuid
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId    String?  @db.Uuid
+  senderType  String   // customer, agent, system
+  message     String
+  attachments Json?    // [{name, url, size}]
+  isInternal  Boolean  @default(false) // Internal notes not visible to customer
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_messages")
+}
+
+// ============================================================================
+// SECTION 18: API KEYS & RATE LIMITING
+// ============================================================================
+
+model ApiKey {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String    // First 8 chars for display: "ak_1234..."
+  scopes      String[]  // ["read", "write", "admin"]
+  rateLimit   Int       @default(1000) // requests per minute
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime? @db.Timestamptz
+  expiresAt   DateTime? @db.Timestamptz
+  createdBy   String?   @db.Uuid
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([keyHash])
+  @@index([isActive])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// SECTION 19: DEPARTMENTS & SPECIALTIES (extended)
+// ============================================================================
+
+model DepartmentSpecialty {
+  id           String   @id @default(uuid()) @db.Uuid
+  departmentId String   @db.Uuid
+  nameAr       String
+  nameEn       String?
+  description  String?
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz
+
+  @@index([departmentId])
+  @@map("department_specialties")
+}
+
+// ============================================================================
+// SECTION 20: HOME VISITS & BRANCH TRANSFERS (from reception-schema)
+// ============================================================================
+
+enum HomeVisitStatus {
+  PENDING
+  ASSIGNED
+  EN_ROUTE
+  SAMPLE_COLLECTED
+  COMPLETED
+  CANCELLED
+}
+
+model HomeVisitRequest {
+  id                    String           @id @default(uuid()) @db.Uuid
+  requestNumber         String           @unique
+  branchId              String           @db.Uuid
+  branch                Branch           @relation(fields: [branchId], references: [id])
+  patientId             String           @db.Uuid
+  patient               Patient          @relation(fields: [patientId], references: [id])
+  orderId               String?          @db.Uuid
+  status                HomeVisitStatus  @default(PENDING)
+  priority              String           @default("normal") // normal, urgent, vip
+  patientAddress        String
+  patientCity           String?
+  patientLat            Float?
+  patientLng            Float?
+  preferredDate         DateTime?        @db.Date
+  preferredTimeStart    String?
+  preferredTimeEnd      String?
+  phlebotomistId        String?          @db.Uuid
+  phlebotomist          PhlebotomistProfile? @relation(fields: [phlebotomistId], references: [id])
+  assignedAt            DateTime?        @db.Timestamptz
+  enRouteAt             DateTime?        @db.Timestamptz
+  arrivedAt             DateTime?        @db.Timestamptz
+  completedAt           DateTime?        @db.Timestamptz
+  specialInstructions   String?
+  accessNotes           String?
+  distanceKm            Float?
+  estimatedArrivalMinutes Int?
+  createdBy             String?          @db.Uuid
+  updatedBy             String?          @db.Uuid
+  createdAt             DateTime         @default(now()) @db.Timestamptz
+  updatedAt             DateTime         @updatedAt @db.Timestamptz
+
+  @@index([branchId, status])
+  @@index([patientId])
+  @@index([phlebotomistId, status])
+  @@index([preferredDate])
+  @@index([status, priority])
+  @@index([createdAt])
+  @@map("home_visit_requests")
+}
+
+enum TransferStatus {
+  PENDING
+  ACCEPTED
+  IN_TRANSIT
+  COMPLETED
+  REJECTED
+}
+
+model BranchTransfer {
+  id              String         @id @default(uuid()) @db.Uuid
+  transferNumber  String         @unique
+  fromBranchId    String         @db.Uuid
+  fromBranch      Branch         @relation("TransferFrom", fields: [fromBranchId], references: [id])
+  toBranchId      String         @db.Uuid
+  toBranch        Branch         @relation("TransferTo", fields: [toBranchId], references: [id])
+  patientId       String         @db.Uuid
+  patient         Patient        @relation(fields: [patientId], references: [id])
+  orderId         String?        @db.Uuid
+  reason          String
+  status          TransferStatus @default(PENDING)
+  priority        String         @default("normal")
+  notes           String?
+  transferredById String         @db.Uuid
+  acceptedById    String?        @db.Uuid
+  transferredAt   DateTime?      @db.Timestamptz
+  acceptedAt      DateTime?      @db.Timestamptz
+  completedAt     DateTime?      @db.Timestamptz
+  createdBy       String?        @db.Uuid
+  updatedBy       String?        @db.Uuid
+  createdAt       DateTime       @default(now()) @db.Timestamptz
+  updatedAt       DateTime       @updatedAt @db.Timestamptz
+
+  @@index([fromBranchId, status])
+  @@index([toBranchId, status])
+  @@index([patientId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("branch_transfers")
+}
+
+// ============================================================================
+// SECTION 21: EMERGENCY CASES & VIP
+// ============================================================================
+
+enum EmergencySeverity {
+  CRITICAL
+  URGENT
+  MODERATE
+}
+
+enum EmergencyStatus {
+  TRIAGED
+  IN_TREATMENT
+  STABILIZED
+  TRANSFERRED
+  COMPLETED
+}
+
+model EmergencyCase {
+  id              String            @id @default(uuid()) @db.Uuid
+  caseNumber      String            @unique
+  branchId        String            @db.Uuid
+  branch          Branch            @relation(fields: [branchId], references: [id])
+  patientId       String?           @db.Uuid
+  patient         Patient?          @relation(fields: [patientId], references: [id])
+  severityLevel   EmergencySeverity
+  symptoms        String
+  vitals          Json?
+  assignedDoctorId String?          @db.Uuid
+  status          EmergencyStatus   @default(TRIAGED)
+  transferredTo   String?
+  transferNotes   String?
+  triageNotes     String?
+  createdBy       String?           @db.Uuid
+  updatedBy       String?           @db.Uuid
+  createdAt       DateTime          @default(now()) @db.Timestamptz
+  updatedAt       DateTime          @updatedAt @db.Timestamptz
+
+  @@index([branchId, status])
+  @@index([severityLevel])
+  @@index([createdAt(sort: Desc)])
+  @@index([patientId])
+  @@map("emergency_cases")
+}
+
+model VipMember {
+  id          String   @id @default(uuid()) @db.Uuid
+  patientId   String   @unique @db.Uuid
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  tier        String   @default("silver") // silver, gold, platinum, diamond
+  reason      String?
+  grantedById String?  @db.Uuid
+  grantedAt   DateTime @default(now()) @db.Timestamptz
+  expiresAt   DateTime? @db.Timestamptz
+  benefits    Json?
+  isActive    Boolean  @default(true)
+  createdBy   String?  @db.Uuid
+  updatedBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([tier])
+  @@index([isActive])
+  @@map("vip_members")
+}
+
+// ============================================================================
+// SECTION 22: BARCODE & PRINT JOBS
+// ============================================================================
+
+model BarcodePrintJob {
+  id          String   @id @default(uuid()) @db.Uuid
+  branchId    String   @db.Uuid
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  entityType  String   // patient, order, appointment, sample, queue-ticket
+  entityId    String
+  patientId   String?  @db.Uuid
+  patient     Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  orderId     String?  @db.Uuid
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  barcodeData String
+  barcodeType String   @default("code128") // code128, qr, datamatrix
+  printerId   String?
+  printedById String?  @db.Uuid
+  printedAt   DateTime @default(now()) @db.Timestamptz
+  status      String   @default("printed") // queued, printing, printed, failed
+  copies      Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([entityType, entityId])
+  @@index([branchId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("barcode_print_jobs")
+}
+
+// ============================================================================
+// SECTION 23: RECEPTION AUDIT LOG
+// ============================================================================
+
+model ReceptionAuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  branchId   String   @db.Uuid
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  userId     String   @db.Uuid
+  action     String
+  entityType String?
+  entityId   String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now()) @db.Timestamptz
+
+  @@index([branchId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action])
+  @@map("reception_audit_log")
+}
+
+// ============================================================================
+// SECTION 24: PAYROLL
+// ============================================================================
+
+enum PayrollStatus {
+  DRAFT
+  PENDING
+  PROCESSED
+  PAID
+}
+
+model PayrollEntry {
+  id            String        @id @default(uuid()) @db.Uuid
+  employeeId    String        @db.Uuid
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
+  period        String        // 2024-01
+  baseSalary    Float
+  allowances    Float         @default(0)
+  bonuses       Float         @default(0)
+  deductions    Float         @default(0)
+  gosiEmployee  Float         @default(0)
+  gosiEmployer  Float         @default(0)
+  tax           Float         @default(0)
+  netPay        Float
+  currency      String        @default("SAR")
+  status        PayrollStatus @default(DRAFT)
+  paidAt        DateTime?     @db.Timestamptz
+  paymentMethod PaymentMethod?
+  notes         String?
+  createdBy     String?       @db.Uuid
+  updatedBy     String?       @db.Uuid
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
+
+  @@unique([employeeId, period])
+  @@index([period])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payroll_entries")
+}
+
+// ============================================================================
+// SECTION 25: MARKETING & PARTNERS
+// ============================================================================
+
+model Partner {
+  id              String   @id @default(uuid()) @db.Uuid
+  nameAr          String
+  nameEn          String
+  type            String   // referral, corporate, insurance, government, pharmacy
+  contactPerson   String
+  email           String?
+  phone           String?
+  totalReferrals  Int      @default(0)
+  totalRevenue    Float    @default(0)
+  commission      Float    @default(0)
+  commissionType  String   @default("percentage")
+  status          String   @default("active") // active, inactive, pending
+  contractStart   DateTime? @db.Date
+  contractEnd     DateTime? @db.Date
+  createdBy       String?  @db.Uuid
+  updatedBy       String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+  deletedAt       DateTime? @db.Timestamptz
+
+  @@index([type])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("partners")
+}
+
+model MarketingCampaign {
+  id          String   @id @default(uuid()) @db.Uuid
+  nameAr      String
+  nameEn      String?
+  type        String   // email, sms, social, ads, whatsapp
+  status      String   @default("draft") // draft, active, paused, completed
+  budget      Float    @default(0)
+  spent       Float    @default(0)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  startDate   DateTime? @db.Timestamptz
+  endDate     DateTime? @db.Timestamptz
+  targetAudience Json?
+  content     Json?
+  createdBy   String?  @db.Uuid
+  updatedBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  @@index([status])
+  @@index([type])
+  @@index([startDate, endDate])
+  @@map("marketing_campaigns")
+}
+
+// ============================================================================
+// SECTION 26: INVENTORY & SUPPLIERS
+// ============================================================================
+
+model Supplier {
+  id              String   @id @default(uuid()) @db.Uuid
+  nameAr          String
+  nameEn          String
+  contactPerson   String
+  email           String?
+  phone           String?
+  address         String?
+  taxNumber       String?
+  paymentTerms    Int      @default(30) // days
+  rating          Float    @default(0)
+  isActive        Boolean  @default(true)
+  createdBy       String?  @db.Uuid
+  updatedBy       String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+  deletedAt       DateTime? @db.Timestamptz
+
+  inventoryItems  InventoryItem[]
+
+  @@index([isActive, deletedAt])
+  @@map("suppliers")
+}
+
+model InventoryItem {
+  id            String   @id @default(uuid()) @db.Uuid
+  sku           String   @unique
+  nameAr        String
+  nameEn        String
+  category      String   // reagents, consumables, equipment, supplies
+  description   String?
+  unit          String   @default("piece")
+  quantity      Int      @default(0)
+  minQuantity   Int      @default(10)
+  maxQuantity   Int      @default(1000)
+  reorderPoint  Int      @default(20)
+  unitPrice     Float
+  currency      String   @default("SAR")
+  supplierId    String?  @db.Uuid
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  location      String?  // Physical storage location
+  expiryDate    DateTime? @db.Date
+  batchNumber   String?
+  isActive      Boolean  @default(true)
+  createdBy     String?  @db.Uuid
+  updatedBy     String?  @db.Uuid
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+  deletedAt     DateTime? @db.Timestamptz
+
+  movements     InventoryMovement[]
+
+  @@index([sku])
+  @@index([category])
+  @@index([supplierId])
+  @@index([expiryDate])
+  @@index([quantity, reorderPoint])
+  @@map("inventory_items")
+}
+
+model InventoryMovement {
+  id            String   @id @default(uuid()) @db.Uuid
+  itemId        String   @db.Uuid
+  item          InventoryItem @relation(fields: [itemId], references: [id])
+  type          String   // in, out, adjustment, transfer
+  quantity      Int
+  fromLocation  String?
+  toLocation    String?
+  referenceType String?  // order, purchase_order, adjustment
+  referenceId   String?
+  notes         String?
+  performedById String?  @db.Uuid
+  createdAt     DateTime @default(now()) @db.Timestamptz
+
+  @@index([itemId, createdAt(sort: Desc)])
+  @@index([type])
+  @@index([createdAt])
+  @@map("inventory_movements")
+}
+
+// ============================================================================
+// SECTION 20: AI ASSISTANT — Conversations, Knowledge Base, Analytics
+// ============================================================================
+
+enum AiConversationStatus {
+  ACTIVE
+  ARCHIVED
+  RESOLVED
+}
+
+enum AiMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum AiModelProvider {
+  OPENAI
+  AZURE_OPENAI
+  GEMINI
+  CLAUDE
+}
+
+enum AiDocumentType {
+  FAQ
+  LAB_TEST_INFO
+  RESULT_EXPLANATION
+  PREPARATION_GUIDE
+  HEALTH_PACKAGE
+  MEDICAL_ARTICLE
+  POLICY
+  PROCEDURE
+}
+
+enum AiFeedbackRating {
+  THUMBS_UP
+  THUMBS_DOWN
+  HELPFUL
+  NOT_HELPFUL
+  ACCURATE
+  INACCURATE
+}
+
+model AiConversation {
+  id            String                  @id @default(uuid()) @db.Uuid
+  userId        String                  @db.Uuid
+  userRole      String                  // PATIENT, DOCTOR, LAB_TECHNICIAN, RECEPTIONIST, ADMIN
+  title         String?
+  language      String                  @default("ar") // ar, en
+  status        AiConversationStatus    @default(ACTIVE)
+  metadata      Json?                   @db.JsonB
+  messageCount  Int                     @default(0)
+  lastMessageAt DateTime?
+  createdAt     DateTime                @default(now()) @db.Timestamptz
+  updatedAt     DateTime                @updatedAt @db.Timestamptz
+  deletedAt     DateTime?               @db.Timestamptz
+
+  messages      AiMessage[]
+  analytics     AiAnalytics[]
+
+  @@index([userId])
+  @@index([userRole])
+  @@index([status])
+  @@index([lastMessageAt])
+  @@index([createdAt])
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id              String            @id @default(uuid()) @db.Uuid
+  conversationId  String            @db.Uuid
+  role            AiMessageRole
+  content         String            @db.Text
+  contentAr       String?           @db.Text
+  contentType     String            @default("text") // text, markdown, html
+  tokensIn        Int               @default(0)
+  tokensOut       Int               @default(0)
+  model           String?
+  provider        AiModelProvider?
+  latencyMs       Int?
+  metadata        Json?             @db.JsonB
+  toolCalls       Json?             @db.JsonB
+  toolResults     Json?             @db.JsonB
+  referencedDocs  String[]          // IDs of referenced knowledge base docs
+  feedback        AiFeedbackRating?
+  feedbackComment String?           @db.Text
+  createdAt       DateTime          @default(now()) @db.Timestamptz
+
+  conversation    AiConversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  feedbacks       AiFeedback[]
+
+  @@index([conversationId, createdAt])
+  @@index([feedback])
+  @@index([createdAt])
+  @@map("ai_messages")
+}
+
+model AiKnowledgeBase {
+  id            String          @id @default(uuid()) @db.Uuid
+  title         String
+  titleAr       String?
+  content       String          @db.Text
+  contentAr     String?         @db.Text
+  summary       String?         @db.Text
+  summaryAr     String?         @db.Text
+  documentType  AiDocumentType
+  category      String?         // e.g., "hematology", "chemistry", "fasting"
+  tags          String[]
+  language      String          @default("both") // ar, en, both
+  source        String?         // manual, import, generated
+  sourceUrl     String?
+  authorId      String?         @db.Uuid
+  version       Int             @default(1)
+  isActive      Boolean         @default(true)
+  viewCount     Int             @default(0)
+  helpfulCount  Int             @default(0)
+  metadata      Json?           @db.JsonB
+  createdAt     DateTime        @default(now()) @db.Timestamptz
+  updatedAt     DateTime        @updatedAt @db.Timestamptz
+  deletedAt     DateTime?       @db.Timestamptz
+
+  chunks        AiKnowledgeChunk[]
+  relatedFrom   AiKnowledgeRelation[] @relation("knowledge_from")
+  relatedTo     AiKnowledgeRelation[] @relation("knowledge_to")
+
+  @@index([documentType])
+  @@index([category])
+  @@index([tags])
+  @@index([isActive])
+  @@index([viewCount])
+  @@index([createdAt])
+  @@map("ai_knowledge_base")
+}
+
+model AiKnowledgeChunk {
+  id              String    @id @default(uuid()) @db.Uuid
+  knowledgeBaseId String    @db.Uuid
+  content         String    @db.Text
+  contentAr       String?   @db.Text
+  chunkIndex      Int
+  tokenCount      Int       @default(0)
+  embedding       Unsupported("vector(1536)")?
+  model           String?   // embedding model used
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+
+  knowledgeBase   AiKnowledgeBase @relation(fields: [knowledgeBaseId], references: [id], onDelete: Cascade)
+
+  @@index([knowledgeBaseId, chunkIndex])
+  @@map("ai_knowledge_chunks")
+}
+
+model AiKnowledgeRelation {
+  id              String    @id @default(uuid()) @db.Uuid
+  sourceId        String    @db.Uuid
+  targetId        String    @db.Uuid
+  relationType    String    // "related", "prerequisite", "contraindication", "follow_up"
+  weight          Float     @default(1.0)
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+
+  source          AiKnowledgeBase @relation("knowledge_from", fields: [sourceId], references: [id], onDelete: Cascade)
+  target          AiKnowledgeBase @relation("knowledge_to", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+  @@index([targetId])
+  @@index([relationType])
+  @@map("ai_knowledge_relations")
+}
+
+model AiAnalytics {
+  id              String    @id @default(uuid()) @db.Uuid
+  conversationId  String?   @db.Uuid
+  userId          String?   @db.Uuid
+  userRole        String?
+  query           String    @db.Text
+  queryLanguage   String    @default("ar")
+  response        String?   @db.Text
+  model           String?
+  provider        AiModelProvider?
+  latencyMs       Int?
+  tokensIn        Int       @default(0)
+  tokensOut       Int       @default(0)
+  costUsd         Float     @default(0)
+  documentType    AiDocumentType?
+  retrievedDocs   Int       @default(0)
+  rerankedDocs    Int       @default(0)
+  hadKnowledge    Boolean   @default(false)
+  feedbackRating  AiFeedbackRating?
+  sessionDuration Int?      // seconds
+  deviceType      String?   // web, mobile, voice
+  ipAddress       String?
+  userAgent       String?
+  metadata        Json?     @db.JsonB
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+
+  conversation    AiConversation? @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId])
+  @@index([userId])
+  @@index([provider])
+  @@index([model])
+  @@index([documentType])
+  @@index([feedbackRating])
+  @@index([createdAt])
+  @@index([createdAt, provider])
+  @@index([createdAt, documentType])
+  @@map("ai_analytics")
+}
+
+model AiFeedback {
+  id              String            @id @default(uuid()) @db.Uuid
+  messageId       String            @db.Uuid
+  userId          String            @db.Uuid
+  rating          AiFeedbackRating
+  comment         String?           @db.Text
+  category        String?           // accuracy, relevance, helpfulness, safety
+  isResolved      Boolean           @default(false)
+  resolvedById    String?           @db.Uuid
+  resolvedAt      DateTime?         @db.Timestamptz
+  createdAt       DateTime          @default(now()) @db.Timestamptz
+
+  message         AiMessage         @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([userId])
+  @@index([rating])
+  @@index([createdAt])
+  @@map("ai_feedback")
+}
+
+// ============================================================================
+// SECTION 21: CMS — Content Management System
+// ============================================================================
+
+model Author {
+  id            String      @id @default(uuid()) @db.Uuid
+  nameAr        String
+  nameEn        String?
+  email         String?
+  bioAr         String?     @db.Text
+  bioEn         String?     @db.Text
+  avatar        String?
+  specialization String?
+  socialLinks   Json?       @db.JsonB // { twitter, linkedin, facebook, instagram }
+  isActive      Boolean     @default(true)
+  isLabStaff    Boolean     @default(false)
+  userId        String?     @db.Uuid
+  displayOrder  Int         @default(0)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @db.Timestamptz
+  deletedAt     DateTime?   @db.Timestamptz
+
+  posts         BlogPost[]
+
+  @@index([isActive])
+  @@index([displayOrder])
+  @@map("authors")
+}
+
+model ContentCategory {
+  id            String            @id @default(uuid()) @db.Uuid
+  nameAr        String
+  nameEn        String?
+  slug          String            @unique
+  descriptionAr String?           @db.Text
+  descriptionEn String?           @db.Text
+  icon          String?
+  color         String?
+  parentId      String?           @db.Uuid
+  parent        ContentCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      ContentCategory[] @relation("CategoryHierarchy")
+  displayOrder  Int               @default(0)
+  isActive      Boolean           @default(true)
+  createdAt     DateTime          @default(now()) @db.Timestamptz
+  updatedAt     DateTime          @updatedAt @db.Timestamptz
+  deletedAt     DateTime?         @db.Timestamptz
+
+  posts         BlogPost[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@index([isActive, displayOrder])
+  @@map("content_categories")
+}
+
+model ContentRevision {
+  id          String   @id @default(uuid()) @db.Uuid
+  postId      String   @db.Uuid
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  version     Int
+  titleAr     String?
+  titleEn     String?
+  contentAr   String?  @db.Text
+  contentEn   String?  @db.Text
+  excerptAr   String?  @db.Text
+  excerptEn   String?  @db.Text
+  slug        String?
+  metaTitle   String?
+  metaDescription String?
+  ogTitle     String?
+  ogDescription String?
+  tags        String[]
+  status      String   // snapshot of status at revision
+  changeNotes String?  @db.Text
+  createdBy   String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([postId, version])
+  @@index([createdAt])
+  @@map("content_revisions")
+}
+
+model BlogPostRelation {
+  id        String   @id @default(uuid()) @db.Uuid
+  sourceId  String   @db.Uuid
+  targetId  String   @db.Uuid
+  type      String   @default("related") // related, similar, series
+  weight    Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  source    BlogPost @relation("relatedFrom", fields: [sourceId], references: [id], onDelete: Cascade)
+  target    BlogPost @relation("relatedTo", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+  @@index([targetId])
+  @@map("blog_post_relations")
+}
+
+model ContentComment {
+  id            String          @id @default(uuid()) @db.Uuid
+  postId        String          @db.Uuid
+  post          BlogPost        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId      String?         @db.Uuid
+  parent        ContentComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies       ContentComment[] @relation("CommentReplies")
+  userId        String?         @db.Uuid
+  authorName    String?         // for guest comments
+  authorEmail   String?         // for guest comments
+  content       String          @db.Text
+  isApproved    Boolean         @default(false)
+  isSpam        Boolean         @default(false)
+  moderatedBy   String?         @db.Uuid
+  moderatedAt   DateTime?       @db.Timestamptz
+  likeCount     Int             @default(0)
+  createdAt     DateTime        @default(now()) @db.Timestamptz
+  updatedAt     DateTime        @updatedAt @db.Timestamptz
+  deletedAt     DateTime?       @db.Timestamptz
+
+  @@index([postId, isApproved])
+  @@index([parentId])
+  @@index([isSpam])
+  @@index([createdAt])
+  @@map("content_comments")
+}
+
+model ContentBookmark {
+  id        String   @id @default(uuid()) @db.Uuid
+  postId    String   @db.Uuid
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("content_bookmarks")
+}
+
+model ContentLike {
+  id        String   @id @default(uuid()) @db.Uuid
+  postId    String   @db.Uuid
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("content_likes")
+}
+
+model ContentAnalytics {
+  id          String   @id @default(uuid()) @db.Uuid
+  postId      String   @db.Uuid
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date
+  views       Int      @default(0)
+  uniqueViews Int      @default(0)
+  shares      Int      @default(0)
+  likes       Int      @default(0)
+  comments    Int      @default(0)
+  bookmarks   Int      @default(0)
+  avgReadTime Float?   // seconds
+  source      String?  // direct, search, social, email, referral
+  country     String?
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@unique([postId, date])
+  @@index([postId, date(sort: Desc)])
+  @@index([date])
+  @@map("content_analytics")
+}
+
+model NewsletterSubscriber {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique
+  nameAr        String?
+  nameEn        String?
+  language      String    @default("ar") // ar, en
+  interests     String[]  // category slugs
+  isActive      Boolean   @default(true)
+  confirmedAt   DateTime? @db.Timestamptz
+  unsubscribedAt DateTime? @db.Timestamptz
+  unsubscribeReason String?
+  source        String?   // website, blog, registration, admin
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @db.Timestamptz
+
+  @@index([email])
+  @@index([isActive])
+  @@index([language])
+  @@index([createdAt])
+  @@map("newsletter_subscribers")
+}
+
+model NewsletterCampaign {
+  id              String           @id @default(uuid()) @db.Uuid
+  subjectAr       String
+  subjectEn       String?
+  previewTextAr   String?
+  previewTextEn   String?
+  contentAr       String?          @db.Text
+  contentEn       String?          @db.Text
+  templateId      String?          // reference to email template
+  postIds         String[]         // linked blog posts
+  categoryIds     String[]         // filter by categories
+  language        String           @default("both") // ar, en, both
+  status          String           @default("draft") // draft, scheduled, sending, sent, cancelled
+  scheduledAt     DateTime?        @db.Timestamptz
+  sentAt          DateTime?        @db.Timestamptz
+  recipientCount  Int              @default(0)
+  openCount       Int              @default(0)
+  clickCount      Int              @default(0)
+  bounceCount     Int              @default(0)
+  unsubscribeCount Int             @default(0)
+  createdBy       String?          @db.Uuid
+  createdAt       DateTime         @default(now()) @db.Timestamptz
+  updatedAt       DateTime         @updatedAt @db.Timestamptz
+  deletedAt       DateTime?        @db.Timestamptz
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([createdAt])
+  @@map("newsletter_campaigns")
+}

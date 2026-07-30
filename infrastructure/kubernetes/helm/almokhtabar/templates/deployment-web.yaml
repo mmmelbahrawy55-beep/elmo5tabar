@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-web
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  annotations:
+    {{- with .Values.global.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        {{- include "almokhtabar.labels" . | nindent 8 }}
+        app.kubernetes.io/component: web
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.global.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "almokhtabar.imagePullSecrets" . | indent 6 }}
+      serviceAccountName: {{ include "almokhtabar.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.web.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
+      {{- with .Values.web.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.web.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: web
+                topologyKey: kubernetes.io/hostname
+        {{- with .Values.web.affinity }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.web.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: web
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          image: {{ .Values.global.imageRegistry }}{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.web.port }}
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "almokhtabar.fullname" . }}-config
+            - secretRef:
+                name: {{ include "almokhtabar.fullname" . }}-secrets
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.configmap.nodeEnv | quote }}
+            - name: PORT
+              value: {{ .Values.web.port | quote }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.web.probe.liveness.path }}
+              port: {{ .Values.web.port }}
+            initialDelaySeconds: {{ .Values.web.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.web.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.web.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.web.probe.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.web.probe.readiness.path }}
+              port: {{ .Values.web.port }}
+            initialDelaySeconds: {{ .Values.web.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.web.probe.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.web.probe.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.web.probe.readiness.failureThreshold }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}

@@ -1,0 +1,596 @@
+// ============================================================================
+// Enterprise Auth Prisma Schema Additions
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------------------------
+
+enum AuthRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  TEAM_LEAD
+  STAFF
+  CUSTOMER
+  VENDOR
+  GUEST
+  VIEWER
+  EDITOR
+  ANALYST
+  SUPPORT
+  AUDITOR
+}
+
+enum AuthStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  LOCKED
+  PENDING_VERIFICATION
+}
+
+enum OAuthProvider {
+  GOOGLE
+  APPLE
+  FACEBOOK
+}
+
+enum OTPType {
+  LOGIN
+  REGISTER
+  VERIFY_EMAIL
+  VERIFY_PHONE
+  RESET_PASSWORD
+  MFA
+}
+
+enum OTPChannel {
+  SMS
+  EMAIL
+  TOTP
+}
+
+enum TwoFactorMethod {
+  SMS
+  EMAIL
+  TOTP
+  BIOMETRIC
+}
+
+enum SessionRevokeReason {
+  LOGOUT
+  ROTATION_VIOLATION
+  ADMIN
+  EXPIRY
+}
+
+enum DataClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  RESTRICTED
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum DeviceType {
+  MOBILE
+  DESKTOP
+  TABLET
+}
+
+enum LoginStatus {
+  SUCCESS
+  FAILED
+  BLOCKED
+  SUSPICIOUS
+}
+
+// ---------------------------------------------------------------------------
+// MODELS
+// ---------------------------------------------------------------------------
+
+// 1. AuthRole
+// ---------------------------------------------------------------------------
+model AuthRole {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @map("name") @db.VarChar(100)
+  nameAr    String?  @map("name_ar") @db.VarChar(100)
+  description    String?  @map("description") @db.Text
+  descriptionAr  String?  @map("description_ar") @db.Text
+  level     Int      @default(0)
+  isSystem Boolean  @default(false) @map("is_system")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rolePermissions AuthRolePermission[]
+  users           AuthUser[]
+
+  @@map("auth_roles")
+}
+
+// 2. AuthPermission
+// ---------------------------------------------------------------------------
+model AuthPermission {
+  id          String  @id @default(uuid()) @db.Uuid
+  module      String  @db.VarChar(100)
+  action      String  @db.VarChar(100)
+  resource    String? @db.VarChar(200)
+  description String? @db.Text
+  descriptionAr String? @map("description_ar") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rolePermissions AuthRolePermission[]
+
+  @@unique([module, action, resource])
+  @@map("auth_permissions")
+}
+
+// 3. AuthRolePermission
+// ---------------------------------------------------------------------------
+model AuthRolePermission {
+  id           String   @id @default(uuid()) @db.Uuid
+  roleId       String   @map("role_id") @db.Uuid
+  permissionId String   @map("permission_id") @db.Uuid
+  conditions   Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  role       AuthRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission AuthPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("auth_role_permissions")
+}
+
+// 4. AuthUser
+// ---------------------------------------------------------------------------
+model AuthUser {
+  id        String     @id @default(uuid()) @db.Uuid
+  email     String     @unique @db.VarChar(255)
+  phone     String?    @unique @db.VarChar(20)
+  phoneCountryCode String? @map("phone_country_code") @db.VarChar(5)
+  passwordHash      String  @map("password_hash") @db.VarChar(255)
+  roleId    String     @map("role_id") @db.Uuid
+  branchId  String?    @map("branch_id") @db.Uuid
+
+  firstNameAr  String?  @map("first_name_ar") @db.VarChar(100)
+  lastNameAr   String?  @map("last_name_ar") @db.VarChar(100)
+  firstNameEn  String?  @map("first_name_en") @db.VarChar(100)
+  lastNameEn   String?  @map("last_name_en") @db.VarChar(100)
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(500)
+  nationalId   String?  @map("national_id") @db.VarChar(30)
+  dateOfBirth  DateTime? @map("date_of_birth") @db.Date
+  gender       String?  @db.VarChar(20)
+
+  status AuthStatus @default(PENDING_VERIFICATION)
+
+  emailVerified       Boolean  @default(false) @map("email_verified")
+  phoneVerified       Boolean  @default(false) @map("phone_verified")
+  nationalIdVerified  Boolean  @default(false) @map("national_id_verified")
+
+  passwordChangedAt   DateTime? @map("password_changed_at")
+  passwordExpiresAt   DateTime? @map("password_expires_at")
+  failedLoginAttempts Int      @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until")
+  lastLoginAt         DateTime? @map("last_login_at")
+  lastLoginIp         String?  @map("last_login_ip") @db.VarChar(45)
+  forcePasswordChange Boolean  @default(false) @map("force_password_change")
+
+  twoFactorEnabled   Boolean       @default(false) @map("two_factor_enabled")
+  twoFactorMethod    TwoFactorMethod? @map("two_factor_method")
+  totpSecret         String?       @map("totp_secret") @db.VarChar(255)
+  totpVerified       Boolean       @default(false) @map("totp_verified")
+  backupCodes        String[]      @map("backup_codes")
+  biometricRegistered     Boolean  @default(false) @map("biometric_registered")
+  biometricCredentialId   String?  @map("biometric_credential_id") @db.VarChar(255)
+  biometricPublicKey      String?  @map("biometric_public_key") @db.Text
+
+  termsAcceptedAt              DateTime? @map("terms_accepted_at")
+  privacyPolicyAcceptedAt      DateTime? @map("privacy_policy_accepted_at")
+  marketingConsent             Boolean   @default(false) @map("marketing_consent")
+  dataRetentionConsent         Boolean   @default(false) @map("data_retention_consent")
+  hipaaAuthorizationSigned     Boolean   @default(false) @map("hipaa_authorization_signed")
+  hipaaAuthorizationDate       DateTime? @map("hipaa_authorization_date")
+
+  timezone   String?  @db.VarChar(50)
+  language   String?  @db.VarChar(10) @default("en")
+  lastActiveAt DateTime? @map("last_active_at")
+
+  metadata Json?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  role           AuthRole           @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  sessions       AuthSession[]
+  refreshTokens  AuthRefreshToken[]
+  devices        AuthDevice[]
+  loginHistory   AuthLoginHistory[]
+  securityAlerts AuthSecurityAlert[]
+  oauthProviders AuthOAuthProvider[]
+  auditLogs      AuthAuditLog[]
+  consents       AuthConsent[]
+  apiKeys        AuthApiKey[]
+  dataVault      AuthDataVault[]
+  otps           AuthOTP[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([roleId])
+  @@index([status])
+  @@index([branchId])
+  @@index([deletedAt])
+  @@index([nationalId])
+  @@map("auth_users")
+}
+
+// 5. AuthRefreshToken
+// ---------------------------------------------------------------------------
+model AuthRefreshToken {
+  id          String              @id @default(uuid()) @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  tokenHash   String              @map("token_hash") @db.VarChar(255)
+  deviceId    String?             @map("device_id") @db.Uuid
+  familyId    String              @map("family_id") @db.VarChar(255)
+  expiresAt   DateTime            @map("expires_at")
+  revokedAt   DateTime?           @map("revoked_at")
+  revokeReason SessionRevokeReason? @map("revoke_reason")
+  ipAddress   String?             @map("ip_address") @db.VarChar(45)
+  userAgent   String?             @map("user_agent") @db.VarChar(500)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     AuthUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device   AuthDevice?       @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  session  AuthSession?
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("auth_refresh_tokens")
+}
+
+// 6. AuthOAuthProvider
+// ---------------------------------------------------------------------------
+model AuthOAuthProvider {
+  id               String        @id @default(uuid()) @db.Uuid
+  userId           String        @map("user_id") @db.Uuid
+  provider         OAuthProvider
+  providerUserId   String        @map("provider_user_id") @db.VarChar(255)
+  providerEmail    String?       @map("provider_email") @db.VarChar(255)
+  providerName     String?       @map("provider_name") @db.VarChar(255)
+  providerAvatar   String?       @map("provider_avatar") @db.VarChar(500)
+  accessToken      String?       @map("access_token") @db.Text
+  refreshToken     String?       @map("refresh_token") @db.Text
+  tokenExpiresAt   DateTime?     @map("token_expires_at")
+  rawProfile       Json?         @map("raw_profile")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("auth_oauth_providers")
+}
+
+// 7. AuthOTP
+// ---------------------------------------------------------------------------
+model AuthOTP {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String?   @map("user_id") @db.Uuid
+  email       String?   @db.VarChar(255)
+  phone       String?   @db.VarChar(20)
+  codeHash    String    @map("code_hash") @db.VarChar(255)
+  type        OTPType
+  channel     OTPChannel
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5) @map("max_attempts")
+  expiresAt   DateTime  @map("expires_at")
+  usedAt      DateTime? @map("used_at")
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.VarChar(500)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([email])
+  @@index([phone])
+  @@index([expiresAt])
+  @@index([type, channel])
+  @@map("auth_otps")
+}
+
+// 8. AuthDevice
+// ---------------------------------------------------------------------------
+model AuthDevice {
+  id                String     @id @default(uuid()) @db.Uuid
+  userId            String     @map("user_id") @db.Uuid
+  deviceName        String?    @map("device_name") @db.VarChar(200)
+  deviceType        DeviceType @map("device_type")
+  deviceOs          String?    @map("device_os") @db.VarChar(100)
+  deviceBrowser     String?    @map("device_browser") @db.VarChar(100)
+  deviceFingerprint String?    @map("device_fingerprint") @db.VarChar(255)
+  pushToken         String?    @map("push_token") @db.VarChar(500)
+  isTrusted         Boolean    @default(false) @map("is_trusted")
+  isBiometricEnabled Boolean   @default(false) @map("is_biometric_enabled")
+  lastSeenAt        DateTime?  @map("last_seen_at")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  revokedAt         DateTime?  @map("revoked_at")
+
+  user          AuthUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions      AuthSession[]
+  refreshTokens AuthRefreshToken[]
+
+  @@index([userId])
+  @@index([deviceFingerprint])
+  @@index([lastSeenAt])
+  @@map("auth_devices")
+}
+
+// 9. AuthSession
+// ---------------------------------------------------------------------------
+model AuthSession {
+  id             String              @id @default(uuid()) @db.Uuid
+  userId         String              @map("user_id") @db.Uuid
+  deviceId       String?             @map("device_id") @db.Uuid
+  refreshTokenId String?             @map("refresh_token_id") @db.Uuid
+  ipAddress      String?             @map("ip_address") @db.VarChar(45)
+  userAgent      String?             @map("user_agent") @db.VarChar(500)
+  locationCity   String?             @map("location_city") @db.VarChar(100)
+  locationCountry String?            @map("location_country") @db.VarChar(100)
+  latitude       Decimal?            @db.Decimal(10, 8)
+  longitude      Decimal?            @db.Decimal(11, 8)
+  startedAt      DateTime            @default(now()) @map("started_at")
+  lastActivityAt DateTime            @default(now()) @map("last_activity_at")
+  expiresAt      DateTime            @map("expires_at")
+  revokedAt      DateTime?           @map("revoked_at")
+  revokeReason   SessionRevokeReason? @map("revoke_reason")
+
+  user       AuthUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device     AuthDevice?       @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  refreshToken AuthRefreshToken? @relation(fields: [refreshTokenId], references: [id], onDelete: SetNull)
+  csrfTokens AuthCSRFToken[]
+
+  @@index([userId])
+  @@index([deviceId])
+  @@index([refreshTokenId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("auth_sessions")
+}
+
+// 10. AuthLoginHistory
+// ---------------------------------------------------------------------------
+model AuthLoginHistory {
+  id               String        @id @default(uuid()) @db.Uuid
+  userId           String        @map("user_id") @db.Uuid
+  status           LoginStatus
+  failureReason    String?       @map("failure_reason") @db.VarChar(500)
+  method           OTPChannel
+  provider         OAuthProvider?
+  ipAddress        String?       @map("ip_address") @db.VarChar(45)
+  ipCountry        String?       @map("ip_country") @db.VarChar(100)
+  ipCity           String?       @map("ip_city") @db.VarChar(100)
+  ipIsp            String?       @map("ip_isp") @db.VarChar(200)
+  ipIsVpn          Boolean       @default(false) @map("ip_is_vpn")
+  ipIsProxy        Boolean       @default(false) @map("ip_is_proxy")
+  ipIsTor          Boolean       @default(false) @map("ip_is_tor")
+  deviceId         String?       @map("device_id") @db.VarChar(255)
+  deviceFingerprint String?      @map("device_fingerprint") @db.VarChar(255)
+  userAgent        String?       @map("user_agent") @db.VarChar(500)
+  geoLatitude      Decimal?      @map("geo_latitude") @db.Decimal(10, 8)
+  geoLongitude     Decimal?      @map("geo_longitude") @db.Decimal(11, 8)
+  riskScore        Int?          @map("risk_score")
+  riskFactors      Json?         @map("risk_factors")
+  mfaRequired      Boolean       @default(false) @map("mfa_required")
+  mfaCompleted     Boolean       @default(false) @map("mfa_completed")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([ipAddress])
+  @@map("auth_login_history")
+}
+
+// 11. AuthSecurityAlert
+// ---------------------------------------------------------------------------
+model AuthSecurityAlert {
+  id             String        @id @default(uuid()) @db.Uuid
+  userId         String        @map("user_id") @db.Uuid
+  type           String        @db.VarChar(100)
+  severity       AlertSeverity
+  titleAr        String?       @map("title_ar") @db.VarChar(255)
+  titleEn        String?       @map("title_en") @db.VarChar(255)
+  descriptionAr  String?       @map("description_ar") @db.Text
+  descriptionEn  String?       @map("description_en") @db.Text
+  ipAddress      String?       @map("ip_address") @db.VarChar(45)
+  deviceInfo     String?       @map("device_info") @db.VarChar(500)
+  isRead         Boolean       @default(false) @map("is_read")
+  isDismissed    Boolean       @default(false) @map("is_dismissed")
+  actionRequired Boolean       @default(false) @map("action_required")
+  actionUrl      String?       @map("action_url") @db.VarChar(500)
+  metadata       Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([severity])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("auth_security_alerts")
+}
+
+// 12. AuthRateLimit
+// ---------------------------------------------------------------------------
+model AuthRateLimit {
+  id             String   @id @default(uuid()) @db.Uuid
+  identifier     String   @db.VarChar(255)
+  identifierType String   @map("identifier_type") @db.VarChar(50)
+  action         String   @db.VarChar(100)
+  attempts       Int      @default(1)
+  windowStart    DateTime @default(now()) @map("window_start")
+  blockedUntil   DateTime? @map("blocked_until")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([identifier, action])
+  @@index([identifierType])
+  @@index([blockedUntil])
+  @@map("auth_rate_limits")
+}
+
+// 13. AuthCSRFToken
+// ---------------------------------------------------------------------------
+model AuthCSRFToken {
+  id          String   @id @default(uuid()) @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  tokenHash   String   @map("token_hash") @db.VarChar(255)
+  expiresAt   DateTime @map("expires_at")
+  usedAt      DateTime? @map("used_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  session AuthSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("auth_csrf_tokens")
+}
+
+// 14. AuthAuditLog
+// ---------------------------------------------------------------------------
+model AuthAuditLog {
+  id                 String           @id @default(uuid()) @db.Uuid
+  userId             String?          @map("user_id") @db.Uuid
+  actorEmail         String?          @map("actor_email") @db.VarChar(255)
+  actorRole          String?          @map("actor_role") @db.VarChar(100)
+  action             String           @db.VarChar(255)
+  resourceType       String           @map("resource_type") @db.VarChar(100)
+  resourceId         String?          @map("resource_id") @db.Uuid
+  details            Json?
+  ipAddress          String?          @map("ip_address") @db.VarChar(45)
+  userAgent          String?          @map("user_agent") @db.VarChar(500)
+  requestId          String?          @map("request_id") @db.VarChar(255)
+  responseStatus     Int?             @map("response_status")
+  durationMs         Int?             @map("duration_ms")
+  dataClassification DataClassification @default(PUBLIC) @map("data_classification")
+  phiAccessed        Boolean          @default(false) @map("phi_accessed")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user AuthUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([actorEmail])
+  @@map("auth_audit_logs")
+}
+
+// 15. AuthDataVault
+// ---------------------------------------------------------------------------
+model AuthDataVault {
+  id              String             @id @default(uuid()) @db.Uuid
+  userId          String             @map("user_id") @db.Uuid
+  fieldName       String             @map("field_name") @db.VarChar(100)
+  encryptedValue  Bytes              @map("encrypted_value")
+  iv              Bytes              @db.VarByte(16)
+  authTag         Bytes              @map("auth_tag") @db.VarByte(16)
+  keyVersion      Int                @default(1) @map("key_version")
+  classification  DataClassification @default(CONFIDENTIAL)
+  accessCount     Int                @default(0) @map("access_count")
+  lastAccessedAt  DateTime?          @map("last_accessed_at")
+  lastAccessedBy  String?            @map("last_accessed_by") @db.Uuid
+  expiresAt       DateTime?          @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fieldName])
+  @@index([userId])
+  @@index([classification])
+  @@index([expiresAt])
+  @@map("auth_data_vault")
+}
+
+// 16. AuthConsent
+// ---------------------------------------------------------------------------
+model AuthConsent {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  consentType  String    @map("consent_type") @db.VarChar(100)
+  version      String    @db.VarChar(20)
+  granted      Boolean
+  ipAddress    String?   @map("ip_address") @db.VarChar(45)
+  userAgent    String?   @map("user_agent") @db.VarChar(500)
+  grantedAt    DateTime  @default(now()) @map("granted_at")
+  withdrawnAt  DateTime? @map("withdrawn_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([consentType])
+  @@map("auth_consents")
+}
+
+// 17. AuthApiKey
+// ---------------------------------------------------------------------------
+model AuthApiKey {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  name        String   @db.VarChar(100)
+  keyHash     String   @map("key_hash") @db.VarChar(255)
+  keyPrefix   String   @map("key_prefix") @db.VarChar(20)
+  scopes      Json?
+  rateLimit   Int?     @map("rate_limit")
+  expiresAt   DateTime? @map("expires_at")
+  lastUsedAt  DateTime? @map("last_used_at")
+  lastUsedIp  String?  @map("last_used_ip") @db.VarChar(45)
+  isActive    Boolean  @default(true) @map("is_active")
+  revokedAt   DateTime? @map("revoked_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([keyHash])
+  @@index([keyPrefix])
+  @@index([isActive])
+  @@map("auth_api_keys")
+}

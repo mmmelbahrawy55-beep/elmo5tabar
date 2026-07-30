@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "almokhtabar.fullname" . }}-ai-service
+  namespace: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ai-service
+  annotations:
+    {{- with .Values.global.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.aiService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ai-service
+  template:
+    metadata:
+      labels:
+        {{- include "almokhtabar.labels" . | nindent 8 }}
+        app.kubernetes.io/component: ai-service
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- if .Values.monitoring.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{ .Values.aiService.port }}"
+        {{- end }}
+        {{- with .Values.global.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "almokhtabar.imagePullSecrets" . | indent 6 }}
+      serviceAccountName: {{ include "almokhtabar.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.aiService.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
+      {{- if .Values.aiService.gpu.enabled }}
+      nodeSelector:
+        nvidia.com/gpu: present
+        {{- with .Values.aiService.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- else }}
+      {{- with .Values.aiService.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.aiService.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: ai-service
+                topologyKey: kubernetes.io/hostname
+        {{- with .Values.aiService.affinity }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.aiService.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ai-service
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          image: {{ .Values.global.imageRegistry }}{{ .Values.aiService.image.repository }}:{{ .Values.aiService.image.tag }}
+          imagePullPolicy: {{ .Values.aiService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.aiService.port }}
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "almokhtabar.fullname" . }}-config
+            - secretRef:
+                name: {{ include "almokhtabar.fullname" . }}-secrets
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PORT
+              value: {{ .Values.aiService.port | quote }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.aiService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.aiService.probe.liveness.path }}
+              port: {{ .Values.aiService.port }}
+            initialDelaySeconds: {{ .Values.aiService.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.aiService.probe.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.aiService.probe.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.aiService.probe.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.aiService.probe.readiness.path }}
+              port: {{ .Values.aiService.port }}
+            initialDelaySeconds: {{ .Values.aiService.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.aiService.probe.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.aiService.probe.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.aiService.probe.readiness.failureThreshold }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- if .Values.aiService.config.modelPath }}
+            - name: models
+              mountPath: {{ .Values.aiService.config.modelPath }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+        - name: models
+          emptyDir:
+            sizeLimit: 10Gi
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}

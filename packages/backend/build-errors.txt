@@ -1,0 +1,2058 @@
+﻿node.exe : [96msrc/modules/appointments/services/appointments.service.ts[0m:[93m34[0m:[93m17[0m - 
+[91merror[0m[90m TS2322: [0mType 'AppointmentStatus' is not assignable to type 'AppointmentStatus | 
+EnumAppointmentStatusFilter<"Appointment">'.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([96msrc/module...Appointment">'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[7m34[0m     if (status) where.status = status;
+[7m  [0m [91m                ~~~~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m56[0m:[93m15[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m56[0m               firstName: true,
+[7m  [0m [91m              ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m63[0m:[93m33[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m63[0m             select: { id: true, name: true, address: true },
+[7m  [0m [91m                                ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m90[0m:[93m9[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'doctor' does not exist in type 
+'AppointmentInclude<DefaultArgs>'.
+
+[7m90[0m         doctor: true,
+[7m  [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m44105[0m:[93m5[0m
+    [7m44105[0m     include?: AppointmentInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+AppointmentSelect<DefaultArgs>; include?: AppointmentInclude<DefaultArgs>; where: AppointmentWhereUniqueInput; }'
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m125[0m:[93m9[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'createdById' does not exist in type 
+'(Without<AppointmentCreateInput, AppointmentUncheckedCreateInput> & AppointmentUncheckedCreateInput) | (Without<...> 
+& AppointmentCreateInput)'. Did you mean to write 'createdBy'?
+
+[7m125[0m         createdById: userId,
+[7m   [0m [91m        ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m44284[0m:[93m5[0m
+    [7m44284[0m     data: XOR<AppointmentCreateInput, AppointmentUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+AppointmentSelect<DefaultArgs>; include?: AppointmentInclude<DefaultArgs>; data: (Without<AppointmentCreateInput, 
+AppointmentUncheckedCreateInput> & AppointmentUncheckedCreateInput) | (Without<...> & AppointmentCreateInput); }'
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m128[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m128[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m129[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m129[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m174[0m:[93m18[0m - [91merror[0m[90m 
+TS2339: [0mProperty 'doctor' does not exist on type 'AppointmentUpdateInput'.
+
+[7m174[0m       updateData.doctor = dto.doctorId ? { connect: { id: dto.doctorId } } : { disconnect: true };
+[7m   [0m [91m                 ~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m180[0m:[93m16[0m - [91merror[0m[90m 
+TS2551: [0mProperty 'updatedById' does not exist on type 'AppointmentUpdateInput'. Did you mean 'updatedBy'?
+
+[7m180[0m     updateData.updatedById = userId;
+[7m   [0m [91m               ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m108506[0m:[93m5[0m
+    [7m108506[0m     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    [7m      [0m [96m    ~~~~~~~~~[0m
+    'updatedBy' is declared here.
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m186[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m186[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m187[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m187[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m215[0m:[93m9[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'cancellationReason' does not exist in type 
+'(Without<AppointmentUpdateInput, AppointmentUncheckedUpdateInput> & AppointmentUncheckedUpdateInput) | (Without<...> 
+& AppointmentUpdateInput)'. Did you mean to write 'cancelReason'?
+
+[7m215[0m         cancellationReason: reason,
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m44332[0m:[93m5[0m
+    [7m44332[0m     data: XOR<AppointmentUpdateInput, AppointmentUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+AppointmentSelect<DefaultArgs>; include?: AppointmentInclude<DefaultArgs>; data: (Without<AppointmentUpdateInput, 
+AppointmentUncheckedUpdateInput> & AppointmentUncheckedUpdateInput) | (Without<...> & AppointmentUpdateInput); where: 
+AppointmentWhereUniqueInput; }'
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m220[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m220[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m221[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m221[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m262[0m:[93m9[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus | 
+EnumAppointmentStatusFieldUpdateOperationsInput'. Did you mean '"SCHEDULED"'?
+
+[7m262[0m         status: AppointmentStatus.RESCHEDULED,
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m108526[0m:[93m5[0m
+    [7m108526[0m     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<AppointmentUpdateInput, 
+AppointmentUncheckedUpdateInput> & AppointmentUncheckedUpdateInput) | (Without<...> & AppointmentUpdateInput)'
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m282[0m:[93m9[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'rescheduledFromId' does not exist in type 
+'(Without<AppointmentCreateInput, AppointmentUncheckedCreateInput> & AppointmentUncheckedCreateInput) | (Without<...> 
+& AppointmentCreateInput)'.
+
+[7m282[0m         rescheduledFromId: id,
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m44284[0m:[93m5[0m
+    [7m44284[0m     data: XOR<AppointmentCreateInput, AppointmentUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+AppointmentSelect<DefaultArgs>; include?: AppointmentInclude<DefaultArgs>; data: (Without<AppointmentCreateInput, 
+AppointmentUncheckedCreateInput> & AppointmentUncheckedCreateInput) | (Without<...> & AppointmentCreateInput); }'
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m286[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m286[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m287[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m287[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m315[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m315[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m316[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m316[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m346[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m346[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m347[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m347[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m375[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m375[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m376[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m376[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m404[0m:[93m75[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus'. Did you mean 
+'"SCHEDULED"'?
+
+[7m404[0m           notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW, AppointmentStatus.RESCHEDULED],
+[7m   [0m [91m                                                                          
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m453[0m:[93m48[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus'. Did you mean 
+'"SCHEDULED"'?
+
+[7m453[0m           notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.RESCHEDULED],
+[7m   [0m [91m                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m458[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m458[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m460[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m460[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m536[0m:[93m40[0m - [91merror[0m[90m 
+TS2561: [0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m536[0m         patient: { select: { id: true, firstName: true, lastName: true, phone: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m537[0m:[93m39[0m - [91merror[0m[90m 
+TS2353: [0mObject literal may only specify known properties, and 'name' does not exist in type 
+'BranchSelect<DefaultArgs>'.
+
+[7m537[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m558[0m:[93m75[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus'. Did you mean 
+'"SCHEDULED"'?
+
+[7m558[0m           notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW, AppointmentStatus.RESCHEDULED],
+[7m   [0m [91m                                                                          
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m568[0m:[93m75[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus'. Did you mean 
+'"SCHEDULED"'?
+
+[7m568[0m           notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW, AppointmentStatus.RESCHEDULED],
+[7m   [0m [91m                                                                          
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/appointments/services/appointments.service.ts[0m:[93m592[0m:[93m79[0m - [91merror[0m[90m 
+TS2820: [0mType 'AppointmentStatus.RESCHEDULED' is not assignable to type 'AppointmentStatus'. Did you mean 
+'"SCHEDULED"'?
+
+[7m592[0m               notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW, 
+AppointmentStatus.RESCHEDULED],
+[7m   [0m [91m                                                                              
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/branches/services/branches.service.ts[0m:[93m275[0m:[93m56[0m - [91merror[0m[90m TS2493: 
+[0mTuple type '[number, number, GetOrderAggregateType<{ where: { status: { not: "CANCELLED"; }; AND?: OrderWhereInput 
+| OrderWhereInput[]; OR?: OrderWhereInput[]; NOT?: OrderWhereInput | OrderWhereInput[]; ... 49 more ...; 
+notifications?: NotificationListRelationFilter; }; _sum: { ...; }; _avg: { ...; }; }>]' of length '3' has no element 
+at index '3'.
+
+[7m275[0m     const [totalOrders, completedOrders, totalRevenue, avgOrderValue] = await Promise.all([
+[7m   [0m [91m                                                       ~~~~~~~~~~~~~[0m
+[96msrc/modules/dashboard/services/dashboard.service.ts[0m:[93m784[0m:[93m18[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'deletedAt' does not exist in type 'PaymentWhereInput'.
+
+[7m784[0m         where: { deletedAt: null },
+[7m   [0m [91m                 ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55932[0m:[93m5[0m
+    [7m55932[0m     where?: PaymentWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; where?: PaymentWhereInput; ... 4 more ...; 
+distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]; }'
+[96msrc/modules/doctors/services/doctors.service.ts[0m:[93m120[0m:[93m7[0m - [91merror[0m[90m TS2322: 
+[0mType 'string[]' is not assignable to type 'never'.
+
+[7m120[0m       distinct: ['patientId'],
+[7m   [0m [91m      ~~~~~~~~[0m
+
+  [96msrc/modules/doctors/services/doctors.service.ts[0m:[93m120[0m:[93m7[0m
+    [7m120[0m       distinct: ['patientId'],
+    [7m   [0m [96m      ~~~~~~~~~~~~~~~~~~~~~~~[0m
+    The expected type comes from property 'distinct' which is declared here on type 'Subset<{ where: { doctorId: 
+string; status: "COMPLETED"; }; distinct: string[]; }, AppointmentCountArgs<DefaultArgs>>'
+[96msrc/modules/insurance/services/insurance.service.ts[0m:[93m289[0m:[93m11[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'patient' does not exist in type 
+'InsuranceClaimInclude<DefaultArgs>'.
+
+[7m289[0m           patient: { select: { firstNameAr: true, lastNameAr: true, phone: true } },
+[7m   [0m [91m          ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m53506[0m:[93m5[0m
+    [7m53506[0m     include?: InsuranceClaimInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+InsuranceClaimSelect<DefaultArgs>; include?: InsuranceClaimInclude<DefaultArgs>; where?: InsuranceClaimWhereInput; ... 
+4 more ...; distinct?: InsuranceClaimScalarFieldEnum | InsuranceClaimScalarFieldEnum[]; }'
+[96msrc/modules/insurance/services/insurance.service.ts[0m:[93m307[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'patient' does not exist in type 
+'InsuranceClaimInclude<DefaultArgs>'.
+
+[7m307[0m         patient: true,
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m53374[0m:[93m5[0m
+    [7m53374[0m     include?: InsuranceClaimInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+InsuranceClaimSelect<DefaultArgs>; include?: InsuranceClaimInclude<DefaultArgs>; where: 
+InsuranceClaimWhereUniqueInput; }'
+[96msrc/modules/insurance/services/insurance.service.ts[0m:[93m333[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'patient' does not exist in type 
+'InsuranceClaimInclude<DefaultArgs>'.
+
+[7m333[0m         patient: { select: { firstNameAr: true, lastNameAr: true } },
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m53549[0m:[93m5[0m
+    [7m53549[0m     include?: InsuranceClaimInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+InsuranceClaimSelect<DefaultArgs>; include?: InsuranceClaimInclude<DefaultArgs>; data: (Without<...> & 
+InsuranceClaimUncheckedCreateInput) | (Without<...> & InsuranceClaimCreateInput); }'
+[96msrc/modules/notifications/gateway/notification.gateway.ts[0m:[93m58[0m:[93m26[0m - [91merror[0m[90m 
+TS2339: [0mProperty 'isActive' does not exist on type '{ role: UserRole; id: string; }'.
+
+[7m58[0m       if (!user || !user.isActive) {
+[7m  [0m [91m                         ~~~~~~~~[0m
+[96msrc/modules/notifications/services/notifications.service.ts[0m:[93m126[0m:[93m9[0m - [91merror[0m[90m 
+TS2322: [0mType 'Record<string, unknown> | JsonNull' is not assignable to type 'NullableJsonNullValueInput | 
+InputJsonValue'.
+  Type 'Record<string, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue'.
+    Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': length, 
+concat, join, slice, and 20 more.
+
+[7m126[0m         data: dto.data ?? Prisma.JsonNull,
+[7m   [0m [91m        ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m110618[0m:[93m5[0m
+    [7m110618[0m     data?: NullableJsonNullValueInput | InputJsonValue
+    [7m      [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '(Without<NotificationCreateInput, 
+NotificationUncheckedCreateInput> & NotificationUncheckedCreateInput) | (Without<...> & NotificationCreateInput)'
+[96msrc/modules/notifications/services/notifications.service.ts[0m:[93m137[0m:[93m7[0m - [91merror[0m[90m 
+TS2322: [0mType '{ userId: string; type: NotificationType; channel: NotificationChannel; title: string; body: string; 
+data: Record<string, unknown>; sentAt: Date; }[]' is not assignable to type 'NotificationCreateManyInput | 
+NotificationCreateManyInput[]'.
+  Type '{ userId: string; type: NotificationType; channel: NotificationChannel; title: string; body: string; data: 
+Record<string, unknown>; sentAt: Date; }[]' is not assignable to type 'NotificationCreateManyInput[]'.
+    Type '{ userId: string; type: $Enums.NotificationType; channel: $Enums.NotificationChannel; title: string; body: 
+string; data: Record<string, unknown>; sentAt: Date; }' is not assignable to type 'NotificationCreateManyInput'.
+      Types of property 'data' are incompatible.
+        Type 'Record<string, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue'.
+          Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': 
+length, concat, join, slice, and 20 more.
+
+[7m137[0m       data: userIds.map((userId) => ({
+[7m   [0m [91m      ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m60449[0m:[93m5[0m
+    [7m60449[0m     data: NotificationCreateManyInput | NotificationCreateManyInput[]
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ data: NotificationCreateManyInput | 
+NotificationCreateManyInput[]; skipDuplicates?: boolean; }'
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m99[0m:[93m10[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m99[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m99[0m:[93m22[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m99[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m  [0m [91m                     ~~~~[0m
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m109[0m:[93m10[0m - [91merror[0m[90m 
+TS2552: [0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m109[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m   [0m [91m         ~~~~[0m
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m109[0m:[93m22[0m - [91merror[0m[90m 
+TS2552: [0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m109[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m   [0m [91m                     ~~~~[0m
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m119[0m:[93m10[0m - [91merror[0m[90m 
+TS2552: [0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m119[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m   [0m [91m         ~~~~[0m
+[96msrc/modules/packages/controllers/packages.controller.ts[0m:[93m119[0m:[93m22[0m - [91merror[0m[90m 
+TS2552: [0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m119[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m   [0m [91m                     ~~~~[0m
+[96msrc/modules/packages/services/packages.service.ts[0m:[93m124[0m:[93m11[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'finalPrice' does not exist in type 
+'(Without<TestPackageCreateInput, TestPackageUncheckedCreateInput> & TestPackageUncheckedCreateInput) | (Without<...> 
+& TestPackageCreateInput)'.
+
+[7m124[0m           finalPrice: Math.max(finalPrice, 0),
+[7m   [0m [91m          ~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m33571[0m:[93m5[0m
+    [7m33571[0m     data: XOR<TestPackageCreateInput, TestPackageUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+TestPackageSelect<DefaultArgs>; include?: TestPackageInclude<DefaultArgs>; data: (Without<TestPackageCreateInput, 
+TestPackageUncheckedCreateInput> & TestPackageUncheckedCreateInput) | (Without<...> & TestPackageCreateInput); }'
+[96msrc/modules/packages/services/packages.service.ts[0m:[93m203[0m:[93m11[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'finalPrice' does not exist in type 
+'(Without<TestPackageUpdateInput, TestPackageUncheckedUpdateInput> & TestPackageUncheckedUpdateInput) | (Without<...> 
+& TestPackageUpdateInput)'.
+
+[7m203[0m           finalPrice: Math.max(finalPrice, 0),
+[7m   [0m [91m          ~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m33619[0m:[93m5[0m
+    [7m33619[0m     data: XOR<TestPackageUpdateInput, TestPackageUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+TestPackageSelect<DefaultArgs>; include?: TestPackageInclude<DefaultArgs>; data: (Without<TestPackageUpdateInput, 
+TestPackageUncheckedUpdateInput> & TestPackageUncheckedUpdateInput) | (Without<...> & TestPackageUpdateInput); where: 
+TestPackageWhereUniqueInput; }'
+[96msrc/modules/packages/services/packages.service.ts[0m:[93m308[0m:[93m43[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'finalPrice' does not exist on type '{ items: ({ labTest: { id: string; isActive: boolean; createdBy: 
+string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; code: string; sortOrder: number; ... 27 
+more ...; metadata: JsonValue; }; } & { ...; })[]; } & { ...; }'.
+
+[7m308[0m       const savings = originalPrice - pkg.finalPrice;
+[7m   [0m [91m                                          ~~~~~~~~~~[0m
+[96msrc/modules/patients/services/patients.service.ts[0m:[93m140[0m:[93m13[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'relationship' does not exist in type 
+'PatientSelect<DefaultArgs>'.
+
+[7m140[0m             relationship: true,
+[7m   [0m [91m            ~~~~~~~~~~~~[0m
+[96msrc/modules/patients/services/patients.service.ts[0m:[93m358[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'relationship' does not exist in type 
+'PatientSelect<DefaultArgs>'.
+
+[7m358[0m         relationship: true,
+[7m   [0m [91m        ~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m19700[0m:[93m5[0m
+    [7m19700[0m     select?: PatientSelect<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'select' which is declared here on type '{ select?: 
+PatientSelect<DefaultArgs>; include?: PatientInclude<DefaultArgs>; where?: PatientWhereInput; ... 4 more ...; 
+distinct?: PatientScalarFieldEnum | PatientScalarFieldEnum[]; }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m34[0m:[93m44[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m34[0m             labTest: { select: { id: true, name: true, nameAr: true, price: true } },
+[7m  [0m [91m                                           ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m38[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m38[0m           select: { id: true, firstName: true, lastName: true, phone: true, email: true },
+[7m  [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m40[0m:[93m39[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m40[0m         branch: { select: { id: true, name: true } },
+[7m  [0m [91m                                      ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m56[0m:[93m28[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'items' does not exist on type '{ insuranceClaim: boolean; id: string; status: OrderStatus; createdBy: 
+string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; patientId: string; ... 28 more ...; 
+completedAt: Date; }'.
+
+[7m56[0m     const subtotal = order.items.reduce(
+[7m  [0m [91m                           ~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m73[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'taxAmount' does not exist in type 
+'(Without<InvoiceCreateInput, InvoiceUncheckedCreateInput> & InvoiceUncheckedCreateInput) | (Without<...> & 
+InvoiceCreateInput)'.
+
+[7m73[0m         taxAmount,
+[7m  [0m [91m        ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m54794[0m:[93m5[0m
+    [7m54794[0m     data: XOR<InvoiceCreateInput, InvoiceUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+InvoiceSelect<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; data: (Without<InvoiceCreateInput, 
+InvoiceUncheckedCreateInput> & InvoiceUncheckedCreateInput) | (Without<...> & InvoiceCreateInput); }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m80[0m:[93m25[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'items' does not exist on type '{ insuranceClaim: boolean; id: string; status: OrderStatus; createdBy: 
+string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; patientId: string; ... 28 more ...; 
+completedAt: Date; }'.
+
+[7m80[0m           create: order.items.map((item) => ({
+[7m  [0m [91m                        ~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m91[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m91[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m  [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m93[0m:[93m39[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m93[0m         branch: { select: { id: true, name: true } },
+[7m  [0m [91m                                      ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m110[0m:[93m39[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m110[0m         branch: { select: { id: true, name: true, address: true, phone: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m112[0m:[93m73[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m112[0m           include: { items: { include: { labTest: { select: { id: true, name: true } } } } },
+[7m   [0m [91m                                                                        ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m117[0m:[93m22[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'processedBy' does not exist in type 
+'PaymentInclude<DefaultArgs>'.
+
+[7m117[0m           include: { processedBy: { select: { id: true, firstName: true, lastName: true } } },
+[7m   [0m [91m                     ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m138[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m138[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m140[0m:[93m39[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m140[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m162[0m:[93m26[0m - [91merror[0m[90m TS2322: 
+[0mType 'string' is not assignable to type 'PaymentStatus | EnumPaymentStatusFilter<"Invoice">'.
+
+[7m162[0m     if (filters?.status) where.status = filters.status;
+[7m   [0m [91m                         ~~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m174[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'firstNameAr'?
+
+[7m174[0m         { patient: { firstName: { contains: search, mode: 'insensitive' } } },
+[7m   [0m [91m                     ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m100247[0m:[93m5[0m
+    [7m100247[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m      [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'InvoiceWhereInput'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m175[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'lastName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'lastNameAr'?
+
+[7m175[0m         { patient: { lastName: { contains: search, mode: 'insensitive' } } },
+[7m   [0m [91m                     ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m100247[0m:[93m5[0m
+    [7m100247[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m      [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'InvoiceWhereInput'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m180[0m:[93m5[0m - [91merror[0m[90m TS2322: 
+[0mType '"desc" | "asc"' is not assignable to type 'PatientOrderByWithRelationInput & BranchOrderByWithRelationInput 
+& OrderOrderByWithRelationInput & RefundOrderByWithRelationInput & ((SortOrder & (SortOrder | SortOrderInput)) & ... 1 
+more ... & PaymentOrderByRelationAggregateInput)'.
+  Type '"desc"' is not assignable to type 'PatientOrderByWithRelationInput & BranchOrderByWithRelationInput & 
+OrderOrderByWithRelationInput & RefundOrderByWithRelationInput & ((SortOrder & (SortOrder | SortOrderInput)) & ... 1 
+more ... & PaymentOrderByRelationAggregateInput)'.
+
+[7m180[0m     orderBy[sortBy as keyof Prisma.InvoiceOrderByWithRelationInput] = sortOrder;
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m190[0m:[93m33[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m190[0m             select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                                ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m192[0m:[93m41[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m192[0m           branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                        ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m248[0m:[93m9[0m - [91merror[0m[90m TS2322: 
+[0mType '"COMPLETED"' is not assignable to type 'PaymentStatus'.
+
+[7m248[0m         status: 'COMPLETED',
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m110023[0m:[93m5[0m
+    [7m110023[0m     status?: $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<PaymentCreateInput, 
+PaymentUncheckedCreateInput> & PaymentUncheckedCreateInput) | (Without<...> & PaymentCreateInput)'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m254[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'processedBy' does not exist in type 
+'PaymentInclude<DefaultArgs>'.
+
+[7m254[0m         processedBy: {
+[7m   [0m [91m        ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55971[0m:[93m5[0m
+    [7m55971[0m     include?: PaymentInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; data: (Without<PaymentCreateInput, 
+PaymentUncheckedCreateInput> & PaymentUncheckedCreateInput) | (Without<...> & PaymentCreateInput); }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m261[0m:[93m47[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ patient: { email: string; firstNameAr: string; lastNameAr: 
+string; phone: string; id: string; isActive: boolean; createdBy: string; updatedBy: string; createdAt: Date; 
+updatedAt: Date; ... 22 more ...; parentPatientId: string; }; branch: { ...; }; } & { ...; }'.
+
+[7m261[0m     const newBalanceDue = Math.round((invoice.totalAmount - newPaidAmount) * 100) / 100;
+[7m   [0m [91m                                              ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m269[0m:[93m9[0m - [91merror[0m[90m TS2322: 
+[0mType '"PAID" | "PARTIAL"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFieldUpdateOperationsInput'.
+  Type '"PARTIAL"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFieldUpdateOperationsInput'.
+
+[7m269[0m         status: newStatus,
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m109899[0m:[93m5[0m
+    [7m109899[0m     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<InvoiceUpdateInput, 
+InvoiceUncheckedUpdateInput> & InvoiceUncheckedUpdateInput) | (Without<...> & InvoiceUpdateInput)'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m297[0m:[93m52[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'InvoiceSelect<DefaultArgs>'.
+
+[7m297[0m           select: { id: true, invoiceNumber: true, totalAmount: true, paidAmount: true },
+[7m   [0m [91m                                                   ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m320[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'processedBy' does not exist in type 
+'PaymentInclude<DefaultArgs>'.
+
+[7m320[0m         processedBy: {
+[7m   [0m [91m        ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55928[0m:[93m5[0m
+    [7m55928[0m     include?: PaymentInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; where?: PaymentWhereInput; ... 4 more ...; 
+distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]; }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m352[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'patientId' does not exist in type 
+'(Without<RefundCreateInput, RefundUncheckedCreateInput> & RefundUncheckedCreateInput) | (Without<...> & 
+RefundCreateInput)'.
+
+[7m352[0m         patientId: invoice.patientId,
+[7m   [0m [91m        ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m57100[0m:[93m5[0m
+    [7m57100[0m     data: XOR<RefundCreateInput, RefundUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: RefundSelect<DefaultArgs>; 
+include?: RefundInclude<DefaultArgs>; data: (Without<RefundCreateInput, RefundUncheckedCreateInput> & 
+RefundUncheckedCreateInput) | (Without<...> & RefundCreateInput); }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m363[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'processedBy' does not exist in type 
+'RefundInclude<DefaultArgs>'.
+
+[7m363[0m         processedBy: {
+[7m   [0m [91m        ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m57096[0m:[93m5[0m
+    [7m57096[0m     include?: RefundInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+RefundSelect<DefaultArgs>; include?: RefundInclude<DefaultArgs>; data: (Without<RefundCreateInput, 
+RefundUncheckedCreateInput> & RefundUncheckedCreateInput) | (Without<...> & RefundCreateInput); }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m370[0m:[93m47[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ patient: { email: string; firstNameAr: string; lastNameAr: 
+string; phone: string; id: string; isActive: boolean; createdBy: string; updatedBy: string; createdAt: Date; 
+updatedAt: Date; ... 22 more ...; parentPatientId: string; }; payments: { ...; }[]; } & { ...; }'.
+
+[7m370[0m     const newBalanceDue = Math.round((invoice.totalAmount - newPaidAmount) * 100) / 100;
+[7m   [0m [91m                                              ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m377[0m:[93m9[0m - [91merror[0m[90m TS2322: 
+[0mType '"PENDING" | "PARTIAL"' is not assignable to type 'PaymentStatus | 
+EnumPaymentStatusFieldUpdateOperationsInput'.
+  Type '"PARTIAL"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFieldUpdateOperationsInput'.
+
+[7m377[0m         status: newBalanceDue > 0 ? 'PARTIAL' : 'PENDING',
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m109899[0m:[93m5[0m
+    [7m109899[0m     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<InvoiceUpdateInput, 
+InvoiceUncheckedUpdateInput> & InvoiceUncheckedUpdateInput) | (Without<...> & InvoiceUpdateInput)'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m404[0m:[93m52[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'InvoiceSelect<DefaultArgs>'.
+
+[7m404[0m           select: { id: true, invoiceNumber: true, totalAmount: true, paidAmount: true },
+[7m   [0m [91m                                                   ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m425[0m:[93m25[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branchId' does not exist on type 'PaymentWhereInput'.
+
+[7m425[0m     if (branchId) where.branchId = branchId;
+[7m   [0m [91m                        ~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m448[0m:[93m54[0m - [91merror[0m[90m TS2322: 
+[0mType '"COMPLETED"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFilter<"Payment">'.
+
+[7m448[0m       this.prisma.payment.count({ where: { ...where, status: 'COMPLETED' } }),
+[7m   [0m [91m                                                     ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m100395[0m:[93m5[0m
+    [7m100395[0m     status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type 'PaymentWhereInput'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m450[0m:[93m28[0m - [91merror[0m[90m TS2322: 
+[0mType '"COMPLETED"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFilter<"Payment">'.
+
+[7m450[0m         where: { ...where, status: 'COMPLETED' },
+[7m   [0m [91m                           ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m100395[0m:[93m5[0m
+    [7m100395[0m     status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type 'PaymentWhereInput'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m454[0m:[93m61[0m - [91merror[0m[90m TS2322: 
+[0mType '"PARTIAL"' is not assignable to type 'PaymentStatus'.
+
+[7m454[0m         where: { ...invoiceWhere, status: { in: ['PENDING', 'PARTIAL'] }, balanceDue: { gt: 0 } },
+[7m   [0m [91m                                                            ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m458[0m:[93m38[0m - [91merror[0m[90m TS2322: 
+[0mType '"REJECTED"' is not assignable to type 'PaymentStatus | NestedEnumPaymentStatusFilter<"Refund">'.
+
+[7m458[0m         where: { ...where, status: { not: 'REJECTED' } },
+[7m   [0m [91m                                     ~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m462[0m:[93m7[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'AND' circularly references itself in mapped type '{ [K in keyof { AND?: 
+PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]; OR?: 
+PaymentScalarWhereWithAggregatesInput[]; ... 19 more ...; updatedAt?: string | ... 1 more ... | 
+DateTimeWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> : ...'.
+
+[7m462[0m       this.prisma.payment.groupBy({
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m463[0m         by: ['method'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m466[0m         _count: true,
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~[0m
+[7m467[0m       }),
+[7m   [0m [91m~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m462[0m:[93m7[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'NOT' circularly references itself in mapped type '{ [K in keyof { AND?: 
+PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]; OR?: 
+PaymentScalarWhereWithAggregatesInput[]; ... 19 more ...; updatedAt?: string | ... 1 more ... | 
+DateTimeWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> : ...'.
+
+[7m462[0m       this.prisma.payment.groupBy({
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m463[0m         by: ['method'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m466[0m         _count: true,
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~[0m
+[7m467[0m       }),
+[7m   [0m [91m~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m462[0m:[93m7[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'OR' circularly references itself in mapped type '{ [K in keyof { AND?: 
+PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]; OR?: 
+PaymentScalarWhereWithAggregatesInput[]; ... 19 more ...; updatedAt?: string | ... 1 more ... | 
+DateTimeWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> : ...'.
+
+[7m462[0m       this.prisma.payment.groupBy({
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m463[0m         by: ['method'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m466[0m         _count: true,
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~[0m
+[7m467[0m       }),
+[7m   [0m [91m~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m495[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'patient' does not exist in type 
+'PaymentInclude<DefaultArgs>'.
+
+[7m495[0m         patient: true,
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55796[0m:[93m5[0m
+    [7m55796[0m     include?: PaymentInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; where: PaymentWhereUniqueInput; }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m505[0m:[93m42[0m - [91merror[0m[90m TS2551: 
+[0mProperty 'invoice' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'. Did you mean 'invoiceId'?
+
+[7m505[0m     const receiptNumber = `RCT-${payment.invoice.invoiceNumber}-${paymentId.slice(-6).toUpperCase()}`;
+[7m   [0m [91m                                         ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m514[0m:[93m30[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedAt' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m514[0m         processedAt: payment.processedAt,
+[7m   [0m [91m                             ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m517[0m:[93m32[0m - [91merror[0m[90m TS2551: 
+[0mProperty 'invoice' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'. Did you mean 'invoiceId'?
+
+[7m517[0m         invoiceNumber: payment.invoice.invoiceNumber,
+[7m   [0m [91m                               ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m518[0m:[93m30[0m - [91merror[0m[90m TS2551: 
+[0mProperty 'invoice' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'. Did you mean 'invoiceId'?
+
+[7m518[0m         totalAmount: payment.invoice.totalAmount,
+[7m   [0m [91m                             ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m519[0m:[93m29[0m - [91merror[0m[90m TS2551: 
+[0mProperty 'invoice' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'. Did you mean 'invoiceId'?
+
+[7m519[0m         paidAmount: payment.invoice.paidAmount,
+[7m   [0m [91m                            ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m520[0m:[93m29[0m - [91merror[0m[90m TS2551: 
+[0mProperty 'invoice' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'. Did you mean 'invoiceId'?
+
+[7m520[0m         balanceDue: payment.invoice.balanceDue,
+[7m   [0m [91m                            ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m523[0m:[93m28[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'patient' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m523[0m         firstName: payment.patient.firstName,
+[7m   [0m [91m                           ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m524[0m:[93m27[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'patient' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m524[0m         lastName: payment.patient.lastName,
+[7m   [0m [91m                          ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m525[0m:[93m24[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'patient' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m525[0m         phone: payment.patient.phone,
+[7m   [0m [91m                       ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m526[0m:[93m24[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'patient' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m526[0m         email: payment.patient.email,
+[7m   [0m [91m                       ~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m529[0m:[93m23[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branch' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m529[0m         name: payment.branch.name,
+[7m   [0m [91m                      ~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m530[0m:[93m26[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branch' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m530[0m         address: payment.branch.address,
+[7m   [0m [91m                         ~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m531[0m:[93m24[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branch' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m531[0m         phone: payment.branch.phone,
+[7m   [0m [91m                       ~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m533[0m:[93m28[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedBy' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m533[0m       processedBy: payment.processedBy
+[7m   [0m [91m                           ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m534[0m:[93m22[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedBy' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m534[0m         ? `${payment.processedBy.firstName} ${payment.processedBy.lastName}`
+[7m   [0m [91m                     ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m534[0m:[93m55[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedBy' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m534[0m         ? `${payment.processedBy.firstName} ${payment.processedBy.lastName}`
+[7m   [0m [91m                                                      ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m557[0m:[93m33[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m557[0m             select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                                ~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m559[0m:[93m41[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m559[0m           branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                        ~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m593[0m:[93m9[0m - [91merror[0m[90m TS2322: 
+[0mType '"COMPLETED"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFilter<"Payment">'.
+
+[7m593[0m         status: 'COMPLETED',
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m100395[0m:[93m5[0m
+    [7m100395[0m     status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type 'PaymentWhereInput'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m597[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'branch' does not exist in type 
+'PaymentInclude<DefaultArgs>'.
+
+[7m597[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55928[0m:[93m5[0m
+    [7m55928[0m     include?: PaymentInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; where?: PaymentWhereInput; ... 4 more ...; 
+distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]; }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m599[0m:[93m18[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'processedAt' does not exist in type 
+'PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]'.
+
+[7m599[0m       orderBy: { processedAt: 'asc' },
+[7m   [0m [91m                 ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m55938[0m:[93m5[0m
+    [7m55938[0m     orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'orderBy' which is declared here on type '{ select?: 
+PaymentSelect<DefaultArgs>; include?: PaymentInclude<DefaultArgs>; where?: PaymentWhereInput; ... 4 more ...; 
+distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]; }'
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m606[0m:[93m29[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branch' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m606[0m         const key = payment.branch.name;
+[7m   [0m [91m                            ~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m616[0m:[93m30[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedAt' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m616[0m         const date = payment.processedAt ? new Date(payment.processedAt) : new Date();
+[7m   [0m [91m                             ~~~~~~~~~~~[0m
+[96msrc/modules/payments/services/payments.service.ts[0m:[93m616[0m:[93m61[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'processedAt' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; currency: string; notes: string; paymentNumber: string; ... 9 more ...; 
+bankReference: string; }'.
+
+[7m616[0m         const date = payment.processedAt ? new Date(payment.processedAt) : new Date();
+[7m   [0m [91m                                                            ~~~~~~~~~~~[0m
+[96msrc/modules/queue/controllers/queue.controller.ts[0m:[93m74[0m:[93m44[0m - [91merror[0m[90m TS2307: 
+[0mCannot find module '../../prisma/prisma.service' or its corresponding type declarations.
+
+[7m74[0m     const { PrismaService } = await import('../../prisma/prisma.service');
+[7m  [0m [91m                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m56[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'position' does not exist in type '(Without<QueueEntryCreateInput, 
+QueueEntryUncheckedCreateInput> & QueueEntryUncheckedCreateInput) | (Without<...> & QueueEntryCreateInput)'.
+
+[7m56[0m         position: await this.getNextPosition(dto.branchId),
+[7m  [0m [91m        ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47714[0m:[93m5[0m
+    [7m47714[0m     data: XOR<QueueEntryCreateInput, QueueEntryUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryCreateInput, 
+QueueEntryUncheckedCreateInput> & QueueEntryUncheckedCreateInput) | (Without<...> & QueueEntryCreateInput); }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m60[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m60[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m  [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m61[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m61[0m         branch: { select: { id: true, name: true } },
+[7m  [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m73[0m:[93m44[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'servicePoint' does not exist on type 'PrismaService'.
+
+[7m73[0m     const servicePoint = await this.prisma.servicePoint.findUnique({
+[7m  [0m [91m                                           ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m85[0m:[93m9[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'servicePointId' does not exist in type 'QueueEntryWhereInput'. Did you 
+mean to write 'servicePoint'?
+
+[7m85[0m         servicePointId: null,
+[7m  [0m [91m        ~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47575[0m:[93m5[0m
+    [7m47575[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m90[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryOrderByWithRelationInput'.
+
+[7m90[0m         { addedAt: 'asc' },
+[7m  [0m [91m          ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m102[0m:[93m9[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'servicePointId' does not exist in type 
+'(Without<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & 
+QueueEntryUpdateInput)'. Did you mean to write 'servicePoint'?
+
+[7m102[0m         servicePointId,
+[7m   [0m [91m        ~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47762[0m:[93m5[0m
+    [7m47762[0m     data: XOR<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput); where: 
+QueueEntryWhereUniqueInput; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m106[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m106[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m107[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m107[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m137[0m:[93m9[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'servicePointId' does not exist in type 
+'(Without<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & 
+QueueEntryUpdateInput)'. Did you mean to write 'servicePoint'?
+
+[7m137[0m         servicePointId,
+[7m   [0m [91m        ~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47762[0m:[93m5[0m
+    [7m47762[0m     data: XOR<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput); where: 
+QueueEntryWhereUniqueInput; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m141[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m141[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m142[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m142[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m169[0m:[93m28[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ branch: { email: string; phone: string; id: string; timezone: string; 
+isActive: boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; ... 12 
+more ...; managerId: string; }; } & { ...; }'.
+
+[7m169[0m     const waitTime = entry.addedAt
+[7m   [0m [91m                           ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m170[0m:[93m55[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ branch: { email: string; phone: string; id: string; timezone: string; 
+isActive: boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; ... 12 
+more ...; managerId: string; }; } & { ...; }'.
+
+[7m170[0m       ? Math.floor((entry.calledAt!.getTime() - entry.addedAt.getTime()) / 1000)
+[7m   [0m [91m                                                      ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m184[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m184[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m185[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m185[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m215[0m:[93m9[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'cancelledAt' does not exist in type '(Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput)'. Did you 
+mean to write 'calledAt'?
+
+[7m215[0m         cancelledAt: new Date(),
+[7m   [0m [91m        ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47762[0m:[93m5[0m
+    [7m47762[0m     data: XOR<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput); where: 
+QueueEntryWhereUniqueInput; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m219[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m219[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m220[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m220[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m251[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'noShowAt' does not exist in type '(Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput)'.
+
+[7m251[0m         noShowAt: new Date(),
+[7m   [0m [91m        ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47762[0m:[93m5[0m
+    [7m47762[0m     data: XOR<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput); where: 
+QueueEntryWhereUniqueInput; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m254[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m254[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m255[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m255[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m284[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'transferredToBranchId' does not exist in type 
+'(Without<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & 
+QueueEntryUpdateInput)'.
+
+[7m284[0m         transferredToBranchId: toBranchId,
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47762[0m:[93m5[0m
+    [7m47762[0m     data: XOR<QueueEntryUpdateInput, QueueEntryUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryUpdateInput, 
+QueueEntryUncheckedUpdateInput> & QueueEntryUncheckedUpdateInput) | (Without<...> & QueueEntryUpdateInput); where: 
+QueueEntryWhereUniqueInput; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m289[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m289[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m290[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m290[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m303[0m:[93m64[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'name' does not exist on type '{ email: string; phone: string; id: string; timezone: string; isActive: 
+boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; city: string; ... 11 
+more ...; managerId: string; }'.
+
+[7m303[0m         notes: entry.notes ? `[Transferred from ${entry.branch.name}] ${entry.notes}` : `[Transferred from 
+${entry.branch.name}]`,
+[7m   [0m [91m                                                               ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m303[0m:[93m123[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'name' does not exist on type '{ email: string; phone: string; id: string; timezone: string; isActive: 
+boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; city: string; ... 11 
+more ...; managerId: string; }'.
+
+[7m303[0m         notes: entry.notes ? `[Transferred from ${entry.branch.name}] ${entry.notes}` : `[Transferred from 
+${entry.branch.name}]`,
+[7m   [0m [91m                                                                                                      
+                    ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m306[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'position' does not exist in type '(Without<QueueEntryCreateInput, 
+QueueEntryUncheckedCreateInput> & QueueEntryUncheckedCreateInput) | (Without<...> & QueueEntryCreateInput)'.
+
+[7m306[0m         position: await this.getNextPosition(toBranchId),
+[7m   [0m [91m        ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47714[0m:[93m5[0m
+    [7m47714[0m     data: XOR<QueueEntryCreateInput, QueueEntryUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; data: (Without<QueueEntryCreateInput, 
+QueueEntryUncheckedCreateInput> & QueueEntryUncheckedCreateInput) | (Without<...> & QueueEntryCreateInput); }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m311[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m311[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m312[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m312[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m343[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m343[0m         addedAt: { not: null },
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m46856[0m:[93m5[0m
+    [7m46856[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type 
+'Subset<QueueEntryAggregateArgs<DefaultArgs>, QueueEntryAggregateArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m346[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'position' does not exist in type 'QueueEntryAvgAggregateInputType'.
+
+[7m346[0m         position: true,
+[7m   [0m [91m        ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m46892[0m:[93m5[0m
+    [7m46892[0m     _avg?: QueueEntryAvgAggregateInputType
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property '_avg' which is declared here on type 
+'Subset<QueueEntryAggregateArgs<DefaultArgs>, QueueEntryAggregateArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m361[0m:[93m45[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'servicePoint' does not exist on type 'PrismaService'.
+
+[7m361[0m     const servicePoints = await this.prisma.servicePoint.findMany({
+[7m   [0m [91m                                            ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m396[0m:[93m17[0m - [91merror[0m[90m TS2322: [0mType 
+'string' is not assignable to type 'QueueStatus | EnumQueueStatusFilter<"QueueEntry">'.
+
+[7m396[0m     if (status) where.status = status;
+[7m   [0m [91m                ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m402[0m:[93m13[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type 'QueueEntryWhereInput'.
+
+[7m402[0m       where.addedAt = { gte: dayStart, lte: dayEnd };
+[7m   [0m [91m            ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m410[0m:[93m21[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryOrderByWithRelationInput'.
+
+[7m410[0m         orderBy: [{ addedAt: 'desc' }],
+[7m   [0m [91m                    ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m412[0m:[93m42[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m412[0m           patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                         ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m413[0m:[93m41[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m413[0m           branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                        ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m439[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m439[0m         addedAt: { gte: start, lte: end },
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m441[0m:[93m18[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryOrderByWithRelationInput | 
+QueueEntryOrderByWithRelationInput[]'.
+
+[7m441[0m       orderBy: { addedAt: 'desc' },
+[7m   [0m [91m                 ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47677[0m:[93m5[0m
+    [7m47677[0m     orderBy?: QueueEntryOrderByWithRelationInput | QueueEntryOrderByWithRelationInput[]
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'orderBy' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m443[0m:[93m40[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'firstName' does not exist in type 'PatientSelect<DefaultArgs>'. Did 
+you mean to write 'firstNameAr'?
+
+[7m443[0m         patient: { select: { id: true, firstName: true, lastName: true } },
+[7m   [0m [91m                                       ~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m444[0m:[93m39[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m444[0m         branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                      ~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m455[0m:[93m16[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m455[0m       (e) => e.addedAt && e.calledAt && e.status === TicketStatus.COMPLETED,
+[7m   [0m [91m               ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m460[0m:[93m53[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m460[0m             const wait = (e.calledAt!.getTime() - e.addedAt!.getTime()) / 1000;
+[7m   [0m [91m                                                    ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m480[0m:[93m24[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'servicePoint' does not exist on type 'PrismaService'.
+
+[7m480[0m     return this.prisma.servicePoint.findMany({
+[7m   [0m [91m                       ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m513[0m:[93m37[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'servicePoint' does not exist on type 'PrismaService'.
+
+[7m513[0m     const point = await this.prisma.servicePoint.findUnique({ where: { id } });
+[7m   [0m [91m                                    ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m518[0m:[93m39[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'servicePoint' does not exist on type 'PrismaService'.
+
+[7m518[0m     const updated = await this.prisma.servicePoint.update({
+[7m   [0m [91m                                      ~~~~~~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m543[0m:[93m62[0m - [91merror[0m[90m TS2561: [0mObject 
+literal may only specify known properties, but 'cancelledAt' does not exist in type 'QueueEntryWhereInput'. Did you 
+mean to write 'calledAt'?
+
+[7m543[0m           where: { branchId, status: TicketStatus.CANCELLED, cancelledAt: { gte: todayStart } },
+[7m   [0m [91m                                                             ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type 
+'Subset<QueueEntryCountArgs<DefaultArgs>, QueueEntryCountArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m546[0m:[93m60[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'noShowAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m546[0m           where: { branchId, status: TicketStatus.NO_SHOW, noShowAt: { gte: todayStart } },
+[7m   [0m [91m                                                           ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type 
+'Subset<QueueEntryCountArgs<DefaultArgs>, QueueEntryCountArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m549[0m:[93m30[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m549[0m           where: { branchId, addedAt: { gte: todayStart } },
+[7m   [0m [91m                             ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type 
+'Subset<QueueEntryCountArgs<DefaultArgs>, QueueEntryCountArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m558[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m558[0m         addedAt: { not: null },
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m561[0m:[93m17[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntrySelect<DefaultArgs>'.
+
+[7m561[0m       select: { addedAt: true, calledAt: true, startedServingAt: true, completedAt: true },
+[7m   [0m [91m                ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47663[0m:[93m5[0m
+    [7m47663[0m     select?: QueueEntrySelect<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'select' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m567[0m:[93m53[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m567[0m             const wait = (e.calledAt!.getTime() - e.addedAt!.getTime()) / 1000;
+[7m   [0m [91m                                                    ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m586[0m:[93m26[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m586[0m       where: { branchId, addedAt: { gte: todayStart } },
+[7m   [0m [91m                         ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m587[0m:[93m17[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntrySelect<DefaultArgs>'.
+
+[7m587[0m       select: { addedAt: true },
+[7m   [0m [91m                ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47663[0m:[93m5[0m
+    [7m47663[0m     select?: QueueEntrySelect<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'select' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m590[0m:[93m15[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m590[0m         if (e.addedAt) {
+[7m   [0m [91m              ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m591[0m:[93m26[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'addedAt' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m591[0m           const hour = e.addedAt.getHours();
+[7m   [0m [91m                         ~~~~~~~[0m
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m644[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'addedAt' does not exist in type 'QueueEntryWhereInput'.
+
+[7m644[0m         addedAt: { gte: todayStart },
+[7m   [0m [91m        ~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47671[0m:[93m5[0m
+    [7m47671[0m     where?: QueueEntryWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type 
+'Subset<QueueEntryCountArgs<DefaultArgs>, QueueEntryCountArgs<DefaultArgs>>'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m655[0m:[93m18[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'position' does not exist in type 'QueueEntryOrderByWithRelationInput | 
+QueueEntryOrderByWithRelationInput[]'.
+
+[7m655[0m       orderBy: { position: 'desc' },
+[7m   [0m [91m                 ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47581[0m:[93m5[0m
+    [7m47581[0m     orderBy?: QueueEntryOrderByWithRelationInput | QueueEntryOrderByWithRelationInput[]
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'orderBy' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m656[0m:[93m17[0m - [91merror[0m[90m TS2353: [0mObject 
+literal may only specify known properties, and 'position' does not exist in type 'QueueEntrySelect<DefaultArgs>'.
+
+[7m656[0m       select: { position: true },
+[7m   [0m [91m                ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m47567[0m:[93m5[0m
+    [7m47567[0m     select?: QueueEntrySelect<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'select' which is declared here on type '{ select?: 
+QueueEntrySelect<DefaultArgs>; include?: QueueEntryInclude<DefaultArgs>; where?: QueueEntryWhereInput; ... 4 more ...; 
+distinct?: QueueEntryScalarFieldEnum | QueueEntryScalarFieldEnum[]; }'
+[96msrc/modules/queue/services/queue.service.ts[0m:[93m658[0m:[93m24[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'position' does not exist on type '{ id: string; status: QueueStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; patientId: string; branchId: string; priority: QueuePriority; ... 12 more 
+...; actualWaitMinutes: number; }'.
+
+[7m658[0m     return (lastEntry?.position ?? 0) + 1;
+[7m   [0m [91m                       ~~~~~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m19[0m:[93m10[0m - [91merror[0m[90m TS2300: 
+[0mDuplicate identifier 'Roles'.
+
+[7m19[0m import { Roles } from '../../../common/decorators/roles.decorator';
+[7m  [0m [91m         ~~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m20[0m:[93m10[0m - [91merror[0m[90m TS2300: 
+[0mDuplicate identifier 'Roles'.
+
+[7m20[0m import { Roles, CurrentUser } from '../../../common/decorators/roles.decorator';
+[7m  [0m [91m         ~~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m31[0m:[93m10[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m31[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m31[0m:[93m22[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m31[0m   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+[7m  [0m [91m                     ~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m41[0m:[93m10[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m41[0m   @Roles(Role.ADMIN)
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m73[0m:[93m10[0m - [91merror[0m[90m TS2552: 
+[0mCannot find name 'Role'. Did you mean 'Roles'?
+
+[7m73[0m   @Roles(Role.ADMIN)
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m105[0m:[93m10[0m - [91merror[0m[90m TS2304: 
+[0mCannot find name 'Role'.
+
+[7m105[0m   @Roles(Role.ADMIN)
+[7m   [0m [91m         ~~~~[0m
+[96msrc/modules/reports/controllers/reports.controller.ts[0m:[93m117[0m:[93m10[0m - [91merror[0m[90m TS2304: 
+[0mCannot find name 'Role'.
+
+[7m117[0m   @Roles(Role.ADMIN)
+[7m   [0m [91m         ~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m77[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'AND' circularly references itself in mapped type '{ [K in keyof { AND?: 
+OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]; OR?: 
+OrderScalarWhereWithAggregatesInput[]; ... 38 more ...; deletedAt?: string | ... 1 more ... | 
+DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> 
+...'.
+
+[7m 77[0m     const orders = await this.prisma.order.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 78[0m       by: ['createdAt'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 85[0m       _avg: { totalAmount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 86[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m77[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'NOT' circularly references itself in mapped type '{ [K in keyof { AND?: 
+OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]; OR?: 
+OrderScalarWhereWithAggregatesInput[]; ... 38 more ...; deletedAt?: string | ... 1 more ... | 
+DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> 
+...'.
+
+[7m 77[0m     const orders = await this.prisma.order.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 78[0m       by: ['createdAt'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 85[0m       _avg: { totalAmount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 86[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m77[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'OR' circularly references itself in mapped type '{ [K in keyof { AND?: 
+OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]; OR?: 
+OrderScalarWhereWithAggregatesInput[]; ... 38 more ...; deletedAt?: string | ... 1 more ... | 
+DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] extends infer TK ? GetHavingFields<...> 
+...'.
+
+[7m 77[0m     const orders = await this.prisma.order.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 78[0m       by: ['createdAt'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 85[0m       _avg: { totalAmount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 86[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m111[0m:[93m17[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'OrderSumAggregateInputType'.
+
+[7m111[0m         _sum: { totalAmount: true },
+[7m   [0m [91m                ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m35088[0m:[93m5[0m
+    [7m35088[0m     _sum?: OrderSumAggregateInputType
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property '_sum' which is declared here on type 
+'Subset<OrderAggregateArgs<DefaultArgs>, OrderAggregateArgs<DefaultArgs>>'
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m116[0m:[93m17[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'OrderSumAggregateInputType'.
+
+[7m116[0m         _sum: { totalAmount: true },
+[7m   [0m [91m                ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m35088[0m:[93m5[0m
+    [7m35088[0m     _sum?: OrderSumAggregateInputType
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property '_sum' which is declared here on type 
+'Subset<OrderAggregateArgs<DefaultArgs>, OrderAggregateArgs<DefaultArgs>>'
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m140[0m:[93m48[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ collectionLat?: number; collectionLng?: number; subtotal?: 
+number; discount?: number; tax?: number; taxRate?: number; total?: number; insuranceCoverage?: number; }'.
+
+[7m140[0m     const currentRevenue = Number(current._sum.totalAmount || 0);
+[7m   [0m [91m                                               ~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m141[0m:[93m50[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ collectionLat?: number; collectionLng?: number; subtotal?: 
+number; discount?: number; tax?: number; taxRate?: number; total?: number; insuranceCoverage?: number; }'.
+
+[7m141[0m     const previousRevenue = Number(previous._sum.totalAmount || 0);
+[7m   [0m [91m                                                 ~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m241[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'orders' does not exist in type 
+'DoctorProfileInclude<DefaultArgs>'.
+
+[7m241[0m         orders: {
+[7m   [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m21240[0m:[93m5[0m
+    [7m21240[0m     include?: DoctorProfileInclude<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'include' which is declared here on type '{ select?: 
+DoctorProfileSelect<DefaultArgs>; include?: DoctorProfileInclude<DefaultArgs>; where?: DoctorProfileWhereInput; ... 4 
+more ...; distinct?: DoctorProfileScalarFieldEnum | DoctorProfileScalarFieldEnum[]; }'
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m250[0m:[93m33[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'orders' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; bio: string; userId: 
+string; licenseNumber: string; specialtyAr: string; specialtyEn: string; departmentId: string; consultationFee: 
+number; ... 8 more ...; totalRatings: number; }'.
+
+[7m250[0m       const completedOrders = d.orders;
+[7m   [0m [91m                                ~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m260[0m:[93m26[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'User' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; bio: string; userId: 
+string; licenseNumber: string; specialtyAr: string; specialtyEn: string; departmentId: string; consultationFee: 
+number; ... 8 more ...; totalRatings: number; }'.
+
+[7m260[0m         doctorName: `${d.User.firstName} ${d.User.lastName}`,
+[7m   [0m [91m                         ~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m260[0m:[93m46[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'User' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; bio: string; userId: 
+string; licenseNumber: string; specialtyAr: string; specialtyEn: string; departmentId: string; consultationFee: 
+number; ... 8 more ...; totalRatings: number; }'.
+
+[7m260[0m         doctorName: `${d.User.firstName} ${d.User.lastName}`,
+[7m   [0m [91m                                             ~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m288[0m:[93m31[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'OrderSelect<DefaultArgs>'.
+
+[7m288[0m           select: { id: true, totalAmount: true },
+[7m   [0m [91m                              ~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m295[0m:[93m21[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'name' does not exist on type '{ email: string; phone: string; id: string; timezone: string; isActive: 
+boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; city: string; ... 11 
+more ...; managerId: string; }'.
+
+[7m295[0m       branchName: b.name,
+[7m   [0m [91m                    ~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m296[0m:[93m22[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'orders' does not exist on type '{ email: string; phone: string; id: string; timezone: string; isActive: 
+boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; city: string; ... 11 
+more ...; managerId: string; }'.
+
+[7m296[0m       ordersCount: b.orders.length,
+[7m   [0m [91m                     ~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m297[0m:[93m18[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'orders' does not exist on type '{ email: string; phone: string; id: string; timezone: string; isActive: 
+boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; city: string; ... 11 
+more ...; managerId: string; }'.
+
+[7m297[0m       revenue: b.orders.reduce((s, o) => s + (o.totalAmount || 0), 0),
+[7m   [0m [91m                 ~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m315[0m:[93m15[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'name' does not exist on type '{ description: string; id: string; isActive: boolean; createdBy: string; 
+updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; location: string; currency: string; ... 12 more 
+...; batchNumber: string; }'.
+
+[7m315[0m       name: i.name,
+[7m   [0m [91m              ~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m317[0m:[93m23[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'reorderLevel' does not exist on type '{ description: string; id: string; isActive: boolean; createdBy: 
+string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; location: string; currency: string; ... 
+12 more ...; batchNumber: string; }'.
+
+[7m317[0m       reorderLevel: i.reorderLevel,
+[7m   [0m [91m                      ~~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m318[0m:[93m35[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'reorderLevel' does not exist on type '{ description: string; id: string; isActive: boolean; createdBy: 
+string; updatedBy: string; createdAt: Date; updatedAt: Date; deletedAt: Date; location: string; currency: string; ... 
+12 more ...; batchNumber: string; }'.
+
+[7m318[0m       isLowStock: i.quantity <= i.reorderLevel,
+[7m   [0m [91m                                  ~~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m333[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'AND' circularly references itself in mapped type '{ [K in keyof { AND?: 
+InsuranceClaimScalarWhereWithAggregatesInput | InsuranceClaimScalarWhereWithAggregatesInput[]; ... 25 more ...; 
+deletedAt?: string | ... 1 more ... | DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] 
+extends infer TK ? GetHavingFields<...> : never : {} extends Field...'.
+
+[7m333[0m     const claims = await this.prisma.insuranceClaim.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m334[0m       by: ['providerId'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m337[0m       _sum: { amount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m338[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m333[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'NOT' circularly references itself in mapped type '{ [K in keyof { AND?: 
+InsuranceClaimScalarWhereWithAggregatesInput | InsuranceClaimScalarWhereWithAggregatesInput[]; ... 25 more ...; 
+deletedAt?: string | ... 1 more ... | DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] 
+extends infer TK ? GetHavingFields<...> : never : {} extends Field...'.
+
+[7m333[0m     const claims = await this.prisma.insuranceClaim.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m334[0m       by: ['providerId'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m337[0m       _sum: { amount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m338[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m333[0m:[93m26[0m - [91merror[0m[90m TS2615: 
+[0mType of property 'OR' circularly references itself in mapped type '{ [K in keyof { AND?: 
+InsuranceClaimScalarWhereWithAggregatesInput | InsuranceClaimScalarWhereWithAggregatesInput[]; ... 25 more ...; 
+deletedAt?: string | ... 1 more ... | DateTimeNullableWithAggregatesFilter<...>; }]: Or<...> extends 1 ? { ...; }[K] 
+extends infer TK ? GetHavingFields<...> : never : {} extends Field...'.
+
+[7m333[0m     const claims = await this.prisma.insuranceClaim.groupBy({
+[7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m334[0m       by: ['providerId'],
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m337[0m       _sum: { amount: true },
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m338[0m     });
+[7m   [0m [91m~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m357[0m:[93m17[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'totalAmount' does not exist in type 
+'InvoiceSelect<DefaultArgs>'.
+
+[7m357[0m       select: { totalAmount: true, tax: true, createdAt: true },
+[7m   [0m [91m                ~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m54743[0m:[93m5[0m
+    [7m54743[0m     select?: InvoiceSelect<ExtArgs> | null
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'select' which is declared here on type '{ select?: 
+InvoiceSelect<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where?: InvoiceWhereInput; ... 4 more ...; 
+distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]; }'
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m363[0m:[93m22[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; deletedAt: Date; patientId: string; orderId: string; ... 14 more ...; 
+zatcaUuid: string; }'.
+
+[7m363[0m       subtotal: (inv.totalAmount || 0) - (inv.tax || 0),
+[7m   [0m [91m                     ~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m365[0m:[93m18[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'totalAmount' does not exist on type '{ id: string; status: PaymentStatus; createdBy: string; updatedBy: 
+string; createdAt: Date; updatedAt: Date; deletedAt: Date; patientId: string; orderId: string; ... 14 more ...; 
+zatcaUuid: string; }'.
+
+[7m365[0m       total: inv.totalAmount || 0,
+[7m   [0m [91m                 ~~~~~~~~~~~[0m
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m450[0m:[93m16[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'userId' does not exist in type 'ReportWhereInput'.
+
+[7m450[0m       where: { userId },
+[7m   [0m [91m               ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m40856[0m:[93m5[0m
+    [7m40856[0m     where?: ReportWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: 
+ReportSelect<DefaultArgs>; include?: ReportInclude<DefaultArgs>; where?: ReportWhereInput; ... 4 more ...; distinct?: 
+ReportScalarFieldEnum | ReportScalarFieldEnum[]; }'
+[96msrc/modules/reports/services/reports.service.ts[0m:[93m458[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type '(Without<ReportCreateInput, 
+ReportUncheckedCreateInput> & ReportUncheckedCreateInput) | (Without<...> & ReportCreateInput)'.
+
+[7m458[0m         name: dto.name,
+[7m   [0m [91m        ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m40899[0m:[93m5[0m
+    [7m40899[0m     data: XOR<ReportCreateInput, ReportUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: ReportSelect<DefaultArgs>; 
+include?: ReportInclude<DefaultArgs>; data: (Without<ReportCreateInput, ReportUncheckedCreateInput> & 
+ReportUncheckedCreateInput) | (Without<...> & ReportCreateInput); }'
+[96msrc/modules/results/services/results.service.ts[0m:[93m47[0m:[93m25[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branchId' does not exist on type 'ReportWhereInput'.
+
+[7m47[0m     if (branchId) where.branchId = branchId;
+[7m  [0m [91m                        ~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m64[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'firstNameAr'?
+
+[7m64[0m         { patient: { firstName: { contains: search, mode: 'insensitive' } } },
+[7m  [0m [91m                     ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m98691[0m:[93m5[0m
+    [7m98691[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'ReportWhereInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m65[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'lastName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'lastNameAr'?
+
+[7m65[0m         { patient: { lastName: { contains: search, mode: 'insensitive' } } },
+[7m  [0m [91m                     ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m98691[0m:[93m5[0m
+    [7m98691[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'ReportWhereInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m71[0m:[93m27[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientOrderByWithRelationInput'. Did you mean to write 'firstNameAr'?
+
+[7m71[0m       orderBy.patient = { firstName: sortOrder };
+[7m  [0m [91m                          ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m73[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType 
+'"desc" | "asc"' is not assignable to type '(PatientOrderByWithRelationInput & OrderOrderByWithRelationInput & 
+(ReportItemOrderByRelationAggregateInput & SortOrder)) & (((SortOrder | SortOrderInput) & ReportOrderByRelevanceInput) 
+& ... 1 more ... & ResultAttachmentOrderByRelationAggregateInput)'.
+  Type '"desc"' is not assignable to type '(PatientOrderByWithRelationInput & OrderOrderByWithRelationInput & 
+(ReportItemOrderByRelationAggregateInput & SortOrder)) & (((SortOrder | SortOrderInput) & ReportOrderByRelevanceInput) 
+& ... 1 more ... & ResultAttachmentOrderByRelationAggregateInput)'.
+
+[7m73[0m       orderBy[sortBy as keyof Prisma.ReportOrderByWithRelationInput] = sortOrder;
+[7m  [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m84[0m:[93m33[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m84[0m             select: { id: true, firstName: true, lastName: true, phone: true, email: true },
+[7m  [0m [91m                                ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m120[0m:[93m43[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'BranchSelect<DefaultArgs>'.
+
+[7m120[0m             branch: { select: { id: true, name: true } },
+[7m   [0m [91m                                          ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m130[0m:[93m35[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m130[0m               select: { id: true, name: true, nameAr: true, category: true, unit: true },
+[7m   [0m [91m                                  ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m155[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m155[0m           select: { id: true, firstName: true, lastName: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m160[0m:[93m44[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m160[0m             labTest: { select: { id: true, name: true, nameAr: true } },
+[7m   [0m [91m                                           ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m242[0m:[93m11[0m - [91merror[0m[90m TS2322: 
+[0mType '{ labTestId: string; value: string; unit: string; referenceRangeLow: number; referenceRangeHigh: number; 
+isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }[]' is not assignable to type 
+'(Without<ReportItemCreateWithoutReportInput, ReportItemUncheckedCreateWithoutReportInput> & 
+ReportItemUncheckedCreateWithoutReportInput) | (Without<...> & ReportItemCreateWithoutReportInput) | 
+ReportItemCreateWithoutReportInput[] | ReportItemUncheckedCreateWithoutReportInput[]'.
+  Type '{ labTestId: string; value: string; unit: string; referenceRangeLow: number; referenceRangeHigh: number; 
+isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }[]' is not assignable to type 
+'ReportItemCreateWithoutReportInput[]'.
+    Property 'labTest' is missing in type '{ labTestId: string; value: string; unit: string; referenceRangeLow: 
+number; referenceRangeHigh: number; isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }' but 
+required in type 'ReportItemCreateWithoutReportInput'.
+
+[7m242[0m           create: dto.items.map((item, index) => ({
+[7m   [0m [91m          ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m143739[0m:[93m5[0m
+    [7m143739[0m     labTest: LabTestCreateNestedOneWithoutReportItemsInput
+    [7m      [0m [96m    ~~~~~~~[0m
+    'labTest' is declared here.
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m126023[0m:[93m5[0m
+    [7m126023[0m     create?: XOR<ReportItemCreateWithoutReportInput, ReportItemUncheckedCreateWithoutReportInput> | 
+ReportItemCreateWithoutReportInput[] | ReportItemUncheckedCreateWithoutReportInput[]
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'create' which is declared here on type 
+'ReportItemUncheckedCreateNestedManyWithoutReportInput | ReportItemCreateNestedManyWithoutReportInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m257[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m257[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m263[0m:[93m44[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m263[0m             labTest: { select: { id: true, name: true, nameAr: true } },
+[7m   [0m [91m                                           ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m300[0m:[93m34[0m - [91merror[0m[90m TS2322: 
+[0mType 'string[]' is not assignable to type 'string | NullableStringFieldUpdateOperationsInput'.
+
+[7m300[0m     if (dto.flags !== undefined) updateData.flags = dto.flags;
+[7m   [0m [91m                                 ~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m307[0m:[93m40[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m307[0m         labTest: { select: { id: true, name: true, nameAr: true } },
+[7m   [0m [91m                                       ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m334[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'approvedAt' does not exist in type 
+'(Without<ReportUpdateInput, ReportUncheckedUpdateInput> & ReportUncheckedUpdateInput) | (Without<...> & 
+ReportUpdateInput)'.
+
+[7m334[0m         approvedAt: new Date(),
+[7m   [0m [91m        ~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m40947[0m:[93m5[0m
+    [7m40947[0m     data: XOR<ReportUpdateInput, ReportUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: ReportSelect<DefaultArgs>; 
+include?: ReportInclude<DefaultArgs>; data: (Without<ReportUpdateInput, ReportUncheckedUpdateInput> & 
+ReportUncheckedUpdateInput) | (Without<...> & ReportUpdateInput); where: ReportWhereUniqueInput; }'
+[96msrc/modules/results/services/results.service.ts[0m:[93m338[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m338[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m377[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m377[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m414[0m:[93m9[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'cancelReason' does not exist in type 
+'(Without<ReportUpdateInput, ReportUncheckedUpdateInput> & ReportUncheckedUpdateInput) | (Without<...> & 
+ReportUpdateInput)'.
+
+[7m414[0m         cancelReason: reason,
+[7m   [0m [91m        ~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m40947[0m:[93m5[0m
+    [7m40947[0m     data: XOR<ReportUpdateInput, ReportUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: ReportSelect<DefaultArgs>; 
+include?: ReportInclude<DefaultArgs>; data: (Without<ReportUpdateInput, ReportUncheckedUpdateInput> & 
+ReportUncheckedUpdateInput) | (Without<...> & ReportUpdateInput); where: ReportWhereUniqueInput; }'
+[96msrc/modules/results/services/results.service.ts[0m:[93m419[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m419[0m           select: { id: true, firstName: true, lastName: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m455[0m:[93m34[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branchId' does not exist on type '{ patient: { email: string; firstNameAr: string; lastNameAr: string; 
+phone: string; id: string; isActive: boolean; createdBy: string; updatedBy: string; createdAt: Date; updatedAt: Date; 
+... 22 more ...; parentPatientId: string; }; items: { ...; }[]; } & { ...; }'.
+
+[7m455[0m         branchId: originalReport.branchId,
+[7m   [0m [91m                                 ~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m465[0m:[93m11[0m - [91merror[0m[90m TS2322: 
+[0mType '{ labTestId: string; value: string; unit: string; referenceRangeLow: number; referenceRangeHigh: number; 
+isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }[] | { labTestId: string; ... 7 more ...; 
+displayOrder: number; }[]' is not assignable to type '(Without<ReportItemCreateWithoutReportInput, 
+ReportItemUncheckedCreateWithoutReportInput> & ReportItemUncheckedCreateWithoutReportInput) | (Without<...> & 
+ReportItemCreateWithoutReportInput) | ReportItemCreateWithoutReportInput[] | 
+ReportItemUncheckedCreateWithoutReportInput[]'.
+  Type '{ labTestId: string; value: string; unit: string; referenceRangeLow: number; referenceRangeHigh: number; 
+isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }[]' is not assignable to type 
+'(Without<ReportItemCreateWithoutReportInput, ReportItemUncheckedCreateWithoutReportInput> & 
+ReportItemUncheckedCreateWithoutReportInput) | (Without<...> & ReportItemCreateWithoutReportInput) | 
+ReportItemCreateWithoutReportInput[] | ReportItemUncheckedCreateWithoutReportInput[]'.
+    Type '{ labTestId: string; value: string; unit: string; referenceRangeLow: number; referenceRangeHigh: number; 
+isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }[]' is not assignable to type 
+'ReportItemCreateWithoutReportInput[]'.
+      Property 'labTest' is missing in type '{ labTestId: string; value: string; unit: string; referenceRangeLow: 
+number; referenceRangeHigh: number; isAbnormal: boolean; flags: string[]; notes: string; displayOrder: number; }' but 
+required in type 'ReportItemCreateWithoutReportInput'.
+
+[7m465[0m           create: dto.items
+[7m   [0m [91m          ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m143739[0m:[93m5[0m
+    [7m143739[0m     labTest: LabTestCreateNestedOneWithoutReportItemsInput
+    [7m      [0m [96m    ~~~~~~~[0m
+    'labTest' is declared here.
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m126023[0m:[93m5[0m
+    [7m126023[0m     create?: XOR<ReportItemCreateWithoutReportInput, ReportItemUncheckedCreateWithoutReportInput> | 
+ReportItemCreateWithoutReportInput[] | ReportItemUncheckedCreateWithoutReportInput[]
+    [7m      [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'create' which is declared here on type 
+'ReportItemUncheckedCreateNestedManyWithoutReportInput | ReportItemCreateNestedManyWithoutReportInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m492[0m:[93m31[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m492[0m           select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                              ~~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m498[0m:[93m44[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m498[0m             labTest: { select: { id: true, name: true, nameAr: true } },
+[7m   [0m [91m                                           ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m564[0m:[93m7[0m - [91merror[0m[90m TS1117: [0mAn 
+object literal cannot have multiple properties with the same name.
+
+[7m564[0m       report: {
+Found 244 error(s).
+
+[7m   [0m [91m      ~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m583[0m:[93m31[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'name' does not exist in type 'LabTestSelect<DefaultArgs>'.
+
+[7m583[0m           select: { id: true, name: true, nameAr: true, unit: true },
+[7m   [0m [91m                              ~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m608[0m:[93m25[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branchId' does not exist on type 'ReportWhereInput'.
+
+[7m608[0m     if (branchId) where.branchId = branchId;
+[7m   [0m [91m                        ~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m663[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'firstNameAr'?
+
+[7m663[0m         { patient: { firstName: { contains: query, mode: 'insensitive' } } },
+[7m   [0m [91m                     ~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m98691[0m:[93m5[0m
+    [7m98691[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'ReportWhereInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m664[0m:[93m22[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'lastName' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'. Did you mean to write 'lastNameAr'?
+
+[7m664[0m         { patient: { lastName: { contains: query, mode: 'insensitive' } } },
+[7m   [0m [91m                     ~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m98691[0m:[93m5[0m
+    [7m98691[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'ReportWhereInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m665[0m:[93m22[0m - [91merror[0m[90m TS2353: 
+[0mObject literal may only specify known properties, and 'medicalRecordNumber' does not exist in type 
+'(Without<PatientRelationFilter, PatientWhereInput> & PatientWhereInput) | (Without<PatientWhereInput, 
+PatientRelationFilter> & PatientRelationFilter)'.
+
+[7m665[0m         { patient: { medicalRecordNumber: { contains: query, mode: 'insensitive' } } },
+[7m   [0m [91m                     ~~~~~~~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m98691[0m:[93m5[0m
+    [7m98691[0m     patient?: XOR<PatientRelationFilter, PatientWhereInput>
+    [7m     [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'patient' which is declared here on type 'ReportWhereInput'
+[96msrc/modules/results/services/results.service.ts[0m:[93m669[0m:[93m25[0m - [91merror[0m[90m TS2339: 
+[0mProperty 'branchId' does not exist on type 'ReportWhereInput'.
+
+[7m669[0m     if (branchId) where.branchId = branchId;
+[7m   [0m [91m                        ~~~~~~~~[0m
+[96msrc/modules/results/services/results.service.ts[0m:[93m680[0m:[93m33[0m - [91merror[0m[90m TS2561: 
+[0mObject literal may only specify known properties, but 'firstName' does not exist in type 
+'PatientSelect<DefaultArgs>'. Did you mean to write 'firstNameAr'?
+
+[7m680[0m             select: { id: true, firstName: true, lastName: true, phone: true },
+[7m   [0m [91m                                ~~~~~~~~~[0m
+

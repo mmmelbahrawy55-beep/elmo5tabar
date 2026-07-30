@@ -1,0 +1,168 @@
+name: Deploy Production
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ github.sha }}
+  K8S_NAMESPACE: almokhtabar
+
+jobs:
+  build-and-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, web, ai-service]
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/almokhtabar/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/almokhtabar/${{ matrix.service }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+  migrate-database:
+    name: Database Migration
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Prisma Migrate
+        run: |
+          cd packages/backend
+          npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+
+  deploy-blue-green:
+    name: Blue-Green Deploy
+    needs: migrate-database
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+      - name: Determine active color
+        id: color
+        run: |
+          CURRENT=$(kubectl get svc backend-active -n ${{ env.K8S_NAMESPACE }} -o jsonpath='{.spec.selector.color}' 2>/dev/null || echo "blue")
+          if [ "$CURRENT" = "blue" ]; then
+            echo "next=green" >> $GITHUB_OUTPUT
+            echo "prev=blue" >> $GITHUB_OUTPUT
+          else
+            echo "next=blue" >> $GITHUB_OUTPUT
+            echo "prev=green" >> $GITHUB_OUTPUT
+          fi
+      - name: Deploy new version (inactive)
+        run: |
+          helm upgrade --install almokhtabar-${{ steps.color.outputs.next }} ./infrastructure/kubernetes/helm/almokhtabar \
+            --namespace ${{ env.K8S_NAMESPACE }} \
+            -f infrastructure/kubernetes/helm/almokhtabar/values-production.yaml \
+            --set global.imageTag=${{ env.IMAGE_TAG }} \
+            --set global.color=${{ steps.color.outputs.next }} \
+            --set backend.replicaCount=3 \
+            --set web.replicaCount=3 \
+            --set ai-service.replicaCount=2 \
+            --wait --timeout 10m
+      - name: Run smoke tests against new version
+        run: |
+          ./infrastructure/scripts/deploy/smoke-test.sh ${{ steps.color.outputs.next }}
+      - name: Switch traffic to new version
+        run: |
+          kubectl patch svc backend-active -n ${{ env.K8S_NAMESPACE }} \
+            -p "{\"spec\":{\"selector\":{\"color\":\"${{ steps.color.outputs.next }}\"}}}"
+          kubectl patch svc web-active -n ${{ env.K8S_NAMESPACE }} \
+            -p "{\"spec\":{\"selector\":{\"color\":\"${{ steps.color.outputs.next }}\"}}}"
+      - name: Health check after switch
+        run: |
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://almokhtabar.com/api/health 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i: health check returned $STATUS, retrying in 10s..."
+            sleep 10
+          done
+          echo "Health check failed after 12 attempts"
+          echo "Initiating rollback..."
+          kubectl patch svc backend-active -n ${{ env.K8S_NAMESPACE }} \
+            -p "{\"spec\":{\"selector\":{\"color\":\"${{ steps.color.outputs.prev }}\"}}}"
+          kubectl patch svc web-active -n ${{ env.K8S_NAMESPACE }} \
+            -p "{\"spec\":{\"selector\":{\"color\":\"${{ steps.color.outputs.prev }}\"}}}"
+          exit 1
+      - name: Scale down old version
+        run: |
+          helm upgrade almokhtabar-${{ steps.color.outputs.prev }} ./infrastructure/kubernetes/helm/almokhtabar \
+            --namespace ${{ env.K8S_NAMESPACE }} \
+            -f infrastructure/kubernetes/helm/almokhtabar/values-production.yaml \
+            --set global.imageTag=${{ env.IMAGE_TAG }} \
+            --set global.color=${{ steps.color.outputs.prev }} \
+            --set backend.replicaCount=0 \
+            --set web.replicaCount=0 \
+            --set ai-service.replicaCount=0 || true
+      - name: Notify deployment success
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "✅ Production deployment complete: v${{ github.ref_name }} (color: ${{ steps.color.outputs.next }})",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Production Deployment Complete*\n• Version: `${{ github.ref_name }}`\n• Image Tag: `${{ env.IMAGE_TAG }}`\n• Color: `${{ steps.color.outputs.next }}`\n• Action: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  performance-regression:
+    name: Performance Regression
+    if: false # Enable after initial deploy — uncomment once environment is live
+    needs: deploy-blue-green
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://almokhtabar.com
+            https://almokhtabar.com/appointments
+            https://almokhtabar.com/results
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: ./lighthouserc.json

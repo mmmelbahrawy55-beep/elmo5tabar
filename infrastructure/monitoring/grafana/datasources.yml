@@ -1,0 +1,134 @@
+# config.version: 2
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 15s
+      queryTimeout: 30s
+      httpMethod: POST
+      prometheusType: Prometheus
+      prometheusVersion: 2.50.0
+      cacheLevel: High
+      manageAlerts: true
+      alertmanagerUid: alertmanager
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 5000
+      derivedFields:
+        - name: traceID
+          matcherRegex: '"traceid":"(\w+)"'
+          url: 'http://tempo:3200/explore?traceId=$${__value.raw}'
+        - name: spanID
+          matcherRegex: '"spanid":"(\w+)"'
+
+  - name: Elasticsearch
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "[almokhtabar-]YYYY.MM.DD"
+    basicAuth: true
+    basicAuthUser: ${ES_USERNAME}
+    secureJsonData:
+      basicAuthPassword: ${ES_PASSWORD}
+    editable: false
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      esVersion: 8.11.0
+      logLevelField: severity
+      logMessageField: message
+      dataLinks:
+        - field: trace.id
+          url: 'http://tempo:3200/explore?traceId=$${__value.raw}'
+          title: "View in Tempo"
+
+  - name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    editable: false
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      assumeRoleArn: ${CLOUDWATCH_ROLE_ARN}
+      timeField: Timestamp
+      customMetricsNamespaces: ""
+      logGroups:
+        - /aws/eks/almokhtabar/cluster
+        - /aws/rds/almokhtabar/postgres
+        - /aws/application-elb/almokhtabar
+    secureJsonData:
+      accessKey: ${AWS_ACCESS_KEY_ID}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+
+  - name: Azure Monitor
+    type: grafana-azure-monitor-datasource
+    access: proxy
+    editable: false
+    jsonData:
+      azureAuthType: msi
+      cloudName: AzureCloud
+      defaultSubscriptionId: ${AZURE_SUBSCRIPTION_ID}
+      tenantId: ${AZURE_TENANT_ID}
+      clientId: ${AZURE_CLIENT_ID}
+      managedIdentity: ""
+      subscriptionId: ${AZURE_SUBSCRIPTION_ID}
+    secureJsonData:
+      clientSecret: ${AZURE_CLIENT_SECRET}
+
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    editable: false
+    jsonData:
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "+1h"
+        tags:
+          - key: service.name
+            value: service
+        filterByTraceID: true
+        filterBySpanID: false
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: loki
+        tags:
+          - instance
+          - pod
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "+1h"
+      serviceMap:
+        datasourceUid: prometheus
+
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://alertmanager:9093
+    editable: false
+    jsonData:
+      implementation: prometheus
+      handleAlertManagerAlarms: true

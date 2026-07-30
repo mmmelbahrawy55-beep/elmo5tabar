@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint --workspaces
+      - run: npm run typecheck --workspaces
+      - name: TypeScript check
+        run: npx tsc --noEmit -p packages/backend/tsconfig.json && npx tsc --noEmit -p packages/web/tsconfig.json
+
+  test:
+    name: Test
+    needs: validate
+    strategy:
+      matrix:
+        package: [backend, web, ai-service]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: npm ci
+      - run: pip install -r packages/ai-service/requirements.txt
+      - run: npm run test --workspace=packages/${{ matrix.package }}
+      - run: npm run test:e2e --workspace=packages/${{ matrix.package }}
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6379
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: packages/${{ matrix.package }}/coverage
+          flags: ${{ matrix.package }}
+
+  docker-build:
+    name: Docker Build
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, web, ai-service]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.${{ matrix.service }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: almokhtabar/${{ matrix.service }}:${{ github.sha }}
+          outputs: type=docker
+
+  security-scan:
+    name: Security Scan
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript, python
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+      - name: Secret scan
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          extra_args: --only-verified

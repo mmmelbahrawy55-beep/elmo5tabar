@@ -1,0 +1,191 @@
+env:
+  contexts:
+    - name: "Al Mokhtabar"
+      url: "https://almokhtabar.com"
+      includePaths:
+        - "https://almokhtabar.com/.*"
+        - "https://almokhtabar.com/api/v1/.*"
+      excludePaths:
+        - "https://almokhtabar.com/_next/.*"
+        - "https://almokhtabar.com/static/.*"
+        - "https://almokhtabar.com/.*\\.(png|jpg|jpeg|gif|ico|svg|woff2?)"
+      authentication:
+        method: "form"
+        loginUrl: "https://almokhtabar.com/api/v1/auth/login"
+        loginRequest:
+          data: "email={%username%}&password={%password%}"
+        loginPageUrl: "https://almokhtabar.com/ar/login"
+        tokenExtraction:
+          type: "HEADER_JSON_PATH"
+          headerName: "Authorization"
+          jsonPath: "token"
+      sessionManagement:
+        method: "cookie"
+        cookieParams:
+          sessionTokens:
+            - "connect.sid"
+            - "refreshToken"
+      users:
+        - name: "admin"
+          username: "admin@almokhtabar.com"
+          password: "${ADMIN_PASSWORD}"
+          enable: true
+        - name: "doctor"
+          username: "doctor1@almokhtabar.com"
+          password: "${DOCTOR_PASSWORD}"
+          enable: true
+        - name: "patient"
+          username: "patient1@almokhtabar.com"
+          password: "${PATIENT_PASSWORD}"
+          enable: true
+
+params:
+  maxNumberOfRequestsPerSecond: 10
+  sleepInSeconds: 0.5
+  maxRetriesOnIOError: 3
+  maxResults: 1000
+
+spider:
+  type: "traditional_ajax"
+  maxDepth: 10
+  maxChildren: 100
+  maxDuration: 60
+  handleODataParametersVisited: true
+  parseComments: true
+  parseGit: false
+  parseRobotsTxt: true
+  parseSitemapXml: true
+  postForm: true
+  processForm: true
+  sendRefererHeader: true
+  threadCount: 2
+  ajaxSpider:
+    maxCrawlDepth: 10
+    maxDuration: 30
+    numberOfBrowserWindows: 3
+    clickDefaultElems: true
+    clickElemsOnce: true
+    waitForContent: 2000
+
+scanner:
+  scanPolicy: "Default Policy"
+  maxAlertsPerRule: 50
+  threadsPerHost: 5
+  hostPerScan: 2
+  delayInMs: 200
+  injectScript: true
+  handleAntiCSRFTokens: true
+  defaultAlertThreshold: "MEDIUM"
+  attackStrength: "HIGH"
+  rules:
+    - id: 40012  # Cross Site Scripting (Reflected)
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40014  # Cross Site Scripting (Persistent)
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40018  # SQL Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40022  # SQL Injection - MsSQL
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40024  # SQL Injection - SQLite
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40021  # Oracle SQL Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90018  # SQL Injection - PostgreSQL
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40019  # SQL Injection - MySQL
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 20019  # Server Side Request Forgery
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40034  # NoSQL Injection - MongoDB
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90019  # Server Side Code Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90011  # Remote Code Execution
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90020  # Remote Code Execution - Shell Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90022  # Path Traversal
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40009  # Server Side Include
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40013  # Parameter Tampering
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90025  # LDAP Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90033  # NoSQL Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40016  # XXE (XML External Entity)
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 90027  # Cookie Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40039  # WebSocket URL Injection
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 40043  # Log4Shell
+      alertThreshold: "HIGH"
+      attackStrength: "HIGH"
+    - id: 10010  # Cookie No HttpOnly Flag
+      alertThreshold: "HIGH"
+    - id: 10011  # Cookie Without Secure Flag
+      alertThreshold: "HIGH"
+    - id: 10015  # Incomplete or No Cache-control Header
+      alertThreshold: "MEDIUM"
+    - id: 10020  # X-Frame-Options Header
+      alertThreshold: "HIGH"
+    - id: 10021  # X-Content-Type-Options Header
+      alertThreshold: "HIGH"
+    - id: 10031  # User Controllable HTML Element Attribute
+      alertThreshold: "HIGH"
+    - id: 10038  # Content Security Policy (CSP) Header
+      alertThreshold: "HIGH"
+    - id: 10040  # Secure Pages Include Mixed Content
+      alertThreshold: "HIGH"
+    - id: 10049  # Non-Storable Content
+      alertThreshold: "MEDIUM"
+    - id: 10055  # CORS Header
+      alertThreshold: "HIGH"
+    - id: 10096  # Timestamp Disclosure
+      alertThreshold: "LOW"
+    - id: 10104  # User Agent Fuzzer
+      alertThreshold: "MEDIUM"
+    - id: 10105  # Weak Authentication Method
+      alertThreshold: "HIGH"
+    - id: 10202  # Absence of Anti-CSRF Tokens
+      alertThreshold: "HIGH"
+    - id: 90001  # Browser Cache
+      alertThreshold: "MEDIUM"
+    - id: 90003  # Subresource Integrity
+      alertThreshold: "MEDIUM"
+
+passiveScan:
+  maxAlertsPerRule: 50
+  maxNumberOfScansInUI: 20
+
+report:
+  format: ["html", "json", "xml"]
+  template: "traditional"
+  reportDir: "../reports/security"
+  reportName: "zap-scan-{timestamp}"
+  displayAlerts: true
+  includeConfidence: true
+  riskSummary: true

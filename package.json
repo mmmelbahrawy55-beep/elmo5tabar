@@ -1,0 +1,39 @@
+{
+  "name": "al-mokhtabar-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "المختبر | Al Mokhtabar Laboratory - World-Class Digital Healthcare Ecosystem",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\"",
+    "dev:web": "npm run dev --workspace=@al-mokhtabar/web",
+    "dev:backend": "npm run dev --workspace=@al-mokhtabar/backend",
+    "dev:ai": "cd packages/ai-service && python -m uvicorn app.main:app --reload --port 8001",
+    "build": "npm run build --workspace=@al-mokhtabar/web && npm run build --workspace=@al-mokhtabar/backend",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "typecheck": "concurrently \"npm run typecheck --workspace=@al-mokhtabar/web\" \"npm run typecheck --workspace=@al-mokhtabar/backend\"",
+    "db:migrate": "npm run db:migrate --workspace=@al-mokhtabar/backend",
+    "db:seed": "npm run db:seed --workspace=@al-mokhtabar/backend",
+    "db:studio": "npm run db:studio --workspace=@al-mokhtabar/backend",
+    "test": "concurrently \"npm run test --workspace=@al-mokhtabar/web\" \"npm run test --workspace=@al-mokhtabar/backend\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.1.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

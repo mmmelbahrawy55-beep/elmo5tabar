@@ -1,0 +1,219 @@
+graph TB
+    subgraph "Cloudflare"
+        CF_DNS["DNS (Secondary from Azure)"]
+        CF_CDN["CDN / Caching / Argo Smart Routing"]
+        CF_WAF["WAF - Managed Rules + Custom"]
+        CF_DDOS["DDoS Protection - L3/L4/L7"]
+        CF_BOT["Bot Management"]
+        CF_WORKER["Workers - API Auth Verification"]
+    end
+
+    subgraph "AWS - Primary Region (me-south-1)"
+        subgraph "VPC 10.0.0.0/16"
+            subgraph "Availability Zone A (10.0.1.0/24)"
+                AZA_PUBLIC["Public Subnet A<br/>10.0.1.0/24"]
+                AZA_PRIVATE["Private Subnet A<br/>10.0.2.0/24"]
+                AZA_DATA["Data Subnet A<br/>10.0.3.0/24"]
+            end
+
+            subgraph "Availability Zone B (10.0.4.0/24)"
+                AZB_PUBLIC["Public Subnet B<br/>10.0.4.0/24"]
+                AZB_PRIVATE["Private Subnet B<br/>10.0.5.0/24"]
+                AZB_DATA["Data Subnet B<br/>10.0.6.0/24"]
+            end
+
+            subgraph "Availability Zone C (10.0.7.0/24)"
+                AZC_PUBLIC["Public Subnet C<br/>10.0.7.0/24"]
+                AZC_PRIVATE["Private Subnet C<br/>10.0.8.0/24"]
+                AZC_DATA["Data Subnet C<br/>10.0.9.0/24"]
+            end
+
+            subgraph "Public Subnets (AZ A+B+C)"
+                ALB["Application Load Balancer<br/>ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06"]
+                NAT_GW["NAT Gateway - Single-AZ"]
+                BASTION["Bastion Host - SSM Session Manager Only"]
+            end
+
+            subgraph "Private Subnets - EKS Worker Nodes"
+                subgraph "EKS Cluster (me-south-1a/b/c)"
+                    INGRESS["NGINX Ingress Controller<br/>replicas: 2 (anti-affinity)"]
+                    BACKEND["Backend Pods<br/>Next.js 14 + NestJS<br/>replicas: min=3, max=15"]
+                    WEB["Web Pods<br/>Next.js 14 SSR<br/>replicas: min=2, max=10"]
+                    AI["AI Service Pods<br/>Python FastAPI<br/>replicas: min=2, max=8"]
+                    QUEUE["Bull Queue Workers<br/>replicas: min=2, max=6"]
+                    SOCKET["Socket.IO Pods<br/>replicas: 2"]
+                    CRON["CronJob Pods<br/>scheduled tasks"]
+                end
+            end
+
+            subgraph "Data Subnets"
+                RDS_PRIMARY["PostgreSQL 16 RDS Multi-AZ<br/>db.r6g.large (prod)<br/>Storage: 500GB gp3<br/>Backup: 35-day retention"]
+                RDS_REPLICA["RDS Read Replica<br/>db.r6g.large<br/>Analytics / Reporting"]
+                ELASTICACHE["Redis 7 ElastiCache<br/>cache.r6g.large<br/>Cluster mode: disabled<br/>Multi-AZ: enabled"]
+                MEILI["MeiliSearch<br/>Self-hosted on EBS<br/>c5.xlarge equivalent"]
+                RDS_PROXY["RDS Proxy<br/>Connection pooling<br/>IAM authentication"]
+            end
+
+            subgraph "VPC Endpoints"
+                VPCE_S3["Gateway Endpoint - S3"]
+                VPCE_DYNAMO["Gateway Endpoint - DynamoDB"]
+                VPCE_ECR["Interface Endpoint - ECR"]
+                VPCE_CLOUDWATCH["Interface Endpoint - CloudWatch"]
+                VPCE_SSM["Interface Endpoint - SSM"]
+            end
+        end
+
+        subgraph "Storage Layer"
+            EFS["EFS - Persistent Volumes<br/>Lifecycle: IA after 30d"]
+            S3_UPLOADS["S3 - Uploads<br/>Standard + Intelligent-Tiering"]
+            S3_BACKUPS["S3 - Backups<br/>Standard → Glacier (30d) → Delete (365d)"]
+            S3_LOGS["S3 - Access Logs<br/>Expire after 90d"]
+        end
+
+        subgraph "Monitoring & Observability"
+            PROM["Prometheus<br/>Retention: 15d hot"]
+            GRAFANA["Grafana<br/>OAuth: Google Workspace<br/>Alerting: PagerDuty + Slack"]
+            CW["CloudWatch<br/>Log retention: 30d<br/>Metrics: 15 months"]
+            ELK["ELK Stack<br/>Hot 7d → Warm 30d → Cold 90d → Delete"]
+            TRACING["OpenTelemetry Collector<br/>Sampling: 10%"]
+            UPTIME["CloudWatch Synthetics<br/>Canaries every 5min"]
+        end
+
+        subgraph "Security Services"
+            WAF_REGIONAL["AWS WAF Regional<br/>ACL: Rate-based + Managed"]
+            SHIELD["AWS Shield Advanced<br/>DDoS cost protection"]
+            KMS["AWS KMS<br/>CMK for EBS/RDS/S3"]
+            GUARDDUTY["GuardDuty<br/>Threat detection"]
+            SECRETS["Secrets Manager<br/>Rotation: 30/90 day"]
+        end
+    end
+
+    subgraph "Azure - DR Region (UAENorth)"
+        AZ_DNS["Azure DNS - Primary<br/>TTL: 300s"]
+        AKS["AKS Cluster<br/>2-node minimum"]
+        AZ_PG["Azure PostgreSQL Flexible Server<br/>Geo-redundant backup"]
+        AZ_REDIS["Azure Redis Cache<br/>Premium tier with replication"]
+        AZ_BACKUP["Azure Blob Backup<br/>RA-GRS"]
+        AZ_TRAFFIC["Traffic Manager<br/>Failover: Priority"]
+    end
+
+    subgraph "GCP - AI/ML Pipeline (me-central2)"
+        GKE["GKE Cluster with GPUs<br/>T4 / L4 nodes"]
+        SQL["Cloud SQL for PostgreSQL<br/>Read Replica"]
+        VERTEX["Vertex AI<br/>Training + Prediction"]
+        BIGQUERY["BigQuery<br/>Analytics warehouse"]
+        PUBSUB["Pub/Sub<br/>Event-driven ML pipeline"]
+    end
+
+    subgraph "CI/CD Pipeline"
+        GH["GitHub Actions<br/>Environment: dev/staging/prod"]
+        GHCR["GitHub Container Registry<br/>Image retention: 10 latest"]
+        TF_CLOUD["Terraform Cloud<br/>Remote state + run tasks"]
+        SONAR["SonarQube<br/>Quality gate: A"]
+        TRIVY["Trivy Container Scanner<br/>Fail on CRITICAL"]
+        DEPLOY["ArgoCD<br/>GitOps sync: 3min"]
+    end
+
+    subgraph "External Integrations"
+        USERS["Users<br/>KSA / MENA Region"]
+        STRIPE["Stripe<br/>Payment processing"]
+        TAP["Tap Payments<br/>MENA payments"]
+        TWILIO["Twilio<br/>SMS / Voice OTP"]
+        WHATSAPP["WhatsApp Cloud API<br/>Notifications"]
+        FCM["Firebase Cloud Messaging<br/>Push notifications"]
+        GOOGLE_OAUTH["Google OAuth 2.0"]
+        APPLE_OAUTH["Apple Sign In"]
+        SENTRY["Sentry<br/>Error tracking"]
+        DATADOG["Datadog<br/>APM + Logs"]
+        PAGERDUTY["PagerDuty<br/>Incident response"]
+        SLACK["Slack<br/>Alert notifications"]
+    end
+
+    subgraph "Compliance & Audit"
+        CLOUDTRAIL["CloudTrail<br/>Management + Data events"]
+        AUTH0["Auth0<br/>Identity platform"]
+        AUDIT_LOG["Audit Log DB<br/>App-level audit trail"]
+    end
+
+    USERS --> CF_DNS
+    USERS --> AZ_DNS
+    CF_DNS --> CF_CDN --> CF_WAF --> CF_DDOS --> CF_BOT
+    CF_BOT --> CF_WORKER
+
+    CF_WORKER --> ALB
+    AZ_DNS --> ALB
+
+    ALB --> WAF_REGIONAL
+    ALB --> INGRESS
+
+    INGRESS --> WEB
+    INGRESS --> BACKEND
+    INGRESS --> AI
+    INGRESS --> SOCKET
+
+    WEB --> BACKEND
+    BACKEND --> RDS_PRIMARY
+    BACKEND --> RDS_REPLICA
+    BACKEND --> ELASTICACHE
+    BACKEND --> MEILI
+    BACKEND --> QUEUE
+    BACKEND --> SOCKET
+    BACKEND --> EFS
+    BACKEND --> S3_UPLOADS
+    BACKEND --> RDS_PROXY
+    RDS_PROXY --> RDS_PRIMARY
+
+    AI --> ELASTICACHE
+    AI --> MEILI
+    AI --> BACKEND
+
+    PROM --> BACKEND
+    PROM --> RDS_PRIMARY
+    PROM --> ELASTICACHE
+    PROM --> MEILI
+    GRAFANA --> PROM
+    GRAFANA --> CW
+    GRAFANA --> ELK
+    GRAFANA --> TRACING
+    CW --> UPTIME
+
+    BACKEND --> STRIPE
+    BACKEND --> TAP
+    BACKEND --> TWILIO
+    BACKEND --> WHATSAPP
+    BACKEND --> FCM
+    BACKEND --> GOOGLE_OAUTH
+    BACKEND --> APPLE_OAUTH
+    BACKEND --> SENTRY
+    BACKEND --> DATADOG
+    BACKEND --> AUTH0
+
+    BACKEND --> GUARDDUTY
+    BACKEND --> SECRETS
+    BACKEND --> KMS
+
+    RDS_PRIMARY -.-> RDS_REPLICA
+    RDS_PRIMARY -.-> AZ_PG
+    RDS_PRIMARY -.-> SQL
+    S3_BACKUPS -.-> AZ_BACKUP
+    AZ_TRAFFIC -.-> AZ_DNS
+    AZ_TRAFFIC -.-> CF_DNS
+
+    GH --> GHCR
+    GH --> TF_CLOUD
+    GH --> SONAR
+    GH --> TRIVY
+    GHCR --> EKS
+    TF_CLOUD --> EKS
+    TF_CLOUD --> AKS
+    TF_CLOUD --> GKE
+    DEPLOY --> EKS
+
+    CLIENT_APP["Mobile App<br/>React Native"]
+    CLIENT_APP --> BACKEND
+    CLIENT_APP --> FCM
+
+    S3_LOGS --> CW
+    CLOUDTRAIL --> CW
+    AUDIT_LOG --> BACKEND
+    AUDIT_LOG --> ELK

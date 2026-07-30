@@ -1,0 +1,136 @@
+filebeat.inputs:
+  - type: container
+    enabled: true
+    paths:
+      - /var/log/containers/*.log
+    processors:
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+      - dissect:
+          tokenizer: "%{namespace}/%{podname}/%{containername}:%{logstream}"
+          target_prefix: "k8s"
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/access.log
+      - /var/log/nginx/error.log
+    tags: ["nginx"]
+    fields:
+      log_type: nginx
+    multiline:
+      pattern: '^\d{4}/\d{2}/\d{2}'
+      negate: true
+      match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/api/*.log
+    tags: ["api"]
+    fields:
+      log_type: api
+    multiline:
+      pattern: '^\d{4}-\d{2}-\d{2}'
+      negate: true
+      match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/syslog
+      - /var/log/auth.log
+    tags: ["system"]
+    fields:
+      log_type: system
+    multiline:
+      pattern: '^\w{3}\s+\d+'
+      negate: true
+      match: after
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+  reload.period: 30s
+
+processors:
+  - add_host_metadata:
+      netinfo.enabled: true
+  - add_cloud_metadata:
+      providers:
+        - aws
+        - azure
+        - gcp
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+  - add_kubernetes_metadata:
+      host: ${NODE_NAME}
+      kube_config: ""
+      default_matchers:
+        - logs_path:
+            logs_path: "/var/log/containers/"
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+      add_error_key: true
+  - drop_fields:
+      fields: ["host", "ecs", "agent", "input"]
+      ignore_missing: true
+  - geoip:
+      fields:
+        source.ip: source.geo
+        destination.ip: destination.geo
+  - timestamp:
+      field: "@timestamp"
+      layouts:
+        - "2006-01-02T15:04:05.000Z"
+        - "02/Jan/2006:15:04:05 -0700"
+      test:
+        - "2024-01-15T10:30:00.000Z"
+
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+  username: "${ELASTICSEARCH_USERNAME}"
+  password: "${ELASTICSEARCH_PASSWORD}"
+  protocol: "https"
+  ssl.verification_mode: "certificate"
+  ssl.certificate_authorities: ["/etc/filebeat/certs/ca.crt"]
+  index: "almokhtabar-%{+yyyy.MM.dd}"
+  ilm:
+    enabled: true
+    rollover_alias: "almokhtabar"
+    pattern: "almokhtabar-{now/d}-000001"
+    policy_name: "almokhtabar-ilm-policy"
+    policy_file: "/etc/filebeat/ilm-policy.json"
+
+setup.template:
+  enabled: true
+  settings:
+    index.number_of_shards: 3
+    index.number_of_replicas: 1
+    index.codec: best_compression
+    index.refresh_interval: 30s
+
+setup.ilm:
+  enabled: true
+  policy_name: "almokhtabar-ilm-policy"
+  rollover_alias: "almokhtabar"
+  pattern: "almokhtabar-{now/d}-000001"
+  check_exists: true
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat.log
+  keepfiles: 7
+  permissions: 0640
+
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 5s

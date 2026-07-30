@@ -1,0 +1,294 @@
+# SAST Configuration - Semgrep + CodeQL
+# Used for static analysis of Al Mokhtabar codebase
+
+rules:
+  # === CRITICAL: Hardcoded Secrets ===
+  - id: hardcoded-jwt-secret
+    pattern: |
+      JWT_SECRET = "..."
+    message: "Hardcoded JWT secret detected. Use environment variable JWT_SECRET."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: hardcoded-api-key
+    pattern-either:
+      - pattern: |
+          API_KEY = "..."
+      - pattern: |
+          apiKey = "..."
+      - pattern: |
+          STRIPE_SECRET_KEY = "..."
+      - pattern: |
+          TAP_SECRET_KEY = "..."
+      - pattern: |
+          HYPERPAY_SECRET = "..."
+      - pattern: |
+          PAYPAL_SECRET = "..."
+    message: "Hardcoded API key detected. Use environment variables."
+    severity: ERROR
+    languages: [javascript, typescript, python, go]
+
+  - id: hardcoded-db-password
+    pattern: |
+      password: "..."
+    pattern-not: |
+      password: process.env.*
+    message: "Database password hardcoded. Use environment variable."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: secret-in-log
+    pattern-either:
+      - pattern: |
+          console.log(...$SECRET...)
+      - pattern: |
+          console.error(...$SECRET...)
+      - pattern: |
+          logger.info(...$SECRET...)
+    message: "Potential secret leakage in logs. Avoid logging sensitive data."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === SQL INJECTION ===
+  - id: prisma-raw-query
+    pattern: |
+      prisma.$queryRawUnsafe(...)
+    message: "Unsafe raw SQL query. Use parameterized queries with $queryRaw."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: sql-string-concatenation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              `SELECT ... ${...} ...`
+          - pattern: |
+              "SELECT ... " + $PARAM + " ..."
+          - pattern: |
+              'SELECT ... ' + $PARAM + ' ...'
+      - pattern-not-inside: |
+          $VAR = sanitize($PARAM)
+    message: "SQL query built via string concatenation. Use parameterized queries."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === XSS PREVENTION ===
+  - id: dangerous-inner-html
+    pattern-either:
+      - pattern: |
+          element.innerHTML = $VAR
+      - pattern: |
+          element.insertAdjacentHTML(...)
+      - pattern: |
+          dangerouslySetInnerHTML={{__html: $VAR}}
+    message: "Potential XSS via innerHTML. Use textContent or sanitize input with DOMPurify."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: unescaped-url-param
+    pattern: |
+      window.location.href = $VAR
+    message: "Unvalidated URL assignment. Could lead to open redirect or XSS."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === PATH TRAVERSAL ===
+  - id: path-traversal
+    pattern-either:
+      - pattern: |
+          fs.readFileSync(path.join(...$INPUT, ...))
+      - pattern: |
+          fs.readFile(path.join(...$INPUT, ...))
+      - pattern: |
+          fs.writeFileSync(path.join(...$INPUT, ...))
+      - pattern: |
+          fs.writeFile(path.join(...$INPUT, ...))
+    message: "Potential path traversal. Validate and sanitize user-controlled file paths."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: unsafe-resolve-path
+    pattern: |
+      path.resolve($INPUT)
+    message: "Unvalidated path.resolve with user input. Use allowlist of allowed paths."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === COMMAND INJECTION ===
+  - id: shell-command-injection
+    pattern-either:
+      - pattern: |
+          exec($INPUT)
+      - pattern: |
+          execSync($INPUT)
+      - pattern: |
+          spawn($INPUT, { shell: true })
+      - pattern: |
+          child_process.exec(...$INPUT...)
+    message: "Command injection risk. Avoid shell execution with user input."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === INSECURE CRYPTO ===
+  - id: weak-hash-md5
+    pattern: |
+      crypto.createHash("md5")
+    message: "MD5 is insecure. Use SHA-256 or bcrypt for password hashing."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: weak-hash-sha1
+    pattern: |
+      crypto.createHash("sha1")
+    message: "SHA-1 is deprecated. Use SHA-256 or higher."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: insecure-random
+    pattern: |
+      Math.random()
+    message: "Math.random() is not cryptographically secure. Use crypto.randomBytes() for tokens, keys, or IDs."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === INPUT VALIDATION ===
+  - id: missing-input-validation
+    pattern-either:
+      - pattern: |
+          async function $FUNC(req, res) {
+            ...
+            const {...} = req.body
+            ...
+            await prisma.$FUNC.create({ data: {...} })
+          }
+    pattern-not: |
+      async function $FUNC(req, res) {
+        ...
+        $VALIDATION(req.body)
+        ...
+      }
+    message: "Request body used without validation. Ensure Zod/Yup/Joi validation is applied."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === UNSAFE REDIRECT ===
+  - id: open-redirect
+    pattern-either:
+      - pattern: |
+          res.redirect(req.query.redirect)
+      - pattern: |
+          res.redirect(req.query.next)
+      - pattern: |
+          res.redirect(req.query.returnUrl)
+      - pattern: |
+          res.redirect($REDIRECT_URL)
+    message: "Open redirect vulnerability. Whitelist allowed redirect URLs."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === PROTOTYPE POLLUTION ===
+  - id: prototype-pollution-assign
+    pattern-either:
+      - pattern: |
+          Object.assign($OBJ, $INPUT)
+      - pattern: |
+          _.merge($OBJ, $INPUT)
+      - pattern: |
+          _.defaultsDeep($OBJ, $INPUT)
+      - pattern: |
+          $OBJ[$KEY] = $VALUE
+    message: "Potential prototype pollution via unsafe object merge/assign with user input."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === REGEX DOS ===
+  - id: regex-dos
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new RegExp("...*+")
+          - pattern: |
+              /(...*+)/
+      - pattern-not: |
+          new RegExp("...", "u")
+    message: "Potential ReDoS (Regular Expression Denial of Service). Avoid nested quantifiers without Unicode mode."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === CONSOLE LOG IN PRODUCTION ===
+  - id: console-log-production
+    pattern-either:
+      - pattern: |
+          console.log(...)
+      - pattern: |
+          console.debug(...)
+      - pattern: |
+          console.trace(...)
+    pattern-not-inside: |
+      if (process.env.NODE_ENV !== 'production') { ... }
+    message: "console.log left in production code. Use structured logging library."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === CORS MISCONFIGURATION ===
+  - id: cors-wildcard
+    pattern: |
+      cors({ origin: "*" })
+    message: "CORS with wildcard origin is insecure for production. Specify allowed origins."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === CSRF PROTECTION ===
+  - id: missing-csrf-protection
+    patterns:
+      - pattern: |
+          app.post(...)
+      - pattern-not-inside: |
+          csrf()
+          doubleCsrf()
+    message: "POST endpoint without CSRF protection. Ensure CSRF middleware is applied."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # === COOKIE SECURITY ===
+  - id: insecure-cookie
+    pattern-either:
+      - pattern: |
+          res.cookie($NAME, $VALUE, { httpOnly: false })
+      - pattern: |
+          res.cookie($NAME, $VALUE, { secure: false })
+      - pattern: |
+          res.cookie($NAME, $VALUE, { sameSite: 'none' })
+    message: "Insecure cookie configuration. Use httpOnly, secure, and sameSite=lax/strict."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === PRISMA SPECIFIC ===
+  - id: prisma-expose-all
+    pattern: |
+      prisma.$extends({...})
+    message: "Prisma extension that may expose internal methods. Review for data leakage."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: unsafe-prisma-update
+    pattern: |
+      prisma.$FUNC.update({ where: { id: $ID }, data: req.body })
+    message: "Unsafe Prisma update with entire req.body. Specify allowed fields for update."
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # === SENSITIVE DATA EXPOSURE ===
+  - id: expose-user-object
+    pattern: |
+      res.json({ user })
+    message: "Full user object returned. Ensure sensitive fields (password, tokens) are excluded."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: send-password-in-response
+    pattern: |
+      res.json(...password...)
+    message: "Password included in response body. Never return password hashes."
+    severity: ERROR
+    languages: [javascript, typescript]

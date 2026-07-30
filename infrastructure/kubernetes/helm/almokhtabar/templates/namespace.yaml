@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" . | nindent 4 }}
+    name: {{ .Values.namespace.name | default "almokhtabar" }}
+  annotations:
+    {{- if .Values.global.podAnnotations }}
+    {{- toYaml .Values.global.podAnnotations | nindent 4 }}
+    {{- end }}

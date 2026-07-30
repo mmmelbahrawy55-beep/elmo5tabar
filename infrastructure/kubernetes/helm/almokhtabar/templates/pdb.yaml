@@ -1,0 +1,19 @@
+{{- range $component, $config := dict "backend" .Values.backend "web" .Values.web "ai-service" .Values.aiService }}
+{{- if $config.podDisruptionBudget.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "almokhtabar.fullname" $ }}-{{ $component }}
+  namespace: {{ $.Values.namespace.name | default "almokhtabar" }}
+  labels:
+    {{- include "almokhtabar.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+spec:
+  minAvailable: {{ $config.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "almokhtabar.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $component }}
+{{- end }}
+{{- end }}

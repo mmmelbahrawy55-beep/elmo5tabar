@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المختبر | Brand Identity Preview</title>
+  <link rel="stylesheet" href="assets/tokens.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-arabic);
+      background: var(--surface-50);
+      color: var(--surface-900);
+      direction: rtl;
+    }
+
+    .page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+
+    h1 { font-size: var(--text-display); font-weight: var(--weight-extrabold); margin-bottom: 1rem; }
+    h2 { font-size: var(--text-h2); font-weight: var(--weight-bold); margin: 3rem 0 1.5rem; color: var(--brand-700); }
+    h3 { font-size: var(--text-h4); font-weight: var(--weight-semibold); margin: 2rem 0 1rem; }
+    p { font-size: var(--text-body); line-height: var(--leading-relaxed); color: var(--surface-600); margin-bottom: 1rem; }
+
+    .hero {
+      background: var(--gradient-brand-hero);
+      color: white;
+      padding: 6rem 2rem;
+      text-align: center;
+      margin: -3rem -2rem 3rem;
+      border-radius: 0 0 3rem 3rem;
+    }
+
+    .hero h1 { color: white; font-size: var(--text-display-lg); }
+    .hero p { color: rgba(255,255,255,0.8); font-size: var(--text-h4); }
+
+    .logo-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      margin: 2rem 0;
+    }
+
+    .logo-mark {
+      width: 120px;
+      height: 150px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-arabic {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--surface-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .logo-english {
+      font-family: var(--font-english);
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--surface-500);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .color-swatch {
+      aspect-ratio: 1;
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      transition: transform 0.2s var(--ease-spring);
+      cursor: default;
+    }
+
+    .color-swatch:hover { transform: scale(1.05); }
+    .color-swatch .hex { font-family: var(--font-mono); font-size: 0.65rem; opacity: 0.8; }
+    .color-swatch .name { margin-top: 0.25rem; }
+
+    .type-specimen {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: 3rem;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .type-sample {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .type-sample:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .type-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--surface-400); margin-top: 0.5rem; }
+    .type-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--brand-500); margin-bottom: 0.5rem; font-family: var(--font-english); font-weight: 600; }
+
+    .stationery-mockup {
+      background: var(--surface-100);
+      border-radius: var(--radius-2xl);
+      padding: 3rem;
+      margin: 1.5rem 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .business-card {
+      width: 360px;
+      height: 220px;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .business-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--brand-500);
+    }
+
+    .business-card .bc-logo { display: flex; align-items: center; gap: 0.75rem; }
+    .business-card .bc-logo-mark { width: 32px; height: 40px; }
+    .business-card .bc-name { font-weight: 700; font-size: 0.95rem; }
+    .business-card .bc-name-en { font-family: var(--font-english); font-weight: 500; font-size: 0.7rem; color: var(--surface-500); letter-spacing: 0.1em; }
+    .business-card .bc-divider { height: 1px; background: var(--surface-200); }
+    .business-card .bc-person { }
+    .business-card .bc-person-name { font-weight: 600; font-size: 1rem; }
+    .business-card .bc-person-title { font-size: 0.8rem; color: var(--brand-500); margin-top: 0.25rem; }
+    .business-card .bc-person-title-en { font-family: var(--font-english); font-size: 0.7rem; color: var(--surface-400); }
+    .business-card .bc-contact { font-family: var(--font-english); font-size: 0.75rem; color: var(--surface-500); direction: ltr; text-align: left; }
+
+    .business-card-back {
+      width: 360px;
+      height: 220px;
+      background: var(--brand-500);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+
+    .business-card-back .bc-back-logo { margin-bottom: 1.5rem; }
+    .business-card-back .bc-back-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .business-card-back .bc-back-name-en { font-family: var(--font-english); font-size: 0.8rem; letter-spacing: 0.15em; opacity: 0.8; }
+    .business-card-back .bc-back-tagline { font-size: 0.75rem; opacity: 0.6; margin-top: 1rem; }
+
+    .cards-row {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .report-preview {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-xl);
+      max-width: 700px;
+      margin: 2rem auto;
+    }
+
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--brand-500);
+      margin-bottom: 1.5rem;
+    }
+
+    .report-header-right { display: flex; align-items: center; gap: 1rem; }
+    .report-header-title { font-size: 1.1rem; font-weight: 700; }
+    .report-header-sub { font-family: var(--font-english); font-size: 0.75rem; color: var(--surface-500); }
+
+    .report-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      padding: 1rem;
+      background: var(--surface-50);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      border-right: 3px solid var(--brand-500);
+    }
+
+    .report-info-section h4 { font-size: 0.75rem; color: var(--brand-500); font-weight: 600; margin-bottom: 0.5rem; }
+    .report-info-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem; }
+    .report-info-row .label { color: var(--surface-500); }
+    .report-info-row .value { font-weight: 600; color: var(--surface-800); }
+
+    .report-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    .report-table th {
+      background: var(--brand-500);
+      color: white;
+      padding: 0.6rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: right;
+    }
+    .report-table td {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      border-bottom: 1px solid var(--surface-100);
+    }
+    .report-table tr:nth-child(even) td { background: var(--surface-50); }
+    .report-table .value-col { font-family: var(--font-mono); font-weight: 600; text-align: center; }
+    .report-table .unit-col { font-family: var(--font-mono); color: var(--surface-500); text-align: center; font-size: 0.7rem; }
+    .report-table .ref-col { font-family: var(--font-mono); color: var(--surface-400); text-align: center; font-size: 0.7rem; }
+    .report-table .abnormal { background: #FEF2F2; color: var(--danger-600); font-weight: 700; }
+
+    .ai-insight-box {
+      background: var(--brand-50);
+      border: 1px solid var(--brand-200);
+      border-right: 3px solid var(--accent-500);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .ai-insight-box .ai-header { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--brand-700); margin-bottom: 0.75rem; }
+    .ai-insight-box .ai-text { font-size: 0.8rem; line-height: 1.7; color: var(--brand-800); }
+    .ai-insight-box .ai-text-en { font-family: var(--font-english); font-size: 0.75rem; color: var(--brand-600); margin-top: 0.5rem; }
+
+    .report-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--surface-200);
+      font-size: 0.7rem;
+      color: var(--surface-500);
+    }
+
+    .badge { display: inline-flex; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; }
+    .badge-brand { background: var(--brand-50); color: var(--brand-600); }
+    .badge-success { background: var(--success-50); color: var(--success-600); }
+    .badge-warning { background: var(--warning-50); color: var(--warning-600); }
+    .badge-danger { background: var(--danger-50); color: var(--danger-600); }
+
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .icon-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .icon-box { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: var(--surface-50); border-radius: var(--radius-lg); border: 1px solid var(--surface-100); }
+    .icon-label { font-size: 0.65rem; color: var(--surface-500); text-align: center; }
+
+    .uniform-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .uniform-card { background: white; border-radius: var(--radius-xl); padding: 1.5rem; box-shadow: var(--shadow-sm); text-align: center; }
+    .uniform-color { width: 100%; height: 60px; border-radius: var(--radius-lg); margin-bottom: 1rem; }
+    .uniform-title { font-weight: 600; font-size: 0.9rem; }
+    .uniform-subtitle { font-family: var(--font-english); font-size: 0.75rem; color: var(--surface-500); }
+    .uniform-badge { font-size: 0.7rem; margin-top: 0.5rem; }
+
+    .divider { height: 1px; background: var(--surface-200); margin: 3rem 0; }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      background: var(--brand-500);
+      color: white;
+      border-radius: var(--radius-full);
+      font-family: var(--font-english);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-left: 0.75rem;
+    }
+
+    .social-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+    .social-post {
+      aspect-ratio: 1;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .social-post::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(transparent, rgba(0,0,0,0.4));
+    }
+    .social-post > * { position: relative; z-index: 1; }
+    .social-post-text { font-size: 0.9rem; font-weight: 600; line-height: 1.5; }
+    .social-post-tag { font-family: var(--font-mono); font-size: 0.65rem; opacity: 0.7; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <div class="hero">
+    <svg class="logo-mark" viewBox="0 0 120 150" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:80px;height:100px;margin:0 auto 1.5rem;">
+      <!-- Flask body (triangle) -->
+      <path d="M60 45 L95 130 Q95 145 60 145 Q25 145 25 130 L60 45Z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- Flask neck -->
+      <rect x="48" y="15" width="24" height="32" rx="4" fill="none" stroke="white" stroke-width="2.5"/>
+      <!-- Human figure (arms up) -->
+      <circle cx="60" cy="8" r="6" fill="white"/>
+      <path d="M40 55 Q35 35 42 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M80 55 Q85 35 78 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- Droplet -->
+      <path d="M60 80 Q65 90 65 96 Q65 102 60 102 Q55 102 55 96 Q55 90 60 80Z" fill="white" opacity="0.9"/>
+    </svg>
+    <h1>المختبر</h1>
+    <p>AL MOKHTABAR LABORATORY — Brand Identity System</p>
+    <p style="font-size:var(--text-body);margin-top:1rem;opacity:0.6;">الدقة في كل تفصيل — Precision in Every Detail</p>
+  </div>
+
+  <div class="page">
+
+    <!-- ============================================================
+         02. COLOR PALETTE
+         ============================================================ -->
+    <h2><span class="section-number">2</span> Color Palette</h2>
+
+    <h3>Brand Blue — Laboratory Blue</h3>
+    <div class="color-grid">
+      <div class="color-swatch" style="background:var(--brand-50);color:var(--brand-800)"><span class="hex">#EFF8FF</span><span class="name">50</span></div>
+      <div class="color-swatch" style="background:var(--brand-100);color:var(--brand-800)"><span class="hex">#DBEEFE</span><span class="name">100</span></div>
+      <div class="color-swatch" style="background:var(--brand-200);color:var(--brand-800)"><span class="hex">#BFDDFE</span><span class="name">200</span></div>
+      <div class="color-swatch" style="background:var(--brand-300);color:var(--brand-900)"><span class="hex">#93C5FD</span><span class="name">300</span></div>
+      <div class="color-swatch" style="background:var(--brand-400);color:white"><span class="hex">#60A5FA</span><span class="name">400</span></div>
+      <div class="color-swatch" style="background:var(--brand-500);color:white"><span class="hex">#0077B6</span><span class="name">500 ★</span></div>
+      <div class="color-swatch" style="background:var(--brand-600);color:white"><span class="hex">#005F8F</span><span class="name">600</span></div>
+      <div class="color-swatch" style="background:var(--brand-700);color:white"><span class="hex">#004E72</span><span class="name">700</span></div>
+      <div class="color-swatch" style="background:var(--brand-800);color:white"><span class="hex">#003853</span><span class="name">800</span></div>
+      <div class="color-swatch" style="background:var(--brand-900);color:white"><span class="hex">#002838</span><span class="name">900</span></div>
+    </div>
+
+    <h3>Accent Teal — Precision Teal</h3>
+    <div class="color-grid">
+      <div class="color-swatch" style="background:var(--accent-50);color:var(--accent-800)"><span class="hex">#F0FDF9</span><span class="name">50</span></div>
+      <div class="color-swatch" style="background:var(--accent-100);color:var(--accent-800)"><span class="hex">#CCFBEF</span><span class="name">100</span></div>
+      <div class="color-swatch" style="background:var(--accent-200);color:var(--accent-900)"><span class="hex">#99F6DE</span><span class="name">200</span></div>
+      <div class="color-swatch" style="background:var(--accent-300);color:var(--accent-900)"><span class="hex">#5EEAD4</span><span class="name">300</span></div>
+      <div class="color-swatch" style="background:var(--accent-400);color:white"><span class="hex">#2DD4BF</span><span class="name">400</span></div>
+      <div class="color-swatch" style="background:var(--accent-500);color:white"><span class="hex">#10B981</span><span class="name">500 ★</span></div>
+      <div class="color-swatch" style="background:var(--accent-600);color:white"><span class="hex">#059669</span><span class="name">600</span></div>
+      <div class="color-swatch" style="background:var(--accent-700);color:white"><span class="hex">#047857</span><span class="name">700</span></div>
+      <div class="color-swatch" style="background:var(--accent-800);color:white"><span class="hex">#065F46</span><span class="name">800</span></div>
+      <div class="color-swatch" style="background:var(--accent-900);color:white"><span class="hex">#064E3B</span><span class="name">900</span></div>
+    </div>
+
+    <h3>Saffron Gold — Premium Gold</h3>
+    <div class="color-grid">
+      <div class="color-swatch" style="background:var(--saffron-50);color:var(--saffron-800)"><span class="hex">#FFFBEB</span><span class="name">50</span></div>
+      <div class="color-swatch" style="background:var(--saffron-100);color:var(--saffron-800)"><span class="hex">#FEF3C7</span><span class="name">100</span></div>
+      <div class="color-swatch" style="background:var(--saffron-200);color:var(--saffron-900)"><span class="hex">#FDE68A</span><span class="name">200</span></div>
+      <div class="color-swatch" style="background:var(--saffron-300);color:var(--saffron-900)"><span class="hex">#FCD34D</span><span class="name">300</span></div>
+      <div class="color-swatch" style="background:var(--saffron-400);color:var(--saffron-900)"><span class="hex">#FBBF24</span><span class="name">400</span></div>
+      <div class="color-swatch" style="background:var(--saffron-500);color:white"><span class="hex">#F59E0B</span><span class="name">500 ★</span></div>
+      <div class="color-swatch" style="background:var(--saffron-600);color:white"><span class="hex">#D97706</span><span class="name">600</span></div>
+      <div class="color-swatch" style="background:var(--saffron-700);color:white"><span class="hex">#B45309</span><span class="name">700</span></div>
+      <div class="color-swatch" style="background:var(--saffron-800);color:white"><span class="hex">#92400E</span><span class="name">800</span></div>
+      <div class="color-swatch" style="background:var(--saffron-900);color:white"><span class="hex">#78350F</span><span class="name">900</span></div>
+    </div>
+
+    <!-- ============================================================
+         03. TYPOGRAPHY
+         ============================================================ -->
+    <h2><span class="section-number">3</span> Typography</h2>
+
+    <div class="type-specimen">
+      <div class="type-sample">
+        <div class="type-label">Display / Arabic</div>
+        <div style="font-size:var(--text-display-lg);font-weight:800;line-height:1.1;">الدقة في كل تفصيل</div>
+        <div class="type-meta">IBM Plex Sans Arabic · 60px · 800 ExtraBold</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">H1 / Arabic</div>
+        <div style="font-size:var(--text-h1);font-weight:700;line-height:1.2;">تقرير تحاليل مخبرية شاملة</div>
+        <div class="type-meta">IBM Plex Sans Arabic · 36px · 700 Bold</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">H2 / Arabic</div>
+        <div style="font-size:var(--text-h2);font-weight:700;line-height:1.25;">نتائج التحاليل الدموية</div>
+        <div class="type-meta">IBM Plex Sans Arabic · 30px · 700 Bold</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">Body / Arabic</div>
+        <div style="font-size:var(--text-body);font-weight:400;line-height:1.7;">يُعد فحص صورة الدم الشاملة (CBC) من أكثر التحاليل المخبرية شيوعاً. يُستخدم هذا الفحص لتقييم الحالة العامة للدم وتشخيص العديد من الأمراض مثل فقر الدم والتهابات والاضطرابات المناعية.</div>
+        <div class="type-meta">IBM Plex Sans Arabic · 16px · 400 Regular · line-height: 1.65</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">Body / English</div>
+        <div style="font-family:var(--font-english);font-size:var(--text-body);font-weight:400;line-height:1.65;">The Complete Blood Count (CBC) is one of the most commonly ordered laboratory tests. It evaluates overall blood health and helps diagnose conditions such as anemia, infections, and immune disorders.</div>
+        <div class="type-meta">Plus Jakarta Sans · 16px · 400 Regular · line-height: 1.65</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">Monospace / Data</div>
+        <div style="font-family:var(--font-mono);font-size:var(--text-body-lg);font-weight:600;color:var(--brand-600);">MK-20240115-X7K9P2 &nbsp; WBC: 7,500 /μL &nbsp; HGB: 14.2 g/dL</div>
+        <div class="type-meta">JetBrains Mono · 18px · 600 SemiBold</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-label">Overline / Bilingual</div>
+        <div style="font-size:var(--text-overline);font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:var(--brand-500);font-family:var(--font-english);">Laboratory Test Results</div>
+        <div style="font-size:var(--text-caption);font-weight:600;color:var(--brand-500);margin-top:0.25rem;">نتائج التحاليل المخبرية</div>
+        <div class="type-meta">IBM Plex Sans Arabic + Plus Jakarta Sans · 11px/12px · 600 SemiBold</div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         04. STATIONERY — BUSINESS CARD
+         ============================================================ -->
+    <h2><span class="section-number">4</span> Business Card</h2>
+
+    <div class="stationery-mockup">
+      <div class="cards-row">
+        <!-- Front -->
+        <div class="business-card">
+          <div class="bc-logo">
+            <svg class="bc-logo-mark" viewBox="0 0 32 40" fill="none">
+              <path d="M16 12L26 35Q26 39 16 39Q6 39 6 35L16 12Z" fill="var(--brand-500)" opacity="0.15" stroke="var(--brand-500)" stroke-width="1.5"/>
+              <rect x="12.5" y="3" width="7" height="10" rx="1.5" stroke="var(--brand-500)" stroke-width="1.5" fill="none"/>
+              <circle cx="16" cy="1.5" r="1.5" fill="var(--brand-500)"/>
+              <path d="M10.5 15Q9 10 11 6" stroke="var(--brand-500)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M21.5 15Q23 10 21 6" stroke="var(--brand-500)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M16 21Q17.5 24 17.5 26Q17.5 28 16 28Q14.5 28 14.5 26Q14.5 24 16 21Z" fill="var(--brand-500)"/>
+            </svg>
+            <div>
+              <div class="bc-name">المختبر</div>
+              <div class="bc-name-en">AL MOKHTABAR</div>
+            </div>
+          </div>
+          <div class="bc-divider"></div>
+          <div class="bc-person">
+            <div class="bc-person-name">محمد أحمد الشمري</div>
+            <div class="bc-person-title">مدير المختبر</div>
+            <div class="bc-person-title-en">Laboratory Director</div>
+          </div>
+          <div class="bc-contact">
+            +966 11 234 5678<br>
+            m.alshammari@almokhtabar.com
+          </div>
+        </div>
+
+        <!-- Back -->
+        <div class="business-card-back">
+          <div class="bc-back-logo">
+            <svg width="40" height="50" viewBox="0 0 120 150" fill="none">
+              <path d="M60 45L95 130Q95 145 60 145Q25 145 25 130L60 45Z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="2.5"/>
+              <rect x="48" y="15" width="24" height="32" rx="4" stroke="white" stroke-width="2.5" fill="none"/>
+              <circle cx="60" cy="8" r="6" fill="white"/>
+              <path d="M40 55Q35 35 42 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M80 55Q85 35 78 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M60 80Q65 90 65 96Q65 102 60 102Q55 102 55 96Q55 90 60 80Z" fill="white" opacity="0.9"/>
+            </svg>
+          </div>
+          <div class="bc-back-name">المختبر</div>
+          <div class="bc-back-name-en">AL MOKHTABAR LABORATORY</div>
+          <div class="bc-back-tagline">الدقة في كل تفصيل — Precision in Every Detail</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         05. LAB REPORT PREVIEW
+         ============================================================ -->
+    <h2><span class="section-number">5</span> Lab Report Design</h2>
+
+    <div class="report-preview">
+      <div class="report-header">
+        <div class="report-header-right">
+          <svg width="36" height="45" viewBox="0 0 120 150" fill="none">
+            <path d="M60 45L95 130Q95 145 60 145Q25 145 25 130L60 45Z" fill="var(--brand-500)" opacity="0.15" stroke="var(--brand-500)" stroke-width="2.5"/>
+            <rect x="48" y="15" width="24" height="32" rx="4" stroke="var(--brand-500)" stroke-width="2.5" fill="none"/>
+            <circle cx="60" cy="8" r="6" fill="var(--brand-500)"/>
+            <path d="M60 80Q65 90 65 96Q65 102 60 102Q55 102 55 96Q55 90 60 80Z" fill="var(--brand-500)"/>
+          </svg>
+          <div>
+            <div class="report-header-title">تقرير تحاليل مخبرية</div>
+            <div class="report-header-sub">LABORATORY TEST REPORT</div>
+          </div>
+        </div>
+        <div>
+          <div class="badge badge-brand">RPT-20240115-X7K9</div>
+        </div>
+      </div>
+
+      <div class="report-info-grid">
+        <div class="report-info-section">
+          <h4>بيانات المريض — Patient Info</h4>
+          <div class="report-info-row"><span class="label">الاسم</span><span class="value">محمد أحمد الشمري</span></div>
+          <div class="report-info-row"><span class="label">الجنس / العمر</span><span class="value">ذكر / 34 سنة</span></div>
+          <div class="report-info-row"><span class="label">رقم المريض</span><span class="value" style="font-family:var(--font-mono)">PAT-X7K9P2</span></div>
+        </div>
+        <div class="report-info-section">
+          <h4>بيانات الطلب — Order Info</h4>
+          <div class="report-info-row"><span class="label">رقم الطلب</span><span class="value" style="font-family:var(--font-mono)">MK-20240115-X7K9P2</span></div>
+          <div class="report-info-row"><span class="label">التاريخ</span><span class="value">2024/01/15</span></div>
+          <div class="report-info-row"><span class="label">الفرع</span><span class="value">الرياض - التحلية</span></div>
+        </div>
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>الفحص / Test</th>
+            <th style="text-align:center">القيمة / Value</th>
+            <th style="text-align:center">الوحدة / Unit</th>
+            <th style="text-align:center">المعدل / Reference</th>
+            <th style="text-align:center">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>WBC</strong><br><span style="color:var(--surface-400);font-size:0.7rem">كريات الدم البيضاء</span></td>
+            <td class="value-col">7,500</td>
+            <td class="unit-col">/μL</td>
+            <td class="ref-col">4,000 - 11,000</td>
+            <td style="text-align:center"><span class="badge badge-success">طبيعي</span></td>
+          </tr>
+          <tr>
+            <td><strong>RBC</strong><br><span style="color:var(--surface-400);font-size:0.7rem">كريات الدم الحمراء</span></td>
+            <td class="value-col">5.2</td>
+            <td class="unit-col">M/μL</td>
+            <td class="ref-col">4.5 - 5.5</td>
+            <td style="text-align:center"><span class="badge badge-success">طبيعي</span></td>
+          </tr>
+          <tr>
+            <td><strong>HGB</strong><br><span style="color:var(--surface-400);font-size:0.7rem">الهيموجلوبين</span></td>
+            <td class="value-col abnormal">18.2</td>
+            <td class="unit-col">g/dL</td>
+            <td class="ref-col">13.5 - 17.5</td>
+            <td style="text-align:center"><span class="badge badge-danger">▲ مرتفع</span></td>
+          </tr>
+          <tr>
+            <td><strong>PLT</strong><br><span style="color:var(--surface-400);font-size:0.7rem">الصفائح الدموية</span></td>
+            <td class="value-col">250,000</td>
+            <td class="unit-col">/μL</td>
+            <td class="ref-col">150K - 400K</td>
+            <td style="text-align:center"><span class="badge badge-success">طبيعي</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ai-insight-box">
+        <div class="ai-header">🧠 رؤية المختبر AI — Al Mokhtabar AI Insight</div>
+        <div class="ai-text">
+          مستوى الهيموجلوبين مرتفع قليلاً (18.2 g/dL) مقارنة بالمعدل الطبيعي. قد يشير هذا إلى جفاف أو تكيّف مع الارتفاع. يُنصح بشرب السوائل الكافية ومراجعة الطبيب المختص.
+        </div>
+        <div class="ai-text-en">
+          Hemoglobin is slightly elevated (18.2 g/dL). This may indicate dehydration or altitude adaptation. Adequate hydration and specialist follow-up recommended.
+        </div>
+      </div>
+
+      <div class="report-footer">
+        <div style="font-family:var(--font-mono)">
+          RPT-20240115-X7K9 &nbsp;|&nbsp; Verified at almokhtabar.com
+        </div>
+        <div>
+          © 2024 المختبر | Al Mokhtabar Laboratory — سري ويخص المريض فقط
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         06. UNIFORM SYSTEM
+         ============================================================ -->
+    <h2><span class="section-number">6</span> Uniform Design</h2>
+
+    <div class="uniform-section">
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:var(--surface-900)"></div>
+        <div class="uniform-title">_lab Coat</div>
+        <div class="uniform-subtitle">White · Embroidered logo</div>
+        <div class="uniform-badge"><span class="badge badge-brand">Medical Staff</span></div>
+      </div>
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:#1E293B"></div>
+        <div class="uniform-title">Navy Scrubs</div>
+        <div class="uniform-subtitle">General Department</div>
+        <div class="uniform-badge"><span class="badge badge-success">General</span></div>
+      </div>
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:#0D9488"></div>
+        <div class="uniform-title">Teal Scrubs</div>
+        <div class="uniform-subtitle">Laboratory</div>
+        <div class="uniform-badge"><span class="badge badge-success">Lab Team</span></div>
+      </div>
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:#0EA5E9"></div>
+        <div class="uniform-title">Light Blue Scrubs</div>
+        <div class="uniform-subtitle">Phlebotomy</div>
+        <div class="uniform-badge"><span class="badge badge-warning">Collection</span></div>
+      </div>
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:var(--brand-500)"></div>
+        <div class="uniform-title">Brand Polo</div>
+        <div class="uniform-subtitle">Non-Clinical Staff</div>
+        <div class="uniform-badge"><span class="badge badge-brand">Support</span></div>
+      </div>
+      <div class="uniform-card">
+        <div class="uniform-color" style="background:var(--gradient-gold-luxe)"></div>
+        <div class="uniform-title">Executive Blazer</div>
+        <div class="uniform-subtitle">Charcoal + Gold pin</div>
+        <div class="uniform-badge"><span class="badge badge-warning">Management</span></div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         07. SOCIAL MEDIA PREVIEW
+         ============================================================ -->
+    <h2><span class="section-number">7</span> Social Media Identity</h2>
+
+    <div class="social-preview">
+      <div class="social-post" style="background:var(--brand-500)">
+        <div class="social-post-text">الدقة في كل تفصيل. أكثر من ١٥٠ فحص مخبري متخصص.</div>
+        <div class="social-post-tag">#المختبر #تحاليل_طبية</div>
+      </div>
+      <div class="social-post" style="background:var(--gradient-brand-hero)">
+        <div class="social-post-text">نتائجك في متناول يدك. تطبيق المختبر الجديد.</div>
+        <div class="social-post-tag">#مختبري #صحة_رقمية</div>
+      </div>
+      <div class="social-post" style="background:var(--surface-900)">
+        <div class="social-post-text" style="color:var(--saffron-400)">خدمة جمع العينات المنزلية. نأتي إليك.</div>
+        <div class="social-post-tag" style="color:var(--saffron-300)">#معاينة_منزلية #خدمة_مميزة</div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         08. BRAND STATISTICS
+         ============================================================ -->
+    <h2><span class="section-number">8</span> Brand at a Glance</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin:1.5rem 0;">
+      <div style="background:white;border-radius:var(--radius-xl);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:2rem;font-weight:800;color:var(--brand-500)">#0077B6</div>
+        <div style="font-size:0.8rem;color:var(--surface-500);margin-top:0.25rem">Primary Brand</div>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--surface-400)">Pantone 3005 C</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-xl);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent-500)">#10B981</div>
+        <div style="font-size:0.8rem;color:var(--surface-500);margin-top:0.25rem">Accent Teal</div>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--surface-400)">Pantone 7723 C</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-xl);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:2rem;font-weight:800;color:var(--saffron-500)">#F59E0B</div>
+        <div style="font-size:0.8rem;color:var(--surface-500);margin-top:0.25rem">Premium Gold</div>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--surface-400)">Pantone 7549 C</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-xl);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:1.5rem;font-weight:700;font-family:var(--font-arabic);">IBM Plex Sans Arabic</div>
+        <div style="font-size:0.8rem;color:var(--surface-500);margin-top:0.25rem">Arabic Typeface</div>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--surface-400)">Google Fonts · Open Source</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-xl);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:1.5rem;font-weight:700;font-family:var(--font-english);">Plus Jakarta Sans</div>
+        <div style="font-size:0.8rem;color:var(--surface-500);margin-top:0.25rem">English Typeface</div>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--surface-400)">Google Fonts · Open Source</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="text-align:center;padding:3rem 0;color:var(--surface-500);font-size:0.85rem;">
+      <p style="font-weight:600;color:var(--surface-700);font-size:1.1rem;">© 2024 المختبر | Al Mokhtabar Laboratory</p>
+      <p style="margin-top:0.5rem;">Brand Identity System · Version 1.0</p>
+      <p style="margin-top:0.25rem;">All Rights Reserved · Confidential</p>
+    </div>
+
+  </div>
+</body>
+</html>

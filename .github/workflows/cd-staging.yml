@@ -1,0 +1,133 @@
+name: Deploy Staging
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    branches: [main, develop]
+
+concurrency:
+  group: staging-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_TAG: pr-${{ github.event.number }}-${{ github.sha }}
+  K8S_NAMESPACE: almokhtabar-staging
+  PR_NUMBER: ${{ github.event.number }}
+
+jobs:
+  preview-label:
+    name: Check Preview Label
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.label-check.outputs.deploy }}
+    steps:
+      - id: label-check
+        run: |
+          if echo "${{ join(github.event.pull_request.labels.*.name) }}" | grep -q "deploy-preview"; then
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-push:
+    name: Build & Push Images
+    needs: preview-label
+    if: needs.preview-label.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, web, ai-service]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/almokhtabar/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/almokhtabar/${{ matrix.service }}:staging-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-preview:
+    name: Deploy Preview Environment
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: pr-${{ env.PR_NUMBER }}
+      url: https://pr-${{ env.PR_NUMBER }}.staging.almokhtabar.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v3
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.STAGING_KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+      - name: Deploy Helm chart
+        run: |
+          RELEASE_NAME="pr-${{ env.PR_NUMBER }}"
+          helm upgrade --install "$RELEASE_NAME" ./infrastructure/kubernetes/helm/almokhtabar \
+            --namespace ${{ env.K8S_NAMESPACE }} \
+            -f infrastructure/kubernetes/helm/almokhtabar/values-staging.yaml \
+            --set global.imageTag=${{ env.IMAGE_TAG }} \
+            --set global.environment=staging \
+            --set global.previewMode=true \
+            --set global.previewNumber=${{ env.PR_NUMBER }} \
+            --set backend.replicaCount=1 \
+            --set web.replicaCount=1 \
+            --set ai-service.replicaCount=1 \
+            --set ingress.host=pr-${{ env.PR_NUMBER }}.staging.almokhtabar.com \
+            --wait --timeout 5m
+      - name: Run smoke tests
+        run: |
+          INGRESS_HOST="pr-${{ env.PR_NUMBER }}.staging.almokhtabar.com"
+          ./infrastructure/scripts/deploy/smoke-test.sh "preview" "$INGRESS_HOST"
+      - name: Comment PR with deployment URL
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: preview-deployment
+          message: |
+            🚀 Preview environment deployed successfully!
+
+            | Service | URL |
+            |---------|-----|
+            | Web App | https://pr-${{ env.PR_NUMBER }}.staging.almokhtabar.com |
+            | API     | https://api.pr-${{ env.PR_NUMBER }}.staging.almokhtabar.com |
+
+            Image tag: `${{ env.IMAGE_TAG }}`
+
+  cleanup-preview:
+    name: Cleanup Preview Environment
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v3
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.STAGING_KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+      - name: Delete Helm release
+        run: |
+          helm uninstall pr-${{ env.PR_NUMBER }} --namespace ${{ env.K8S_NAMESPACE }} || true
+      - name: Delete namespace if empty
+        run: |
+          kubectl delete namespace ${{ env.K8S_NAMESPACE }} --ignore-not-found || true
+      - name: Remove preview label
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: preview-deployment
+          delete: true

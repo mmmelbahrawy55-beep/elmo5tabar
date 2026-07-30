@@ -1,0 +1,403 @@
+{
+  "title": "Al Mokhtabar Production Overview",
+  "uid": "almokhtabar-overview",
+  "tags": ["production", "almokhtabar"],
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "Asia/Riyadh",
+  "editable": false,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Uptime (30d)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "avg(probe_success{job=\"blackbox\"}[30d]) * 100",
+          "legendFormat": "Uptime"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["mean"], "values": false },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99 },
+              { "color": "green", "value": 99.9 }
+            ]
+          },
+          "min": 0,
+          "max": 100
+        }
+      }
+    },
+    {
+      "title": "Request Rate (RPS)",
+      "type": "graph",
+      "gridPos": { "h": 4, "w": 5, "x": 3, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[5m]))",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"2..\"}[5m]))",
+          "legendFormat": "2xx"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"4..\"}[5m]))",
+          "legendFormat": "4xx"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m]))",
+          "legendFormat": "5xx"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate (%)",
+      "type": "graph",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) * 100",
+          "legendFormat": "Error %"
+        }
+      ],
+      "thresholds": [
+        { "colorMode": "critical", "fill": true, "line": true, "op": "gt", "value": 5 }
+      ]
+    },
+    {
+      "title": "Latency (p50 / p95 / p99)",
+      "type": "graph",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p99" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Active Users (Real-time)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(active_users_total)",
+          "legendFormat": "Active Users"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "title": "API Health - Endpoints",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "probe_success{job=\"blackbox\"}",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": "#A" }, "indexByName": {}, "renameByName": { "instance": "Endpoint", "Value": "Status" } } }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } }, "type": "value" }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Database Connections",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 4 },
+      "targets": [
+        { "expr": "pg_stat_activity_count{datname=\"almokhtabar\"}", "legendFormat": "Active" },
+        { "expr": "pg_stat_activity_max_connections{datname=\"almokhtabar\"}", "legendFormat": "Max" }
+      ],
+      "thresholds": [
+        { "colorMode": "critical", "fill": true, "line": true, "op": "gt", "value": 150 }
+      ]
+    },
+    {
+      "title": "Query Time",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "rate(pg_stat_database_blk_read_time{datname=\"almokhtabar\"}[5m]) / 1000", "legendFormat": "Read" },
+        { "expr": "rate(pg_stat_database_blk_write_time{datname=\"almokhtabar\"}[5m]) / 1000", "legendFormat": "Write" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Cache Hit Ratio",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 4, "x": 16, "y": 4 },
+      "targets": [
+        {
+          "expr": "(sum(pg_stat_database_blks_hit{datname=\"almokhtabar\"}) / (sum(pg_stat_database_blks_hit{datname=\"almokhtabar\"}) + sum(pg_stat_database_blks_read{datname=\"almokhtabar\"}))) * 100",
+          "legendFormat": "Hit Ratio"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 } }
+    },
+    {
+      "title": "Redis Memory Usage",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 10 },
+      "targets": [
+        { "expr": "redis_memory_used_bytes / redis_memory_max_bytes * 100", "legendFormat": "Memory %" }
+      ],
+      "thresholds": [
+        { "colorMode": "critical", "fill": true, "line": true, "op": "gt", "value": 80 }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "Redis Hit Rate",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 6, "y": 10 },
+      "targets": [
+        { "expr": "rate(redis_keyspace_hits_total[5m]) / (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m])) * 100", "legendFormat": "Hit Rate" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "title": "Redis Ops/sec",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 10, "y": 10 },
+      "targets": [
+        { "expr": "rate(redis_commands_total[5m])", "legendFormat": "Ops" }
+      ]
+    },
+    {
+      "title": "Bull Queue Size",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 14, "y": 10 },
+      "targets": [
+        { "expr": "bull_queue_size{queue=\"notifications\"}", "legendFormat": "Notifications" },
+        { "expr": "bull_queue_size{queue=\"email\"}", "legendFormat": "Email" },
+        { "expr": "bull_queue_size{queue=\"reports\"}", "legendFormat": "Reports" }
+      ]
+    },
+    {
+      "title": "Queue Processing Time",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 4, "x": 18, "y": 10 },
+      "targets": [
+        { "expr": "rate(bull_job_duration_seconds_sum[5m]) / rate(bull_job_duration_seconds_count[5m])", "legendFormat": "Avg Duration" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Pod Health Status",
+      "type": "bargauge",
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "count(kube_pod_status_phase{phase=\"Running\"})", "legendFormat": "Running" },
+        { "expr": "count(kube_pod_status_phase{phase=\"Pending\"})", "legendFormat": "Pending" },
+        { "expr": "count(kube_pod_status_phase{phase=\"Failed\"})", "legendFormat": "Failed" },
+        { "expr": "count(kube_pod_status_phase{phase=\"Unknown\"})", "legendFormat": "Unknown" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "CPU Usage by Service",
+      "type": "graph",
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 16 },
+      "targets": [
+        { "expr": "sum(rate(container_cpu_usage_seconds_total{container!=\"POD\",namespace=\"production\"}[5m])) by (container)", "legendFormat": "{{ container }}" }
+      ]
+    },
+    {
+      "title": "Memory Usage by Service",
+      "type": "graph",
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 16 },
+      "targets": [
+        { "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",namespace=\"production\"}) by (container)", "legendFormat": "{{ container }}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "title": "Disk Usage by Volume",
+      "type": "table",
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 21 },
+      "targets": [
+        {
+          "expr": "100 - (avg(node_filesystem_avail_bytes{mountpoint!=\"\"}) by (mountpoint) / avg(node_filesystem_size_bytes{mountpoint!=\"\"}) by (mountpoint) * 100)",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true }, "indexByName": {}, "renameByName": { "mountpoint": "Volume", "Value": "Usage %" } } }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 85 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "SSL Certificate Expiry",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 4, "x": 8, "y": 21 },
+      "targets": [
+        {
+          "expr": "probe_ssl_earliest_cert_expiry{job=\"blackbox\"} - time()",
+          "legendFormat": "Days Left"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1209600 },
+              { "color": "red", "value": 2592000 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "ssl-expiry" },
+            "properties": [{ "id": "unit", "value": "dtduration" }]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Last Backup Age",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 4, "x": 12, "y": 21 },
+      "targets": [
+        {
+          "expr": "time() - max(postgres_last_backup_timestamp)",
+          "legendFormat": "Age"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 43200 },
+              { "color": "red", "value": 86400 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Age" },
+            "properties": [{ "id": "unit", "value": "dtduration" }]
+          }
+        ]
+      }
+    },
+    {
+      "title": "SLO - 30d Rolling Availability",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 8, "x": 16, "y": 21 },
+      "targets": [
+        {
+          "expr": "(1 - (sum(rate(http_requests_total{status=~\"5..\"}[30d])) / sum(rate(http_requests_total[30d])))) * 100",
+          "legendFormat": "Availability"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99.5 },
+              { "color": "green", "value": 99.9 }
+            ]
+          },
+          "min": 99,
+          "max": 100
+        }
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" }
+      },
+      {
+        "name": "namespace",
+        "type": "query",
+        "query": "label_values(kube_namespace_labels, kubernetes_namespace)",
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "production", "value": "production" }
+      },
+      {
+        "name": "service",
+        "type": "query",
+        "query": "label_values(up, app)",
+        "includeAll": true,
+        "multi": true
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Deployments",
+        "type": "grafana_annotation",
+        "query": "type:deployment",
+        "iconColor": "blue"
+      },
+      {
+        "name": "Alerts",
+        "type": "grafana_annotation",
+        "query": "type:alert",
+        "iconColor": "red"
+      }
+    ]
+  }
+}
