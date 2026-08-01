@@ -180,7 +180,7 @@ export default function EmailsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>حملات البريد الإلكتروني</CardTitle>
-                <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الحملات..." />
+                <SearchInput value={searchQuery} onChange={(v) => setSearchQuery(v)} placeholder="بحث في الحملات..." />
               </div>
             </CardHeader>
             <CardContent>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useCallback } from 'react';
-import { useSpring, type SpringValue } from 'framer-motion';
+import { useSpring, type MotionValue } from 'framer-motion';
 
 interface LiquidEffectOptions {
   intensity?: number;
@@ -10,10 +10,10 @@ interface LiquidEffectOptions {
 }
 
 interface LiquidEffectReturn {
-  x: SpringValue<number>;
-  y: SpringValue<number>;
-  scale: SpringValue<number>;
-  rotation: SpringValue<number>;
+  x: MotionValue<number>;
+  y: MotionValue<number>;
+  scale: MotionValue<number>;
+  rotation: MotionValue<number>;
   ref: React.RefObject<HTMLDivElement | null>;
 }
 

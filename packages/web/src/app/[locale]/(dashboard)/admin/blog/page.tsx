@@ -160,7 +160,7 @@ export default function BlogPage() {
                 <SearchInput
                   placeholder="بحث في المقالات..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="flex-1"
                 />
                 <select

@@ -125,7 +125,7 @@ export default function PartnersPage() {
                 <SearchInput
                   placeholder="بحث عن شريك..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="flex-1"
                 />
                 <select

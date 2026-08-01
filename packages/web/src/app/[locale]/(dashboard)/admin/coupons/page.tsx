@@ -132,7 +132,7 @@ export default function CouponsPage() {
                 <SearchInput
                   placeholder="بحث بالكود..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="max-w-md"
                 />
               </div>

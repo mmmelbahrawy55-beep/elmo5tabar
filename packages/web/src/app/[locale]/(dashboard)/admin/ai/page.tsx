@@ -253,7 +253,7 @@ export default function AdminAIPage() {
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                 </svg>
                 <p className="text-sm">{isRtl ? 'سيتم إضافة إدارة قاعدة المعرفة قريباً' : 'Knowledge base management coming soon'}</p>
-                <Button className="mt-4" variant="outline" onClick={() => window.open('/admin/knowledge-base', '_self')}>
+                <Button className="mt-4" variant="outline-brand" onClick={() => window.open('/admin/knowledge-base', '_self')}>
                   {isRtl ? 'الذهاب إلى قاعدة المعرفة' : 'Go to Knowledge Base'}
                 </Button>
               </div>

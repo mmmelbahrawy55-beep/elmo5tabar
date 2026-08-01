@@ -6,7 +6,6 @@ import {
   User,
   Phone,
   Mail,
-  IdCard,
   Globe,
   FileText,
   Shield,
@@ -282,7 +281,7 @@ export function Step5PatientDetails({ patient, onSubmit, language }: Step5Props)
         <motion.div variants={fadeUp}>
           <label className={LABEL}>
             <span className="inline-flex items-center gap-1.5">
-              <IdCard className="w-4 h-4 text-brand-500" />
+              <CreditCard className="w-4 h-4 text-brand-500" />
               رقم الهوية الوطنية
             </span>
           </label>

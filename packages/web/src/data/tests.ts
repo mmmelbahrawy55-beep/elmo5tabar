@@ -23,7 +23,7 @@ export const CATEGORIES: Record<TestCategory, { nameAr: string; nameEn: string; 
   otolaryngology: { nameAr: 'الأنف والأذن', nameEn: 'ENT', icon: '👂', color: '#64748B', description: 'فحوصات الأنف والأذن والحنجرة' },
   urology: { nameAr: 'المسالك البولية', nameEn: 'Urology', icon: '💧', color: '#0D9488', description: 'تحاليل المسالك البولية' },
   gynecology: { nameAr: 'النسائية', nameEn: 'Gynecology', icon: '👩', color: '#E11D48', description: 'التحاليل النسائية والتماسك' },
-  pediatric: { nameAr: 'الأطفال', nameEn: 'Pediatrics', icon: '👶', color: '#F97316', description: 'التحاليل المخصصة للأطفال' },
+  pediatrics: { nameAr: 'الأطفال', nameEn: 'Pediatrics', icon: '👶', color: '#F97316', description: 'التحاليل المخصصة للأطفال' },
   nutritional: { nameAr: 'التغذية', nameEn: 'Nutritional', icon: '🥗', color: '#16A34A', description: 'فحص الفيتامينات والمعادن والتحاليل الغذائية' },
   hormonal: { nameAr: 'الهرمونات', nameEn: 'Hormonal', icon: '💊', color: '#A855F7', description: 'تحاليل الهرمونات المختلفة' },
   autoimmune: { nameAr: 'الأمراض المناعية', nameEn: 'Autoimmune', icon: '⚡', color: '#EAB308', description: 'فحوصات الأمراض المناعية الذاتية' },

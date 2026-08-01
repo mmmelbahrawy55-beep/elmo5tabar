@@ -151,7 +151,6 @@ export const useCompareStore = create<CompareState>()(
       },
       clearCompare: () => set({ compareIds: [] }),
       isInCompare: (id) => get().compareIds.includes(id),
-      MAX_COMPARE: 4,
     }),
     { name: 'al-mokhtabar-compare' }
   )

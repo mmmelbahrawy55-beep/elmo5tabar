@@ -26,7 +26,7 @@ export interface QueueEntry {
   estimatedWaitMinutes?: number;
   actualWaitMinutes?: number;
   notes?: string;
-  createdBy: string;
+  createdBy?: string;
   createdAt: string;
   updatedAt: string;
   // Computed fields

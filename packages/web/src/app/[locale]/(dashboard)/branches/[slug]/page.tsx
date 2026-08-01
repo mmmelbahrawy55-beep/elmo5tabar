@@ -87,7 +87,7 @@ export default function BranchDetailPage() {
 
   useEffect(() => {
     if (branch && permissionState === "granted" && latitude && longitude) {
-      const d = calculateDistance(latitude, longitude, branch.lat, branch.lng);
+      const d = calculateDistance(latitude, longitude, branch.coordinates.lat, branch.coordinates.lng);
       setDistance(d);
     }
   }, [branch, latitude, longitude, permissionState]);
@@ -146,7 +146,7 @@ export default function BranchDetailPage() {
   };
 
   const handleNavigate = () => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${branch.coordinates.lat},${branch.coordinates.lng}`;
     window.open(url, "_blank");
   };
 
@@ -317,8 +317,8 @@ export default function BranchDetailPage() {
                 </p>
                 <p className="text-sm font-bold text-slate-800 font-arabic">
                   {branch.status === "active"
-                    ? `يغلق الساعة ${branch.closingTime || "11:00 م"}`
-                    : `يفتح الساعة ${branch.openingTime || "08:00 ص"}`}
+                    ? `يغلق الساعة ${branch.openingHours?.[0]?.close || "11:00 م"}`
+                    : `يفتح الساعة ${branch.openingHours?.[0]?.open || "08:00 ص"}`}
                 </p>
               </div>
               <Clock className="w-4 h-4 text-slate-400 mr-1" />
@@ -329,9 +329,9 @@ export default function BranchDetailPage() {
               <div className="shrink-0 flex items-center gap-2 px-4 py-3 bg-white rounded-2xl shadow-sm border border-slate-200/80">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    branch.queueStatus.level === "low"
+                    branch.queueStatus.waiting <= 5
                       ? "bg-emerald-500"
-                      : branch.queueStatus.level === "medium"
+                      : branch.queueStatus.waiting <= 15
                       ? "bg-amber-500"
                       : "bg-red-500"
                   }`}
@@ -342,7 +342,7 @@ export default function BranchDetailPage() {
                   </p>
                   <p className="text-sm font-bold text-slate-800 font-arabic">
                     {branch.queueStatus.waiting} انتظار •{" "}
-                    {branch.queueStatus.estimatedWait} دقيقة
+                    {branch.queueStatus.averageWait}
                   </p>
                 </div>
                 <Users className="w-4 h-4 text-slate-400 mr-1" />
@@ -358,17 +358,17 @@ export default function BranchDetailPage() {
                     <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${
-                          branch.capacity > 80
+                          branch.capacity.percentage > 80
                             ? "bg-red-500"
-                            : branch.capacity > 50
+                            : branch.capacity.percentage > 50
                             ? "bg-amber-500"
                             : "bg-emerald-500"
                         }`}
-                        style={{ width: `${branch.capacity}%` }}
+                        style={{ width: `${branch.capacity.percentage}%` }}
                       />
                     </div>
                     <span className="text-sm font-bold text-slate-800 font-arabic">
-                      {branch.capacity}%
+                      {branch.capacity.percentage}%
                     </span>
                   </div>
                 </div>
@@ -428,14 +428,14 @@ export default function BranchDetailPage() {
                   </div>
                   <span
                     className={`font-arabic text-sm ${
-                      !schedule || schedule.closed
+                      !schedule || schedule.isClosed
                         ? "text-red-500 font-bold"
                         : isToday
                         ? "text-indigo-700 font-bold"
                         : "text-slate-600"
                     }`}
                   >
-                    {!schedule || schedule.closed
+                    {!schedule || schedule.isClosed
                       ? "مغلق"
                       : `${schedule.open} - ${schedule.close}`}
                   </span>
@@ -535,7 +535,7 @@ export default function BranchDetailPage() {
         </motion.section>
 
         {/* Available Tests */}
-        {branch.testCategories && branch.testCategories.length > 0 && (
+        {branch.availableTests && branch.availableTests.length > 0 && (
           <motion.section {...fadeInUp}>
             <button
               onClick={() => setTestsOpen(!testsOpen)}
@@ -545,7 +545,7 @@ export default function BranchDetailPage() {
                 <Shield className="w-5 h-5 text-indigo-500" />
                 الفحوصات المتاحة
                 <span className="text-sm font-normal text-slate-400 font-arabic">
-                  ({branch.testCategories.length} تصنيف)
+                  ({branch.availableTests.length} فحص)
                 </span>
               </h2>
               {testsOpen ? (
@@ -564,28 +564,15 @@ export default function BranchDetailPage() {
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {branch.testCategories.map((cat, i) => (
+                    {branch.availableTests.slice(0, 12).map((test, i) => (
                       <div
                         key={i}
                         className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm"
                       >
-                        <h3 className="font-bold font-arabic text-slate-800 mb-2">
-                          {cat.nameAr}
-                        </h3>
                         <div className="flex flex-wrap gap-1.5">
-                          {cat.tests.slice(0, 6).map((test, j) => (
-                            <span
-                              key={j}
-                              className="text-xs font-arabic bg-slate-100 text-slate-600 px-2 py-1 rounded-lg"
-                            >
-                              {test}
-                            </span>
-                          ))}
-                          {cat.tests.length > 6 && (
-                            <span className="text-xs font-arabic text-indigo-600 px-2 py-1">
-                              +{cat.tests.length - 6} أخرى
-                            </span>
-                          )}
+                          <span className="text-xs font-arabic bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">
+                            {test}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -715,7 +702,7 @@ export default function BranchDetailPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Parking */}
-            {branch.facilities?.parking && (
+            {branch.parking && branch.parking.available && (
               <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
                 <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-3">
                   <Car className="w-5 h-5" />
@@ -725,12 +712,12 @@ export default function BranchDetailPage() {
                 </h3>
                 <ul className="space-y-1 text-sm text-slate-600 font-arabic">
                   <li>
-                    • {branch.facilities.parking.spots} موقف متاح
+                    • {branch.parking.spots} موقف متاح
                   </li>
-                  {branch.facilities.parking.type && (
-                    <li>• {branch.facilities.parking.type}</li>
+                  {branch.parking.type && (
+                    <li>• {branch.parking.type === 'free' ? 'مجاني' : branch.parking.type === 'paid' ? 'مدفوع' : 'مجاني ومدفوع'}</li>
                   )}
-                  {branch.facilities.parking.valet && (
+                  {branch.parking.valet && (
                     <li className="text-emerald-600 font-bold">
                       ✓ خدمة صفّارة السيارة
                     </li>
@@ -740,7 +727,7 @@ export default function BranchDetailPage() {
             )}
 
             {/* Accessibility */}
-            {branch.facilities?.accessibility && (
+            {branch.accessibility && (
               <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
                 <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-3">
                   <Accessibility className="w-5 h-5" />
@@ -749,16 +736,16 @@ export default function BranchDetailPage() {
                   سهولة الوصول
                 </h3>
                 <ul className="space-y-1 text-sm text-slate-600 font-arabic">
-                  {branch.facilities.accessibility.wheelchair && (
+                  {branch.accessibility.wheelchair && (
                     <li className="text-emerald-600">✓ كرسي متحرك</li>
                   )}
-                  {branch.facilities.accessibility.ramp && (
+                  {branch.accessibility.ramp && (
                     <li className="text-emerald-600">✓ منحدر وصول</li>
                   )}
-                  {branch.facilities.accessibility.elevator && (
+                  {branch.accessibility.elevator && (
                     <li className="text-emerald-600">✓ مصعد</li>
                   )}
-                  {branch.facilities.accessibility.handicappedParking && (
+                  {branch.accessibility.handicappedParking && (
                     <li className="text-emerald-600">✓ موقف ذوي الاحتياجات</li>
                   )}
                 </ul>
@@ -766,7 +753,7 @@ export default function BranchDetailPage() {
             )}
 
             {/* Amenities */}
-            {branch.facilities?.amenities && (
+            {branch.amenities && branch.amenities.length > 0 && (
               <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
                   <Wifi className="w-5 h-5" />
@@ -775,18 +762,9 @@ export default function BranchDetailPage() {
                   المرافق
                 </h3>
                 <ul className="space-y-1 text-sm text-slate-600 font-arabic">
-                  {branch.facilities.amenities.wifi && (
-                    <li className="text-emerald-600">✓ واي فاي مجاني</li>
-                  )}
-                  {branch.facilities.amenities.prayerRoom && (
-                    <li className="text-emerald-600">✓ صالة صلاة</li>
-                  )}
-                  {branch.facilities.amenities.kidsArea && (
-                    <li className="text-emerald-600">✓ منطقة أطفال</li>
-                  )}
-                  {branch.facilities.amenities.cafe && (
-                    <li className="text-emerald-600">✓ مقهى</li>
-                  )}
+                  {branch.amenities.map((item, i) => (
+                    <li key={i} className="text-emerald-600">✓ {item}</li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -844,7 +822,7 @@ export default function BranchDetailPage() {
         )}
 
         {/* Emergency Contact */}
-        {branch.emergencyPhone && (
+        {branch.emergencyContact?.phone && (
           <motion.section {...fadeInUp}>
             <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-100 p-6">
               <div className="flex items-start gap-4">
@@ -860,15 +838,15 @@ export default function BranchDetailPage() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <a
-                      href={`tel:${branch.emergencyPhone}`}
+                      href={`tel:${branch.emergencyContact.phone}`}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-arabic transition-colors shadow-lg shadow-red-500/25"
                     >
                       <Phone className="w-4 h-4" />
-                      {branch.emergencyPhone}
+                      {branch.emergencyContact.phone}
                     </a>
-                    {branch.emergencyWhatsapp && (
+                    {branch.whatsapp && (
                       <a
-                        href={`https://wa.me/${branch.emergencyWhatsapp}`}
+                        href={`https://wa.me/${branch.whatsapp}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold font-arabic transition-colors"
@@ -925,7 +903,7 @@ export default function BranchDetailPage() {
                 </p>
               </div>
               <a
-                href={`https://www.google.com/maps?q=${branch.lat},${branch.lng}`}
+                href={`https://www.google.com/maps?q=${branch.coordinates.lat},${branch.coordinates.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute bottom-3 left-3 inline-flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white rounded-xl text-sm font-bold font-arabic text-slate-700 shadow-sm backdrop-blur-sm transition-colors"

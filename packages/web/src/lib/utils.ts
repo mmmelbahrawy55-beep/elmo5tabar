@@ -13,12 +13,12 @@ export function cn(...inputs: ClassValue[]) {
 // ============================================================
 export function formatDate(date: Date | string, format: 'short' | 'medium' | 'long' | 'full' = 'medium', locale = 'ar-SA'): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  const options: Intl.DateTimeFormatOptions = {
+  const options = ({
     short: { day: 'numeric', month: 'short' },
     medium: { day: 'numeric', month: 'short', year: 'numeric' },
     long: { day: 'numeric', month: 'long', year: 'numeric' },
     full: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
-  }[format]!;
+  }[format] as Intl.DateTimeFormatOptions);
   return d.toLocaleDateString(locale, options);
 }
 

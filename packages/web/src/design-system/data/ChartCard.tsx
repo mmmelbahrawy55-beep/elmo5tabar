@@ -40,18 +40,32 @@ function ChartCard({ title, description, action, children, className, loading }:
 // ============================================================
 // BAR CHART (CSS-only, no library dependency)
 // ============================================================
+interface BarChartSeries {
+  key: string;
+  label?: string;
+  color?: string;
+}
+
 interface BarChartProps {
-  data: Array<{ label: string; value: number; color?: string }>;
+  data: Array<{ label: string } & Record<string, number | string | undefined>>;
   maxValue?: number;
   height?: number;
   showLabels?: boolean;
   showValues?: boolean;
   horizontal?: boolean;
+  series?: BarChartSeries[];
   className?: string;
 }
 
-function BarChart({ data, maxValue, height = 200, showLabels = true, showValues = true, horizontal, className }: BarChartProps) {
-  const max = maxValue || Math.max(...data.map((d) => d.value));
+function getDatumValue(datum: Record<string, number | string | undefined>, key: string): number {
+  const v = datum[key];
+  return typeof v === 'number' ? v : parseFloat(String(v)) || 0;
+}
+
+function BarChart({ data, maxValue, height = 200, showLabels = true, showValues = true, horizontal, series, className }: BarChartProps) {
+  const hasSeries = !!series && series.length > 0;
+  const keys = hasSeries ? series.map((s) => s.key) : ['value'];
+  const max = maxValue || Math.max(...data.flatMap((d) => keys.map((k) => getDatumValue(d, k))), 0);
 
   if (horizontal) {
     return (
@@ -60,12 +74,12 @@ function BarChart({ data, maxValue, height = 200, showLabels = true, showValues 
           <div key={i} className="space-y-1">
             <div className="flex items-center justify-between">
               {showLabels && <span className="text-xs text-surface-600">{item.label}</span>}
-              {showValues && <span className="text-xs font-semibold text-surface-900">{item.value.toLocaleString('ar-SA')}</span>}
+              {showValues && <span className="text-xs font-semibold text-surface-900">{getDatumValue(item, keys[0]).toLocaleString('ar-SA')}</span>}
             </div>
             <div className="h-2.5 w-full rounded-full bg-surface-100 overflow-hidden">
               <div
-                className={cn('h-full rounded-full transition-all duration-700 ease-out', item.color || 'bg-brand-500')}
-                style={{ width: `${(item.value / max) * 100}%` }}
+                className={cn('h-full rounded-full transition-all duration-700 ease-out', hasSeries ? series[0].color : item.color || 'bg-brand-500')}
+                style={{ width: `${(getDatumValue(item, keys[0]) / max) * 100}%` }}
               />
             </div>
           </div>
@@ -80,15 +94,29 @@ function BarChart({ data, maxValue, height = 200, showLabels = true, showValues 
         {data.map((item, i) => (
           <div key={i} className="flex flex-col items-center flex-1 gap-1">
             {showValues && (
-              <span className="text-[10px] font-semibold text-surface-700">{item.value.toLocaleString('ar-SA')}</span>
+              <span className="text-[10px] font-semibold text-surface-700">
+                {hasSeries
+                  ? series.map((s) => getDatumValue(item, s.key)).reduce((a, b) => a + b, 0).toLocaleString('ar-SA')
+                  : getDatumValue(item, 'value').toLocaleString('ar-SA')}
+              </span>
             )}
-            <div
-              className={cn(
-                'w-full rounded-t-lg transition-all duration-500 ease-out min-h-[2px]',
-                item.color || 'bg-brand-500'
-              )}
-              style={{ height: `${(item.value / max) * 100}%` }}
-            />
+            <div className={cn('flex w-full items-end justify-center gap-0.5', hasSeries && 'gap-1')}>
+              {hasSeries
+                ? series.map((s, si) => (
+                    <div
+                      key={si}
+                      title={s.label}
+                      className={cn('w-full rounded-t-lg transition-all duration-500 ease-out min-h-[2px]', s.color ? '' : 'bg-brand-500')}
+                      style={{ height: `${(getDatumValue(item, s.key) / max) * 100}%`, backgroundColor: s.color }}
+                    />
+                  ))
+                : (
+                    <div
+                      className={cn('w-full rounded-t-lg transition-all duration-500 ease-out min-h-[2px]', item.color || 'bg-brand-500')}
+                      style={{ height: `${(getDatumValue(item, 'value') / max) * 100}%` }}
+                    />
+                  )}
+            </div>
           </div>
         ))}
       </div>
@@ -97,6 +125,16 @@ function BarChart({ data, maxValue, height = 200, showLabels = true, showValues 
           {data.map((item, i) => (
             <div key={i} className="flex-1 text-center">
               <span className="text-[10px] text-surface-500 truncate block">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {hasSeries && (
+        <div className="flex items-center justify-center gap-4 mt-2">
+          {series.map((s) => (
+            <div key={s.key} className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color || '#0077B6' }} />
+              <span className="text-[10px] text-surface-500">{s.label}</span>
             </div>
           ))}
         </div>
@@ -220,14 +258,19 @@ function Sparkline({ data, color = '#0077B6', height = 32, width = 80, className
 // ============================================================
 // METRIC ROW (used in dashboards)
 // ============================================================
-function MetricRow({ label, value, change, sparkData, className }: { label: string; value: string | number; change?: number; sparkData?: number[]; className?: string }) {
+function MetricRow({ label, value, change, trend, sparkData, className }: { label: string; value: string | number; change?: number; trend?: 'up' | 'down' | string; sparkData?: number[]; className?: string }) {
+  const positive = trend === 'up' ? true : trend === 'down' ? false : change !== undefined && change >= 0;
   return (
     <div className={cn('flex items-center justify-between py-3', className)}>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-surface-500">{label}</p>
         <div className="flex items-baseline gap-2 mt-0.5">
           <span className="text-lg font-bold text-surface-900">{typeof value === 'number' ? value.toLocaleString('ar-SA') : value}</span>
-          {change !== undefined && (
+          {trend === 'up' || trend === 'down' ? (
+            <span className={cn('text-xs font-semibold', trend === 'up' ? 'text-success-600' : 'text-danger-600')}>
+              {trend === 'up' ? '↑' : '↓'}
+            </span>
+          ) : change !== undefined && (
             <span className={cn('text-xs font-semibold', change >= 0 ? 'text-success-600' : 'text-danger-600')}>
               {change >= 0 ? '↑' : '↓'} {Math.abs(change)}%
             </span>
@@ -237,7 +280,7 @@ function MetricRow({ label, value, change, sparkData, className }: { label: stri
       {sparkData && (
         <Sparkline
           data={sparkData}
-          color={change !== undefined && change < 0 ? '#EF4444' : '#10B981'}
+          color={positive ? '#10B981' : '#EF4444'}
         />
       )}
     </div>

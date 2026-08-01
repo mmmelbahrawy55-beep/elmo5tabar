@@ -15,6 +15,7 @@ export function LoadingBar({ className, isLoading = false, onComplete }: Loading
   const rawWidth = useMotionValue(0);
   const width = useSpring(rawWidth, { stiffness: 100, damping: 20 });
   const opacity = useTransform(width, [0, 100], [1, 0]);
+  const widthPercent = useTransform(width, (v) => `${v}%`);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const complete = useCallback(() => {
@@ -55,7 +56,7 @@ export function LoadingBar({ className, isLoading = false, onComplete }: Loading
       <motion.div
         className="h-full"
         style={{
-          width: width.to((v) => `${v}%`),
+          width: widthPercent,
           background: 'linear-gradient(90deg, #0077B6, #10B981, #F59E0B, #0077B6)',
           backgroundSize: '200% 100%',
         }}

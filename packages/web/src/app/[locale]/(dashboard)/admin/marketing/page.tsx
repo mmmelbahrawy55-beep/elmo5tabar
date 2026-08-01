@@ -145,7 +145,7 @@ export default function MarketingPage() {
                 <SearchInput
                   placeholder="بحث في الحملات..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="flex-1"
                 />
                 <select

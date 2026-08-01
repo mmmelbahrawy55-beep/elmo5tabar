@@ -618,7 +618,7 @@ export default function PayrollPage() {
         open={processConfirmOpen}
         onOpenChange={setProcessConfirmOpen}
         title="معالجة رواتب يوليو 2026"
-        message={`هل أنت متأكد من معالجة رواتب ${employees.filter((e) => e.status === 'pending').length} موظف قيد الانتظار؟ صافي الإجمالي: ${formatCurrency(currentMonthTotals.totalNet, 'SAR')}. لا يمكن التراجع عن هذا الإجراء.`}
+        description={`هل أنت متأكد من معالجة رواتب ${employees.filter((e) => e.status === 'pending').length} موظف قيد الانتظار؟ صافي الإجمالي: ${formatCurrency(currentMonthTotals.totalNet, 'SAR')}. لا يمكن التراجع عن هذا الإجراء.`}
         onConfirm={handleProcessPayroll}
         variant="warning"
       />

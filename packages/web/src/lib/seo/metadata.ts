@@ -1,7 +1,9 @@
-import type { Metadata, OpenGraph, Twitter, ResolvedMetadata } from 'next';
+import type { Metadata, ResolvedMetadata } from 'next';
 import { siteConfig, type Locale } from './config';
 
 type SEOImage = string | { url: string; width?: number; height?: number; alt?: string };
+type OpenGraph = NonNullable<Metadata['openGraph']>;
+type Twitter = NonNullable<Metadata['twitter']>;
 
 export interface SeoOptions {
   title: string;
@@ -36,8 +38,8 @@ function buildImageUrl(image: SEOImage | undefined, path: string): string {
   return url;
 }
 
-function buildAlternates(path: string, locale: Locale): Record<string, string | string[]> {
-  const alternates: Record<string, string | string[]> = {};
+function buildAlternates(path: string, locale: Locale): Record<string, string> {
+  const alternates: Record<string, string> = {};
   for (const loc of siteConfig.locales) {
     const href = `${siteConfig.url}${loc === 'ar' ? path : `/en${path}`}`;
     alternates[loc === 'ar' ? 'x-default' : loc] = href;
@@ -80,13 +82,12 @@ export function generateMetadata(opts: SeoOptions): Metadata {
     robots: {
       index,
       follow: index,
-      googleBot: { index, follow, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
+      googleBot: { index, follow: index, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
     },
-    canonical: opts.canonical || url,
     openGraph: og,
     twitter,
     ...(opts.noindex && { robots: { index: false, follow: false } as any }),
-    alternates: { languages: buildAlternates(opts.path, opts.locale) },
+    alternates: { canonical: opts.canonical || url, languages: buildAlternates(opts.path, opts.locale) },
     other: {
       'article:published_time': opts.publishedTime || '',
       'article:modified_time': opts.modifiedTime || '',

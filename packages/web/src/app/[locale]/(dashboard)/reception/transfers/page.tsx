@@ -4,7 +4,7 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, ArrowLeft, Building2, Clock, CheckCircle2, XCircle,
-  Download, Plus, RefreshCw, AlertTriangle, MapPin, Loader2,
+  Download, Plus, RefreshCw, AlertTriangle, MapPin, Loader2, Eye,
 } from 'lucide-react';
 import { Card, StatCard } from '@/design-system/layout/Card';
 import { Badge } from '@/design-system/primitives/Badge';

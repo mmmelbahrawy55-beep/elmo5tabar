@@ -191,10 +191,10 @@ export default function TestsManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="إجمالي التحاليل" value={formatNumber(450)} icon="🧪" trend={{ value: 12, isPositive: true }} />
-        <StatCard title="تحاليل نشطة" value={formatNumber(380)} icon="✅" trend={{ value: 8, isPositive: true }} />
+        <StatCard title="إجمالي التحاليل" value={formatNumber(450)} icon="🧪" change={{ value: 12, isPositive: true }} />
+        <StatCard title="تحاليل نشطة" value={formatNumber(380)} icon="✅" change={{ value: 8, isPositive: true }} />
         <StatCard title="فئات التحاليل" value={formatNumber(15)} icon="📁" />
-        <StatCard title="التحاليل الأكثر طلباً" value="CBC" icon="🏆" trend={{ value: 23, isPositive: true }} />
+        <StatCard title="التحاليل الأكثر طلباً" value="CBC" icon="🏆" change={{ value: 23, isPositive: true }} />
       </div>
 
       <div className="flex items-center gap-4">

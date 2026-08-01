@@ -36,20 +36,12 @@ function EffectsLayer({
   noise?: boolean;
   vignette?: boolean;
 }) {
-  return (
-    <EffectComposer>
-      {bloom && (
-        <Bloom
-          luminanceThreshold={0.2}
-          luminanceSmoothing={0.9}
-          intensity={0.5}
-          mipmapBlur
-        />
-      )}
-      {noise && <Noise opacity={0.02} />}
-      {vignette && <Vignette eskil={false} offset={0.3} darkness={0.5} />}
-    </EffectComposer>
-  );
+  const effects: React.ReactElement[] = [];
+  if (bloom) effects.push(<Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={0.5} mipmapBlur />);
+  if (noise) effects.push(<Noise opacity={0.02} />);
+  if (vignette) effects.push(<Vignette eskil={false} offset={0.3} darkness={0.5} />);
+
+  return <EffectComposer>{effects}</EffectComposer>;
 }
 
 export function BackgroundCanvas({

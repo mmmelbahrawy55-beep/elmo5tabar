@@ -1,7 +1,7 @@
 import { siteConfig, type Locale } from './config';
 
 export function HreflangTags({ path, locale }: { path: string; locale: Locale }) {
-  const langs = siteConfig.locales as Locale[];
+  const langs = siteConfig.locales as readonly Locale[];
 
   return (
     <>

@@ -117,7 +117,7 @@ export default function OffersPage() {
             <SearchInput
               placeholder="بحث في العروض..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(v) => setSearchQuery(v)}
               className="max-w-md"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

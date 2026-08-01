@@ -185,10 +185,10 @@ export default function ReportsManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="إجمالي التقارير" value={formatNumber(8934)} icon="📊" trend={{ value: 18, isPositive: true }} />
-        <StatCard title="تقارير اليوم" value="124" icon="📋" trend={{ value: 8, isPositive: true }} />
-        <StatCard title="قيد النشر" value="45" icon="⏳" trend={{ value: 12, isPositive: false }} />
-        <StatCard title="تقارير متأخرة" value="8" icon="⚠️" trend={{ value: 2, isPositive: false }} className="border-r-2 border-r-danger" />
+        <StatCard title="إجمالي التقارير" value={formatNumber(8934)} icon="📊" change={{ value: 18, isPositive: true }} />
+        <StatCard title="تقارير اليوم" value="124" icon="📋" change={{ value: 8, isPositive: true }} />
+        <StatCard title="قيد النشر" value="45" icon="⏳" change={{ value: 12, isPositive: false }} />
+        <StatCard title="تقارير متأخرة" value="8" icon="⚠️" change={{ value: 2, isPositive: false }} className="border-r-2 border-r-danger" />
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">

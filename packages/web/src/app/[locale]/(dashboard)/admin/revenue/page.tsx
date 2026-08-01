@@ -625,7 +625,7 @@ export default function RevenuePage() {
               <CardContent>
                 <div className="flex items-center gap-8">
                   <DonutChart
-                    data={departmentRevenue}
+                    data={departmentRevenue.map((d) => ({ label: d.department, value: d.revenue, color: d.color }))}
                     size={160}
                     thickness={24}
                     centerLabel="إجمالي"

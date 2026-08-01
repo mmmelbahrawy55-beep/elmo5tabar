@@ -991,7 +991,7 @@ export const ALL_DEPARTMENTS: Department[] = [
       { id: 'hepatitis-c', nameAr: 'فيروس التهاب الكبد C', nameEn: 'Hepatitis C Antibody', price: 95, turnaround: '24 ساعة', popular: true },
       { id: 'influenza-ab', nameAr: 'إنفلونزا A و B', nameEn: 'Influenza A&B Rapid', price: 80, turnaround: 'ساعة واحدة', popular: true },
       { id: 'cmv', nameAr: 'فيروس السيتوميгалو', nameEn: 'CMV IgM & IgG', price: 85, turnaround: '24 ساعة', popular: false },
-      { id: 'ebv', nameMononucleosis', nameEn: 'EBV Monospot', price: 70, turnaround: 'ساعة واحدة', popular: false },
+      { id: 'ebv', nameAr: 'فيروس إبشتاين-بار', nameEn: 'EBV Monospot', price: 70, turnaround: 'ساعة واحدة', popular: false },
       { id: 'hsv', nameAr: 'فيروس الهربس', nameEn: 'HSV-1 & HSV-2 PCR', price: 120, turnaround: '24 ساعة', popular: false },
     ],
     medicalTeam: [

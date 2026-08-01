@@ -8,7 +8,7 @@ interface SkeletonCardProps {
   animated?: boolean;
 }
 
-function Shimmer({ className }: { className?: string }) {
+function Shimmer({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
       className={cn(
@@ -16,12 +16,13 @@ function Shimmer({ className }: { className?: string }) {
         'bg-gradient-to-r from-surface-100 via-white to-surface-100',
         className,
       )}
+      style={style}
     />
   );
 }
 
-function StaticBlock({ className }: { className?: string }) {
-  return <div className={cn('bg-surface-200', className)} />;
+function StaticBlock({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={cn('bg-surface-200', className)} style={style} />;
 }
 
 function SkeletonLine({ className, animated = true }: { className?: string; animated?: boolean }) {

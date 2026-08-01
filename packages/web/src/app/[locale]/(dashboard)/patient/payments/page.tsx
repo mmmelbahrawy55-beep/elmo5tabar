@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/i18n';
 import { paymentClient } from '@/lib/api/payments';
 import { toast } from 'sonner';
 

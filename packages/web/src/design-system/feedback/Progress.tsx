@@ -8,7 +8,7 @@ interface ProgressBarProps {
   value: number;
   max?: number;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'brand' | 'success' | 'warning' | 'danger' | 'info';
+  color?: 'brand' | 'success' | 'warning' | 'danger' | 'info' | string;
   label?: string;
   showValue?: boolean;
   animated?: boolean;
@@ -25,6 +25,9 @@ function ProgressBar({ value, max = 100, size = 'md', color = 'brand', label, sh
     danger: 'bg-danger-500',
     info: 'bg-info-500',
   };
+
+  const isNamedColor = color in colorClasses;
+  const bgColor = isNamedColor ? colorClasses[color as keyof typeof colorClasses] : undefined;
 
   const sizeClasses = {
     sm: 'h-1.5',
@@ -44,10 +47,10 @@ function ProgressBar({ value, max = 100, size = 'md', color = 'brand', label, sh
         <div
           className={cn(
             'h-full rounded-full transition-all',
-            colorClasses[color],
+            bgColor,
             animated && 'duration-500 ease-out'
           )}
-          style={{ width: `${percent}%` }}
+          style={{ width: `${percent}%`, ...(bgColor ? {} : { backgroundColor: color }) }}
         />
       </div>
     </div>

@@ -9,19 +9,20 @@ export function useExport() {
   const [exporting, setExporting] = useState(false);
 
   const exportData = useCallback(async (
-    data: Record<string, unknown>[],
+    data: Record<string, unknown>[] | object[],
     filename: string,
     format: 'pdf' | 'excel' | 'csv' = 'pdf',
     title?: string,
   ) => {
     setExporting(true);
     try {
+      const rows = data as Record<string, unknown>[];
       if (format === 'csv') {
-        if (data.length === 0) return;
-        const headers = Object.keys(data[0]);
+        if (rows.length === 0) return;
+        const headers = Object.keys(rows[0]);
         const csv = [
           headers.join(','),
-          ...data.map(row => headers.map(h => {
+          ...rows.map(row => headers.map(h => {
             const val = row[h];
             return typeof val === 'string' && val.includes(',') ? `"${val}"` : String(val ?? '');
           }).join(','))
@@ -34,15 +35,15 @@ export function useExport() {
         a.click();
         URL.revokeObjectURL(url);
       } else if (format === 'excel') {
-        if (data.length === 0) return;
-        const headers = Object.keys(data[0]);
+        if (rows.length === 0) return;
+        const headers = Object.keys(rows[0]);
         const xml = [
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<?mso-application progid="Excel.Sheet"?>',
           '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet">',
           '<Worksheet ss:Name="' + (title || filename) + '"><Table>',
           headers.map(h => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join(''),
-          ...data.map(row => '<Row>' + headers.map(h => `<Cell><Data ss:Type="String">${String(row[h] ?? '')}</Data></Cell>`).join('') + '</Row>'),
+          ...rows.map(row => '<Row>' + headers.map(h => `<Cell><Data ss:Type="String">${String(row[h] ?? '')}</Data></Cell>`).join('') + '</Row>'),
           '</Table></Worksheet></Workbook>'
         ].join('');
         const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
@@ -55,12 +56,12 @@ export function useExport() {
       } else {
         const printWin = window.open('', '_blank');
         if (!printWin) return;
-        const headers = data.length > 0 ? Object.keys(data[0]) : [];
+        const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
         printWin.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><title>${title || filename}</title>
           <style>body{font-family:sans-serif;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#0077B6;color:white}tr:nth-child(even){background:#f5f5f5}.header{text-align:center;margin-bottom:20px}.logo{font-size:24px;font-weight:bold;color:#0077B6}</style>
           </head><body><div class="header"><div class="logo">المختبر | Al Mokhtabar</div><h2>${title || filename}</h2><p>${new Date().toLocaleDateString('ar-SA')}</p></div>
           <table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-          <tbody>${data.map(row => `<tr>${headers.map(h => `<td>${String(row[h] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>
+          <tbody>${rows.map(row => `<tr>${headers.map(h => `<td>${String(row[h] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>
           <script>window.print();</script></body></html>`);
         printWin.document.close();
       }
@@ -72,7 +73,7 @@ export function useExport() {
   return { exportData, exporting };
 }
 
-export function ExportButton({ data, filename, title }: { data: Record<string, unknown>[]; filename: string; title?: string }) {
+export function ExportButton({ data = [], filename = 'export', title }: { data?: Record<string, unknown>[] | object[]; filename?: string; title?: string }) {
   const { exportData, exporting } = useExport();
 
   return (
@@ -100,3 +101,5 @@ export function ExportButton({ data, filename, title }: { data: Record<string, u
     </Dropdown>
   );
 }
+
+export default ExportButton;

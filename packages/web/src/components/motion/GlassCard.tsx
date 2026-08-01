@@ -69,7 +69,7 @@ export function GlassCard({
   const style = variantStyles[variant] ?? variantStyles.light;
   const isLink = Component === 'a' && href;
 
-  const MotionComponent = isLink ? motion.a : motion[Component as keyof typeof motion] ?? motion.div;
+  const MotionComponent: any = isLink ? motion.a : motion[Component as keyof typeof motion] ?? motion.div;
 
   return (
     <MotionComponent

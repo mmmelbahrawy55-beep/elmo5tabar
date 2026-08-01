@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/design-system/naviga
 import { SearchInput, FormField, FormGroup, FormSection } from '@/design-system/forms/FormField';
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '@/design-system/feedback/Alert';
 import { ProgressBar } from '@/design-system/feedback/Progress';
+import { Switch } from '@/design-system/primitives/Input';
 import { ExportButton } from '@/components/admin/ExportButton';
 
 const TEMPLATE_VARIABLES = [
@@ -297,7 +298,7 @@ export default function SmsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>سجل الرسائل النصية</CardTitle>
-                <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الرسائل..." />
+                <SearchInput value={searchQuery} onChange={(v) => setSearchQuery(v)} placeholder="بحث في الرسائل..." />
               </div>
             </CardHeader>
             <CardContent>

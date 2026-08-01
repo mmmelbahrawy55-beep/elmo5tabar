@@ -8,7 +8,7 @@ export interface LabTest {
   nameEn: string;
   slug: string;
   category: TestCategory;
-  subcategory: string;
+  subcategory?: string;
   descriptionAr: string;
   descriptionEn: string;
   purposeAr: string;

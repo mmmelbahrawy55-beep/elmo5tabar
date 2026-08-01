@@ -411,7 +411,7 @@ export default function PatientsPage() {
           <p className="text-foreground">هل أنت متأكد من حذف هذا المريض؟ لا يمكن التراجع عن هذا الإجراء.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>إلغاء</Button>
-            <Button variant="destructive" onClick={confirmDelete}>نعم، حذف</Button>
+            <Button variant="danger" onClick={confirmDelete}>نعم، حذف</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

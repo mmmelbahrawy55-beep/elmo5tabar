@@ -40,6 +40,7 @@ const config: Config = {
           400: '#2DD4BF', 500: '#10B981', 600: '#059669', 700: '#047857',
           800: '#065F46', 900: '#064E3B',
           DEFAULT: '#10B981',
+          foreground: '#10B981',
         },
         // Saffron Gold — Premium Gold
         saffron: {
@@ -96,10 +97,6 @@ const config: Config = {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
         },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
@@ -126,7 +123,7 @@ const config: Config = {
         'body-sm':    ['0.875rem', { lineHeight: '1.6', fontWeight: '400' }],
         'caption':    ['0.75rem',  { lineHeight: '1.5', fontWeight: '400' }],
         'overline':   ['0.6875rem',{ lineHeight: '1.4', fontWeight: '600', letterSpacing: '0.1em' }],
-        'mono':       ['0.875rem', { lineHeight: '1.5', fontWeight: '400', fontFamily: 'var(--font-mono)' }],
+        'mono':       ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
       },
       fontFamily: {
         sans: ['var(--font-arabic)', 'IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
@@ -207,6 +204,8 @@ const config: Config = {
         'inner':  'inset 0 2px 4px 0 rgb(0 0 0 / 0.04)',
         'glass':  '0 8px 32px rgb(0 0 0 / 0.08)',
         'elevated':'0 8px 16px rgb(0 0 0 / 0.04), 0 16px 48px rgb(0 0 0 / 0.04)',
+        'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
+        'card-hover': '0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04)',
         'none':   'none',
       },
 

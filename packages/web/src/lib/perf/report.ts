@@ -64,11 +64,11 @@ function sendToAnalytics(metric: Metric, attribution?: Record<string, unknown>) 
 
 export function useWebVitals() {
   useEffect(() => {
-    onCLS((m) => sendToAnalytics(m, m.attribution));
+    onCLS((m) => sendToAnalytics(m, (m as { attribution?: Record<string, unknown> }).attribution));
     onFCP((m) => sendToAnalytics(m));
-    onFID((m) => sendToAnalytics(m, m.attribution));
-    onINP((m) => sendToAnalytics(m, m.attribution));
-    onLCP((m) => sendToAnalytics(m, m.attribution));
+    onFID((m) => sendToAnalytics(m, (m as { attribution?: Record<string, unknown> }).attribution));
+    onINP((m) => sendToAnalytics(m, (m as { attribution?: Record<string, unknown> }).attribution));
+    onLCP((m) => sendToAnalytics(m, (m as { attribution?: Record<string, unknown> }).attribution));
     onTTFB((m) => sendToAnalytics(m));
   }, []);
 }

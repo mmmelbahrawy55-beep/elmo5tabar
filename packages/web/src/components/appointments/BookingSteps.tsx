@@ -25,17 +25,18 @@ import {
   X,
 } from 'lucide-react';
 
-import type {
-  BookingStep,
+import {
   STEP_CONFIG,
   SERVICE_TYPES,
+} from '@/types/appointment';
+import type {
+  BookingStep,
   BookingService,
   BookingBranch,
   TimeSlot,
   DayAvailability,
   BookingState,
 } from '@/types/appointment';
-import { STEP_CONFIG, SERVICE_TYPES } from '@/types/appointment';
 import { ALL_BRANCHES, calculateDistance, calculateTravelTime } from '@/data/branches';
 import { cn } from '@/lib/utils';
 import { useBranchFavoritesStore, useLocationStore } from '@/stores/branches';
@@ -525,11 +526,22 @@ function Step2Branch({ selectedBranch, onSelect, userLocation }: Step2BranchProp
       const availableSlots = Math.max(0, b.queueStatus.appointmentSlots - b.queueStatus.waiting);
 
       return {
-        ...b,
+        id: b.id,
+        nameAr: b.nameAr,
+        nameEn: b.nameEn,
+        address: b.addressAr,
+        addressAr: b.addressAr,
         distance: dist,
         travelTime: travel,
-        computedCrowd: crowdLevel,
+        crowdLevel,
+        parkingAvailable: b.parking.available,
+        queueCount: b.queueStatus.waiting,
+        queueWaitTime: b.queueStatus.averageWait,
+        rating: b.rating,
+        queueStatus: b.queueStatus,
+        coordinates: b.coordinates,
         availableSlots,
+        computedCrowd: crowdLevel,
       } as BookingBranch & {
         distance: number | null;
         travelTime: number | null;
@@ -547,16 +559,16 @@ function Step2Branch({ selectedBranch, onSelect, userLocation }: Step2BranchProp
         (b) =>
           b.nameAr.toLowerCase().includes(q) ||
           b.nameEn.toLowerCase().includes(q) ||
-          b.addressAr.includes(q) ||
-          b.address.city.includes(q),
+          b.addressAr?.includes(q) ||
+          b.address.includes(q),
       );
     }
     if (sortBy === 'distance') {
       list.sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999));
     } else if (sortBy === 'rating') {
-      list.sort((a, b) => b.rating - a.rating);
+      list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     } else if (sortBy === 'queue') {
-      list.sort((a, b) => a.queueStatus.waiting - b.queueStatus.waiting);
+      list.sort((a, b) => (a.queueStatus?.waiting ?? 0) - (b.queueStatus?.waiting ?? 0));
     }
     return list;
   }, [branchesWithDistance, searchQuery, sortBy]);
@@ -759,7 +771,7 @@ function BranchCard({ branch, isSelected, onSelect, compact }: BranchCardProps) 
             {/* Queue */}
             <div className="flex items-center gap-1 text-xs text-surface-500">
               <Users className="w-3 h-3" />
-              <span>{branch.queueStatus.waiting} بانتظار • {branch.queueStatus.averageWait}</span>
+              <span>{branch.queueStatus?.waiting ?? 0} بانتظار • {branch.queueStatus?.averageWait}</span>
             </div>
 
             {/* Parking */}

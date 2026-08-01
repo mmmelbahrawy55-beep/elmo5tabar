@@ -135,12 +135,17 @@ function Alert({ variant = 'info', title, icon, closable, onClose, action, child
 // ============================================================
 interface DialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-function Dialog({ open, onClose, children, size = 'md' }: DialogProps) {
+function Dialog({ open, onClose, onOpenChange, children, size = 'md' }: DialogProps) {
+  const handleClose = () => {
+    onClose?.();
+    onOpenChange?.(false);
+  };
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -150,11 +155,11 @@ function Dialog({ open, onClose, children, size = 'md' }: DialogProps) {
 
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     if (open) window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [open, onClose]);
+  }, [open, handleClose]);
 
   if (!open) return null;
 
@@ -168,7 +173,7 @@ function Dialog({ open, onClose, children, size = 'md' }: DialogProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-surface-900/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-surface-900/50 backdrop-blur-sm" onClick={handleClose} />
       <div
         className={cn(
           'relative w-full bg-white rounded-2xl shadow-2xl',
@@ -221,7 +226,8 @@ function DialogFooter({ children, className }: { children: React.ReactNode; clas
 // ============================================================
 interface ConfirmDialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
   onConfirm: () => void;
   title?: string;
   description?: string;
@@ -234,6 +240,7 @@ interface ConfirmDialogProps {
 function ConfirmDialog({
   open,
   onClose,
+  onOpenChange,
   onConfirm,
   title = 'تأكيد',
   description,
@@ -242,6 +249,10 @@ function ConfirmDialog({
   variant = 'danger',
   loading,
 }: ConfirmDialogProps) {
+  const handleClose = () => {
+    onClose?.();
+    onOpenChange?.(false);
+  };
   const btnVariant = {
     danger: 'danger' as const,
     warning: 'warning' as const,
@@ -249,8 +260,8 @@ function ConfirmDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} size="sm">
-      <DialogHeader onClose={onClose}>
+    <Dialog open={open} onClose={handleClose} size="sm">
+      <DialogHeader onClose={handleClose}>
         <DialogTitle>{title}</DialogTitle>
       </DialogHeader>
       <DialogContent>
@@ -258,7 +269,7 @@ function ConfirmDialog({
       </DialogContent>
       <DialogFooter>
         <button
-          onClick={onClose}
+          onClick={handleClose}
           disabled={loading}
           className="px-4 py-2 text-sm font-medium text-surface-700 bg-surface-100 rounded-xl hover:bg-surface-200 transition-colors disabled:opacity-50"
         >
@@ -417,10 +428,11 @@ function FullPageLoader({ message }: { message?: string }) {
   );
 }
 
+export type { Toast };
 export {
   Alert,
   Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter,
   ConfirmDialog,
-  Toast, ToastProvider, useToast,
+  ToastProvider, useToast,
   LoadingSpinner, FullPageLoader,
 };

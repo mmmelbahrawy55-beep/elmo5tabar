@@ -38,7 +38,6 @@ import {
   Archive,
   FileCheck,
   Package,
-  Handshake,
   Megaphone,
   Brain,
   Key,
@@ -131,7 +130,7 @@ const adminNavSections: AdminNavSection[] = [
   {
     title: 'الشراكات والتسويق',
     items: [
-      { href: '/ar/admin/partners', label: 'الشركاء', icon: Handshake },
+      { href: '/ar/admin/partners', label: 'الشركاء', icon: Users },
       { href: '/ar/admin/marketing', label: 'التسويق', icon: Megaphone },
       { href: '/ar/admin/seo', label: 'تحسين محركات البحث', icon: SearchIcon },
       { href: '/ar/admin/cms', label: 'إدارة المحتوى', icon: Globe },

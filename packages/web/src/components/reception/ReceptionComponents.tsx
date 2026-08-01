@@ -1993,7 +1993,7 @@ export function BarcodeGenerator({ entityType, entityId, onPrint }: BarcodeGener
    ────────────────────────────────────────────────────────────────────────────── */
 
 interface KeyboardShortcutsHelpProps {
-  shortcuts: { id: string; key: string; ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean; description: string; descriptionAr: string; category: string }[];
+  shortcuts: { id: string; key: string; ctrlKey?: boolean; shiftKey?: boolean; altKey?: boolean; description: string; descriptionAr: string; action?: string; category: string }[];
   onClose: () => void;
 }
 

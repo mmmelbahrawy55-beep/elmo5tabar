@@ -3,8 +3,14 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import type { LottieComponentProps } from 'lottie-react';
 
-const Lottie = dynamic(() => import('lottie-react').then((m) => ({ default: m.default })), {
+interface LottiePathProps extends Omit<LottieComponentProps, 'animationData'> {
+  path?: string;
+  animationData?: unknown;
+}
+
+const Lottie = dynamic<LottiePathProps>(() => import('lottie-react').then((m) => ({ default: m.default as React.ComponentType<LottiePathProps> })), {
   ssr: false,
 });
 

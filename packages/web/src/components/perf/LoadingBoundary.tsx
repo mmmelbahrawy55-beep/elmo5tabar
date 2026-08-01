@@ -69,7 +69,7 @@ export function withLazy<P extends Record<string, unknown>>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
   fallback?: ReactNode,
 ) {
-  const LazyComponent = lazy(importFn);
+  const LazyComponent = lazy(importFn) as unknown as ComponentType<P>;
   return (props: P) => (
     <Suspense fallback={fallback || <Skeleton variant="card" />}>
       <LazyComponent {...props} />

@@ -68,7 +68,7 @@ export default function DeviceManager() {
   const fetchLoginHistory = async (deviceId: string) => {
     setLoadingHistory(true);
     try {
-      const result = await authClient.request(`/auth/devices/${deviceId}/history`);
+      const result = await authClient.getDeviceHistory(deviceId);
       setLoginHistory(result.history || []);
     } catch (err: any) {
       addToast(err.message || 'Failed to fetch login history');
@@ -80,10 +80,7 @@ export default function DeviceManager() {
   const handleTrustToggle = async (device: Device) => {
     try {
       if (device.trusted) {
-        await authClient.request(`/auth/devices/${device.id}/trust`, {
-          method: 'PATCH',
-          body: JSON.stringify({ trusted: false }),
-        });
+        await authClient.untrustDevice(device.id);
         addToast('تم إلغاء ثقة الجهاز', 'success');
       } else {
         await authClient.trustDevice(device.id);

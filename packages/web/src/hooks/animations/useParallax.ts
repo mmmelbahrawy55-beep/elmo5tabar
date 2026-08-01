@@ -28,7 +28,7 @@ export function useParallax(options: ParallaxOptions = {}) {
   const dirFactor = direction === 'up' ? -1 : 1;
 
   const y = useTransform(scrollYProgress, [0, 1], [0, dirFactor * speed * 200]);
-  const x = useMotionValue('0px') as unknown as MotionValue<string>;
+  const x = useMotionValue('0px');
 
   const mouseYTransform = useTransform(mouseY, [0, 1], [dirFactor * speed * 40, dirFactor * speed * -40]);
   const mouseXTransform = useTransform(mouseX, [0, 1], [speed * -40, speed * 40]);
@@ -45,12 +45,12 @@ export function useParallax(options: ParallaxOptions = {}) {
     return () => window.removeEventListener('mousemove', handleMouse);
   }, [type, mouseX, mouseY]);
 
-  const outputX: MotionValue<string> = type === 'mouse'
+  const outputX = type === 'mouse'
     ? mouseXTransform
-    : (new MotionValue() as unknown as MotionValue<string>);
-  const outputY: MotionValue<string> = type === 'mouse'
-    ? mouseYTransform as unknown as MotionValue<string>
-    : y as unknown as MotionValue<string>;
+    : x;
+  const outputY = type === 'mouse'
+    ? mouseYTransform
+    : y;
 
   return { ref, x: outputX, y: outputY };
 }

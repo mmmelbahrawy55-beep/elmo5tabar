@@ -94,10 +94,10 @@ export default function ActivityPage() {
   }, [activities, searchQuery, filterType]);
 
   const stats = [
-    { title: 'إجمالي الأنشطة', value: '123,456', icon: '📈', trend: '+567', trendUp: true },
-    { title: 'نشاط اليوم', value: '567', icon: '📊', trend: '+12%', trendUp: true },
-    { title: 'مستخدمون نشطون', value: 34, icon: '👥', trend: '+5', trendUp: true },
-    { title: 'متوسط النشاط/ساعة', value: 23, icon: '⏱️', trend: '+3', trendUp: true },
+    { title: 'إجمالي الأنشطة', value: '123,456', icon: '📈', trend: 'up' as const },
+    { title: 'نشاط اليوم', value: '567', icon: '📊', trend: 'up' as const },
+    { title: 'مستخدمون نشطون', value: 34, icon: '👥', trend: 'up' as const },
+    { title: 'متوسط النشاط/ساعة', value: 23, icon: '⏱️', trend: 'up' as const },
   ];
 
   return (
@@ -118,7 +118,7 @@ export default function ActivityPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <StatCard key={i} title={stat.title} value={stat.value} icon={stat.icon} trend={stat.trend} trendUp={stat.trendUp} />
+          <StatCard key={i} title={stat.title} value={stat.value} icon={stat.icon} trend={stat.trend} />
         ))}
       </div>
 

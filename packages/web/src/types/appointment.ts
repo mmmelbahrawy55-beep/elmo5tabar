@@ -36,12 +36,20 @@ export interface BookingBranch {
   nameAr: string;
   nameEn: string;
   address: string;
+  addressAr?: string;
   distance?: number; // km
   travelTime?: number; // minutes
   crowdLevel: 'low' | 'medium' | 'high';
   parkingAvailable: boolean;
   queueCount: number;
   queueWaitTime: string;
+  rating?: number;
+  queueStatus?: {
+    waiting: number;
+    averageWait: string;
+    walkInAvailable: boolean;
+    appointmentSlots: number;
+  };
   coordinates: { lat: number; lng: number };
   availableSlots: number;
 }

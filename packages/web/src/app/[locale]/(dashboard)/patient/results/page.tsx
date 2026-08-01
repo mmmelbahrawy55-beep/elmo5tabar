@@ -241,15 +241,15 @@ export default function PatientResultsPage() {
           </TabsList>
         </Tabs>
         <div className="flex items-center gap-2 flex-wrap">
-          <SearchInput placeholder="بحث في النتائج..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-56" />
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm">
+          <SearchInput placeholder="بحث في النتائج..." value={searchQuery} onChange={(v) => setSearchQuery(v)} className="w-56" />
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm">
             <option value="all">جميع الحالات</option>
             <option value="published">منشور</option>
             <option value="approved">معتمد</option>
             <option value="review">قيد المراجعة</option>
             <option value="draft">مسودة</option>
           </select>
-          <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
+          <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
         </div>
       </div>
 
@@ -542,7 +542,7 @@ export default function PatientResultsPage() {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-surface-700 mb-1">صلاحية الرابط (أيام)</label>
-                    <select value={shareExpiry} onChange={e => setShareExpiry(e.target.value)} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm">
+                    <select value={shareExpiry} onChange={(e) => setShareExpiry(e.target.value)} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm">
                       <option value="1">يوم واحد</option>
                       <option value="3">3 أيام</option>
                       <option value="7">7 أيام</option>
@@ -551,7 +551,7 @@ export default function PatientResultsPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-surface-700 mb-1">كلمة مرور (اختياري)</label>
-                    <input type="text" value={sharePassword} onChange={e => setSharePassword(e.target.value)} placeholder="أدخل كلمة مرور" className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" />
+                    <input type="text" value={sharePassword} onChange={(e) => setSharePassword(e.target.value)} placeholder="أدخل كلمة مرور" className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" />
                   </div>
                 </div>
                 <Button variant="primary" className="w-full" onClick={handleCreateShareLink} disabled={creatingShare}>
@@ -568,9 +568,10 @@ export default function PatientResultsPage() {
       </Dialog>
 
       <Dialog open={showAttachmentViewer} onOpenChange={setShowAttachmentViewer}>
+        {selectedAttachment && (
         <DialogContent className="max-w-2xl">
-          <DialogHeader><DialogTitle>{selectedAttachment?.fileName}</DialogTitle></DialogHeader>
-          {selectedAttachment?.fileType.startsWith('image/') ? (
+          <DialogHeader><DialogTitle>{selectedAttachment.fileName}</DialogTitle></DialogHeader>
+          {selectedAttachment.fileType.startsWith('image/') ? (
             <img src={selectedAttachment.url} alt={selectedAttachment.fileName} className="w-full rounded-xl" />
           ) : (
             <div className="flex flex-col items-center py-12 gap-3">
@@ -585,6 +586,7 @@ export default function PatientResultsPage() {
             <Button variant="outline" onClick={() => setShowAttachmentViewer(false)}>إغلاق</Button>
           </DialogFooter>
         </DialogContent>
+        )}
       </Dialog>
     </div>
   );

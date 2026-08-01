@@ -87,6 +87,13 @@ const buttonVariants = cva(
           'focus-visible:ring-brand-500',
           'active:bg-brand-100',
         ].join(' '),
+        // Outline Neutral
+        outline: [
+          'bg-white text-surface-700 border border-surface-200',
+          'hover:bg-surface-50 hover:border-surface-300',
+          'focus-visible:ring-brand-500',
+          'active:bg-surface-100',
+        ].join(' '),
       },
       size: {
         xs:   'h-7 px-2.5 text-xs rounded-lg gap-1',
@@ -118,6 +125,7 @@ interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  icon?: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   loadingText?: string;
@@ -131,6 +139,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size,
       fullWidth,
       loading,
+      icon,
       leftIcon,
       rightIcon,
       loadingText,
@@ -144,7 +153,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         className={cn(buttonVariants({ variant, size, fullWidth, loading, className }))}
         ref={ref}
-        disabled={disabled || loading}
+        disabled={disabled || !!loading}
         {...props}
       >
         {loading ? (
@@ -173,7 +182,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </>
         ) : (
           <>
-            {leftIcon && <span className="shrink-0">{leftIcon}</span>}
+            {(icon || leftIcon) && <span className="shrink-0">{icon || leftIcon}</span>}
             {children}
             {rightIcon && <span className="shrink-0">{rightIcon}</span>}
           </>

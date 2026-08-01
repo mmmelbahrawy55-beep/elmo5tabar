@@ -26,6 +26,7 @@ interface AuditLog {
   ipAddress: string;
   severity: 'info' | 'warning' | 'critical';
   category: 'security' | 'modification' | 'access' | 'export';
+  orderId?: string;
 }
 
 const SEVERITY_MAP: Record<string, { label: string; className: string }> = {
@@ -43,7 +44,7 @@ const MOCK_LOGS: AuditLog[] = [
   { id: '2', timestamp: '2026-07-28T14:28:00', user: 'dr.sara@elm.com', userAr: 'د. سارة أحمد', action: 'UPDATE', actionAr: 'تعديل', resource: 'patient', resourceAr: 'مريض', resourceId: 'pat-4521', details: 'تعديل بيانات المريض: تحديث العنوان', ipAddress: '192.168.1.105', severity: 'info', category: 'modification' },
   { id: '3', timestamp: '2026-07-28T14:15:00', user: 'system', userAr: 'النظام', action: 'FAILED_LOGIN', actionAr: 'فشل تسجيل دخول', resource: 'auth', resourceAr: 'المصادقة', resourceId: 'usr-099', details: '3 محاولات فاشلة متتالية - حظر مؤقت', ipAddress: '45.33.12.88', severity: 'critical', category: 'security' },
   { id: '4', timestamp: '2026-07-28T14:10:00', user: 'billing@elm.com', userAr: 'خالد علي', action: 'EXPORT', actionAr: 'تصدير', resource: 'reports', resourceAr: 'تقارير', resourceId: 'rpt-monthly', details: 'تصدير تقرير الفواتير الشهري - 1,234 سجل', ipAddress: '192.168.1.110', severity: 'warning', category: 'export' },
-  { id: '5', timestamp: '2026-07-28T13:55:00', user: 'nurse.mona@elm.com', userAr: 'م. منى حسن', action: 'CREATE', actionAr: 'إنشاء', resource: 'order', resourceAr: 'طلب', orderId: 'ord-7890', details: 'إنشاء طلب اختبار دم جديد للمريض pat-3321', ipAddress: '192.168.1.120', severity: 'info', category: 'modification' },
+  { id: '5', timestamp: '2026-07-28T13:55:00', user: 'nurse.mona@elm.com', userAr: 'م. منى حسن', action: 'CREATE', actionAr: 'إنشاء', resource: 'order', resourceAr: 'طلب', resourceId: 'ord-7890', orderId: 'ord-7890', details: 'إنشاء طلب اختبار دم جديد للمريض pat-3321', ipAddress: '192.168.1.120', severity: 'info', category: 'modification' },
   { id: '6', timestamp: '2026-07-28T13:40:00', user: 'lab@elm.com', userAr: 'محمد صابر', action: 'PUBLISH', actionAr: 'نشر', resource: 'report', resourceAr: 'تقرير', resourceId: 'rpt-6543', details: 'نشر نتائج التحاليل للمريض pat-2210', ipAddress: '192.168.1.115', severity: 'info', category: 'modification' },
   { id: '7', timestamp: '2026-07-28T13:25:00', user: 'system', userAr: 'النظام', action: 'BACKUP', actionAr: 'نسخ احتياطي', resource: 'system', resourceAr: 'النظام', resourceId: 'backup-daily', details: 'نسخ احتياطي يومي مكتمل - 2.3GB', ipAddress: '127.0.0.1', severity: 'info', category: 'security' },
   { id: '8', timestamp: '2026-07-28T13:10:00', user: 'reception@elm.com', userAr: 'نورا سعيد', action: 'DELETE', actionAr: 'حذف', resource: 'appointment', resourceAr: 'موعد', resourceId: 'apt-9012', details: 'إلغاء موعد المريض pat-1122', ipAddress: '192.168.1.130', severity: 'warning', category: 'modification' },

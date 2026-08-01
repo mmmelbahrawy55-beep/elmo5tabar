@@ -296,14 +296,14 @@ export default function AdminDashboardPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-primary" trend="up" />
+                    <BarChart3 className="h-5 w-5 text-primary" />
                     اتجاه الإيرادات الشهرية
                   </CardTitle>
                   <Badge variant="secondary">آخر 12 شهر</Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <BarChart data={revenueData} height={280} color="#3b82f6" />
+                <BarChart data={revenueData} height={280} />
                 <div className="mt-4 grid grid-cols-3 gap-4 border-t border-gray-100 pt-4 dark:border-gray-800">
                   <div className="text-center">
                     <p className="text-xs text-gray-500 dark:text-gray-400">متوسط الشهري</p>
@@ -522,7 +522,7 @@ export default function AdminDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <BarChart data={revenueData} height={240} color="#3b82f6" />
+                <BarChart data={revenueData} height={240} />
                 <div className="mt-3 grid grid-cols-2 gap-4 border-t border-gray-100 pt-3 dark:border-gray-800">
                   <div className="flex items-center gap-2">
                     <span className="h-3 w-3 rounded-sm bg-blue-500" />
@@ -589,8 +589,7 @@ export default function AdminDashboardPage() {
                   <MetricRow
                     label="إجمالي الطلبات اليوم"
                     value={formatNumber(203)}
-                    trend="up"
-                    change="+12.5%"
+                    change={12.5}
                   />
                 </div>
               </CardContent>

@@ -193,10 +193,10 @@ export default function InventoryManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="إجمالي المنتجات" value={formatNumber(1234)} icon="📦" trend={{ value: 8, isPositive: true }} />
-        <StatCard title="على وشك النفاد" value={formatNumber(lowStockCount)} icon="⚠️" trend={{ value: 3, isPositive: false }} className="border-r-2 border-r-warning" />
-        <StatCard title="منتهي الصلاحية" value={formatNumber(expiredCount)} icon="🔴" trend={{ value: expiredCount, isPositive: false }} className="border-r-2 border-r-danger" />
-        <StatCard title="قيمة المخزون" value={formatCurrency(totalInventoryValue)} icon="💰" trend={{ value: 12, isPositive: true }} />
+        <StatCard title="إجمالي المنتجات" value={formatNumber(1234)} icon="📦" change={{ value: 8, isPositive: true }} />
+        <StatCard title="على وشك النفاد" value={formatNumber(lowStockCount)} icon="⚠️" change={{ value: 3, isPositive: false }} className="border-r-2 border-r-warning" />
+        <StatCard title="منتهي الصلاحية" value={formatNumber(expiredCount)} icon="🔴" change={{ value: expiredCount, isPositive: false }} className="border-r-2 border-r-danger" />
+        <StatCard title="قيمة المخزون" value={formatCurrency(totalInventoryValue)} icon="💰" change={{ value: 12, isPositive: true }} />
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">

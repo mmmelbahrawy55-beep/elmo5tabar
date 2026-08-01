@@ -64,7 +64,7 @@ export function MagneticButton({
     [disabled, loading, onClick]
   );
 
-  const Tag = Component === 'a' && href ? motion.a : motion.button;
+  const Tag: any = Component === 'a' && href ? motion.a : motion.button;
 
   return (
     <Tag

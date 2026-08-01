@@ -36,7 +36,7 @@ export function SectionReveal({
     return fadeIn(direction, delay);
   };
 
-  const MotionComponent = motion[Component as keyof typeof motion] ?? motion.div;
+  const MotionComponent: any = motion[Component as keyof typeof motion] ?? motion.div;
 
   return (
     <MotionComponent

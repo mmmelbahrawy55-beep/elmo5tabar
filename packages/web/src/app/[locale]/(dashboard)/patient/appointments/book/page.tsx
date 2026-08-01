@@ -29,6 +29,7 @@ import {
   Step7Confirmation,
 } from '@/components/appointments/BookingStepsExtra';
 import { useAppointmentBooking, createAppointmentConfirmation } from '@/stores/appointments';
+import type { AppointmentBookingState } from '@/stores/appointments';
 import { useLocationStore } from '@/stores/branches';
 import type {
   BookingStep,
@@ -283,7 +284,7 @@ function MobileBottomBar({
   summary,
   onNext,
 }: {
-  booking: ReturnType<typeof useAppointmentBooking>;
+  booking: AppointmentBookingState;
   summary: { subtotal: number; discount: number; tax: number; total: number };
   onNext: () => void;
 }) {

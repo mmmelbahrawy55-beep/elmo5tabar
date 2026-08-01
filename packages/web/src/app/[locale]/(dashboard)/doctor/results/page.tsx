@@ -350,7 +350,7 @@ export default function DoctorResultsPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>بحث عن مريض</CardTitle>
-                <SearchInput placeholder="اسم المريض أو رقم الملف..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-64" />
+                <SearchInput placeholder="اسم المريض أو رقم الملف..." value={searchQuery} onChange={(v) => setSearchQuery(v)} className="w-64" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -393,8 +393,8 @@ export default function DoctorResultsPage() {
                   <h3 className="text-lg font-semibold text-surface-900">{selectedPatient.name}</h3>
                 </div>
                 <div className="flex gap-2">
-                  <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="rounded-lg border border-surface-200 px-3 py-1.5 text-sm" />
-                  <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="rounded-lg border border-surface-200 px-3 py-1.5 text-sm" />
+                  <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-lg border border-surface-200 px-3 py-1.5 text-sm" />
+                  <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-lg border border-surface-200 px-3 py-1.5 text-sm" />
                 </div>
               </div>
 
@@ -625,7 +625,7 @@ export default function DoctorResultsPage() {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>إعادة النتيجة للمراجعة</DialogTitle></DialogHeader>
           <FormField label="سبب الإعادة">
-            <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" placeholder="أدخل سبب الإعادة..." />
+            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" placeholder="أدخل سبب الإعادة..." />
           </FormField>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRejectDialog(false)}>إلغاء</Button>
@@ -653,7 +653,7 @@ export default function DoctorResultsPage() {
                 </div>
               </div>
             )}
-            <textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} rows={4} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" placeholder="اكتب ملاحظتك..." />
+            <textarea value={noteContent} onChange={(e) => setNoteContent(e.target.value)} rows={4} className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm" placeholder="اكتب ملاحظتك..." />
             <div className="flex items-center gap-2">
               <Switch checked={noteVisibility === 'public'} onCheckedChange={(v) => setNoteVisibility(v ? 'public' : 'private')} />
               <span className="text-sm text-surface-600">{noteVisibility === 'public' ? 'عام (يراه المريض)' : 'خاص (للكادر الطبي فقط)'}</span>

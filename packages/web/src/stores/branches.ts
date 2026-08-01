@@ -9,6 +9,7 @@ import type { BranchFilter, UserLocation } from '@/types/branch';
 // ============================================================
 interface BranchFavoritesState {
   favoriteIds: string[];
+  favorites: string[];
   addFavorite: (id: string) => void;
   removeFavorite: (id: string) => void;
   toggleFavorite: (id: string) => void;
@@ -19,23 +20,25 @@ export const useBranchFavoritesStore = create<BranchFavoritesState>()(
   persist(
     (set, get) => ({
       favoriteIds: [],
+      favorites: [],
       addFavorite: (id) =>
-        set((state) => ({
-          favoriteIds: state.favoriteIds.includes(id)
+        set((state) => {
+          const favoriteIds = state.favoriteIds.includes(id)
             ? state.favoriteIds
-            : [...state.favoriteIds, id],
-        })),
+            : [...state.favoriteIds, id];
+          return { favoriteIds, favorites: favoriteIds };
+        }),
       removeFavorite: (id) =>
-        set((state) => ({
-          favoriteIds: state.favoriteIds.filter((fid) => fid !== id),
-        })),
+        set((state) => {
+          const favoriteIds = state.favoriteIds.filter((fid) => fid !== id);
+          return { favoriteIds, favorites: favoriteIds };
+        }),
       toggleFavorite: (id) => {
         const { favoriteIds } = get();
-        if (favoriteIds.includes(id)) {
-          set({ favoriteIds: favoriteIds.filter((fid) => fid !== id) });
-        } else {
-          set({ favoriteIds: [...favoriteIds, id] });
-        }
+        const next = favoriteIds.includes(id)
+          ? favoriteIds.filter((fid) => fid !== id)
+          : [...favoriteIds, id];
+        set({ favoriteIds: next, favorites: next });
       },
       isFavorite: (id) => get().favoriteIds.includes(id),
     }),
@@ -46,6 +49,8 @@ export const useBranchFavoritesStore = create<BranchFavoritesState>()(
 // ============================================================
 // LOCATION STORE (GPS)
 // ============================================================
+export type PermissionState = 'granted' | 'denied' | 'prompt';
+
 interface LocationState {
   userLocation: UserLocation | null;
   locationError: string | null;
@@ -53,15 +58,22 @@ interface LocationState {
   requestLocation: () => void;
   setUserLocation: (location: UserLocation) => void;
   clearLocation: () => void;
+  // convenience aliases used by branch pages
+  latitude: number | null;
+  longitude: number | null;
+  permissionState: PermissionState;
+  isLoading: boolean;
+  error: string | null;
+  locate: () => void;
 }
 
-export const useLocationStore = create<LocationState>((set) => ({
+export const useLocationStore = create<LocationState>((set, get) => ({
   userLocation: null,
   locationError: null,
   isLocating: false,
   requestLocation: () => {
     if (!navigator.geolocation) {
-      set({ locationError: 'Geolocation is not supported by this browser.' });
+      set({ locationError: 'Geolocation is not supported by this browser.', permissionState: 'denied' });
       return;
     }
 
@@ -69,13 +81,17 @@ export const useLocationStore = create<LocationState>((set) => ({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const userLocation: UserLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: position.timestamp,
+        };
         set({
-          userLocation: {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            timestamp: position.timestamp,
-          },
+          userLocation,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          permissionState: 'granted',
           isLocating: false,
           locationError: null,
         });
@@ -95,13 +111,38 @@ export const useLocationStore = create<LocationState>((set) => ({
           default:
             message = 'An unknown error occurred while retrieving location.';
         }
-        set({ locationError: message, isLocating: false });
+        set({
+          locationError: message,
+          error: message,
+          permissionState: error.code === error.PERMISSION_DENIED ? 'denied' : 'prompt',
+          isLocating: false,
+        });
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
     );
   },
-  setUserLocation: (location) => set({ userLocation: location, locationError: null }),
-  clearLocation: () => set({ userLocation: null, locationError: null, isLocating: false }),
+  setUserLocation: (location) =>
+    set({
+      userLocation: location,
+      latitude: location.lat,
+      longitude: location.lng,
+      permissionState: 'granted',
+      locationError: null,
+    }),
+  clearLocation: () =>
+    set({
+      userLocation: null,
+      latitude: null,
+      longitude: null,
+      locationError: null,
+      isLocating: false,
+    }),
+  latitude: null,
+  longitude: null,
+  permissionState: 'prompt',
+  isLoading: false,
+  error: null,
+  locate: () => get().requestLocation(),
 }));
 
 // ============================================================
@@ -120,6 +161,8 @@ const defaultBranchFilters: BranchFilter = {
   sortBy: 'distance',
 };
 
+type SortMode = 'distance' | 'rating' | 'name' | 'capacity' | 'nearest';
+
 interface BranchFilterState {
   filters: BranchFilter;
   setFilter: <K extends keyof BranchFilter>(key: K, value: BranchFilter[K]) => void;
@@ -128,6 +171,13 @@ interface BranchFilterState {
   setViewMode: (mode: 'map' | 'list' | 'grid') => void;
   selectedBranchId: string | null;
   setSelectedBranch: (id: string | null) => void;
+  // convenience aliases used by branch pages
+  selectedCity: string;
+  selectedType: string;
+  sortBy: SortMode;
+  setCity: (city: string) => void;
+  setType: (type: string) => void;
+  setSortBy: (mode: SortMode) => void;
 }
 
 export const useBranchFilterStore = create<BranchFilterState>()(
@@ -141,6 +191,12 @@ export const useBranchFilterStore = create<BranchFilterState>()(
       setViewMode: (mode) => set({ viewMode: mode }),
       selectedBranchId: null,
       setSelectedBranch: (id) => set({ selectedBranchId: id }),
+      selectedCity: '',
+      selectedType: 'all',
+      sortBy: 'nearest' as SortMode,
+      setCity: (city) => set({ selectedCity: city }),
+      setType: (type) => set({ selectedType: type }),
+      setSortBy: (mode) => set({ sortBy: mode }),
     }),
     { name: 'al-mokhtabar-branch-filters' }
   )

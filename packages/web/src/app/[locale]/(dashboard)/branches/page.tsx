@@ -94,8 +94,6 @@ export default function BranchLocatorPage() {
     longitude,
     isLoading: locationLoading,
     error: locationError,
-    nearestBranch,
-    detectedCity,
     locate,
   } = useLocationStore();
 
@@ -117,6 +115,20 @@ export default function BranchLocatorPage() {
     return count;
   }, [selectedCity, selectedType]);
 
+  const nearestBranch = useMemo(() => {
+    if (!latitude || !longitude) return undefined;
+    let nearest: (typeof ALL_BRANCHES)[0] | undefined;
+    let minDist = Infinity;
+    for (const b of ALL_BRANCHES) {
+      const d = calculateDistance(latitude, longitude, b.coordinates.lat, b.coordinates.lng);
+      if (d < minDist) {
+        minDist = d;
+        nearest = b;
+      }
+    }
+    return nearest;
+  }, [latitude, longitude]);
+
   const filteredBranches = useMemo(() => {
     let branches = [...ALL_BRANCHES];
 
@@ -131,7 +143,7 @@ export default function BranchLocatorPage() {
     }
 
     if (selectedCity) {
-      branches = branches.filter((b) => b.city === selectedCity);
+      branches = branches.filter((b) => b.address.city === selectedCity);
     }
 
     if (selectedType !== 'all') {
@@ -140,8 +152,8 @@ export default function BranchLocatorPage() {
 
     if (sortBy === 'nearest' && latitude && longitude) {
       branches.sort((a, b) => {
-        const dA = calculateDistance(latitude, longitude, a.lat, a.lng);
-        const dB = calculateDistance(latitude, longitude, b.lat, b.lng);
+        const dA = calculateDistance(latitude, longitude, a.coordinates.lat, a.coordinates.lng);
+        const dB = calculateDistance(latitude, longitude, b.coordinates.lat, b.coordinates.lng);
         return dA - dB;
       });
     } else if (sortBy === 'rating') {
@@ -149,7 +161,7 @@ export default function BranchLocatorPage() {
     } else if (sortBy === 'name') {
       branches.sort((a, b) => a.nameAr.localeCompare(b.nameAr, 'ar'));
     } else if (sortBy === 'capacity') {
-      branches.sort((a, b) => (b.capacityPercentage ?? 0) - (a.capacityPercentage ?? 0));
+      branches.sort((a, b) => (b.capacity?.percentage ?? 0) - (a.capacity?.percentage ?? 0));
     }
 
     return branches;
@@ -171,14 +183,14 @@ export default function BranchLocatorPage() {
 
   const getDistanceLabel = (branch: (typeof ALL_BRANCHES)[0]) => {
     if (!latitude || !longitude) return null;
-    const dist = calculateDistance(latitude, longitude, branch.lat, branch.lng);
+    const dist = calculateDistance(latitude, longitude, branch.coordinates.lat, branch.coordinates.lng);
     if (dist < 1) return `${Math.round(dist * 1000)} م`;
     return `${dist.toFixed(1)} كم`;
   };
 
   const getTravelTime = (branch: (typeof ALL_BRANCHES)[0]) => {
     if (!latitude || !longitude) return null;
-    return calculateTravelTime(latitude, longitude, branch.lat, branch.lng);
+    return calculateTravelTime(calculateDistance(latitude, longitude, branch.coordinates.lat, branch.coordinates.lng));
   };
 
   const getQueueColor = (waitingCount?: number) => {
@@ -202,11 +214,10 @@ export default function BranchLocatorPage() {
 
   const getHoursDisplay = (branch: (typeof ALL_BRANCHES)[0]) => {
     if (branch.is24Hours) return 'مفتوح 24 ساعة';
-    if (!branch.workingHours) return '—';
     const today = new Date().toLocaleDateString('ar-SA', { weekday: 'long' });
-    const todayHours = branch.workingHours[today];
-    if (todayHours) return todayHours;
-    return branch.workingHours?.['السبت'] || '—';
+    const dayEntry = branch.openingHours.find((d) => d.dayAr === today);
+    if (dayEntry) return `${dayEntry.open} - ${dayEntry.close}`;
+    return '—';
   };
 
   const handleShare = (branch: (typeof ALL_BRANCHES)[0]) => {
@@ -339,12 +350,12 @@ export default function BranchLocatorPage() {
               </span>
               {latitude && longitude && (
                 <span className="text-xs text-emerald-600">
-                  ({calculateDistance(latitude, longitude, nearestBranch.lat, nearestBranch.lng).toFixed(1)} كم)
+                  ({calculateDistance(latitude, longitude, nearestBranch.coordinates.lat, nearestBranch.coordinates.lng).toFixed(1)} كم)
                 </span>
               )}
             </div>
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${nearestBranch.lat},${nearestBranch.lng}`}
+              href={`https://www.google.com/maps/dir/?api=1&destination=${nearestBranch.coordinates.lat},${nearestBranch.coordinates.lng}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
@@ -609,27 +620,27 @@ export default function BranchLocatorPage() {
                     </div>
 
                     {/* Queue Status */}
-                    {branch.waitingCount !== undefined && (
+                    {branch.queueStatus.waiting !== undefined && (
                       <div className="mt-2 flex items-center gap-2">
-                        <div className={cn('h-2 w-2 rounded-full', getQueueColor(branch.waitingCount))} />
+                        <div className={cn('h-2 w-2 rounded-full', getQueueColor(branch.queueStatus.waiting))} />
                         <span className="text-xs text-gray-500">
-                          {getQueueLabel(branch.waitingCount)}
-                          {branch.waitingCount > 0 && ` — ${branch.waitingCount} في الانتظار`}
+                          {getQueueLabel(branch.queueStatus.waiting)}
+                          {branch.queueStatus.waiting > 0 && ` — ${branch.queueStatus.waiting} في الانتظار`}
                         </span>
                       </div>
                     )}
 
                     {/* Capacity Bar */}
-                    {branch.capacityPercentage !== undefined && (
+                    {branch.capacity.percentage !== undefined && (
                       <div className="mt-3">
                         <div className="mb-1 flex items-center justify-between text-xs">
                           <span className="text-gray-500">الاستيعاب</span>
-                          <span className="font-medium text-gray-700">{branch.capacityPercentage}%</span>
+                          <span className="font-medium text-gray-700">{branch.capacity.percentage}%</span>
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                           <div
-                            className={cn('h-full rounded-full transition-all', getCapacityColor(branch.capacityPercentage))}
-                            style={{ width: `${branch.capacityPercentage}%` }}
+                            className={cn('h-full rounded-full transition-all', getCapacityColor(branch.capacity.percentage))}
+                            style={{ width: `${branch.capacity.percentage}%` }}
                           />
                         </div>
                       </div>
@@ -656,7 +667,7 @@ export default function BranchLocatorPage() {
                         </a>
                       )}
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`}
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${branch.coordinates.lat},${branch.coordinates.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-400 transition-colors hover:bg-[#0077B6] hover:text-white"
@@ -763,10 +774,10 @@ export default function BranchLocatorPage() {
                         <Clock size={12} />
                         {getHoursDisplay(branch)}
                       </span>
-                      {branch.waitingCount !== undefined && (
+                      {branch.queueStatus.waiting !== undefined && (
                         <span className="flex items-center gap-1">
-                          <div className={cn('h-1.5 w-1.5 rounded-full', getQueueColor(branch.waitingCount))} />
-                          {branch.waitingCount} في الانتظار
+                          <div className={cn('h-1.5 w-1.5 rounded-full', getQueueColor(branch.queueStatus.waiting))} />
+                          {branch.queueStatus.waiting} في الانتظار
                         </span>
                       )}
                     </div>
@@ -779,7 +790,7 @@ export default function BranchLocatorPage() {
                         <Phone size={12} />
                       </a>
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`}
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${branch.coordinates.lat},${branch.coordinates.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-50 text-gray-400 transition-colors hover:bg-[#0077B6] hover:text-white"
@@ -969,8 +980,8 @@ function MapPinOnMap({
               <Star size={10} className="fill-amber-400 text-amber-400" />
               {branch.rating?.toFixed(1)}
             </span>
-            {branch.waitingCount !== undefined && (
-              <span>{branch.waitingCount} في الانتظار</span>
+            {branch.queueStatus.waiting !== undefined && (
+              <span>{branch.queueStatus.waiting} في الانتظار</span>
             )}
           </div>
           <Link

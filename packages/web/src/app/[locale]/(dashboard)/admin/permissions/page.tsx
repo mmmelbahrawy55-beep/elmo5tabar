@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/design-system/naviga
 import { SearchInput, FormField, FormGroup, FormSection } from '@/design-system/forms/FormField';
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '@/design-system/feedback/Alert';
 import { Switch } from '@/design-system/primitives/Input';
+import { ProgressBar } from '@/design-system/feedback/Progress';
 import ExportButton from '@/components/admin/ExportButton';
 
 interface Permission {

@@ -105,7 +105,7 @@ export default function SettingsPage() {
     enabled: true,
   });
 
-  const [paymentSettings] = React.useState({
+  const [paymentSettings, setPaymentSettings] = React.useState({
     visaEnabled: true,
     madaEnabled: true,
     applePayEnabled: true,

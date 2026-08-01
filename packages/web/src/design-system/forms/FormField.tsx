@@ -9,12 +9,19 @@ interface FormFieldProps {
   description?: string;
   error?: string;
   required?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   htmlFor?: string;
+  value?: string | number;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  type?: string;
+  placeholder?: string;
 }
 
-function FormField({ label, description, error, required, children, className, htmlFor }: FormFieldProps) {
+function FormField({ label, description, error, required, children, className, htmlFor, value, defaultValue, onChange, type = 'text', placeholder }: FormFieldProps) {
+  const inputValue = value === undefined || value === null ? '' : String(value);
+  const hasInputMode = typeof onChange === 'function' || defaultValue !== undefined;
   return (
     <div className={cn('space-y-1.5', className)}>
       {label && (
@@ -23,7 +30,23 @@ function FormField({ label, description, error, required, children, className, h
           {required && <span className="mr-1 text-danger-500">*</span>}
         </label>
       )}
-      {children}
+      {hasInputMode ? (
+        <input
+          type={type}
+          value={hasInputMode && onChange ? inputValue : undefined}
+          defaultValue={defaultValue}
+          onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+          placeholder={placeholder}
+          className={cn(
+            'w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-900',
+            'placeholder:text-surface-400',
+            'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none',
+            'transition-all'
+          )}
+        />
+      ) : (
+        children
+      )}
       {description && !error && (
         <p className="text-xs text-surface-400">{description}</p>
       )}
@@ -72,13 +95,15 @@ function FormGroup({ children, columns = 1, gap = 4, className }: FormGroupProps
 // ============================================================
 // FORM SECTION
 // ============================================================
-function FormSection({ title, description, children, className }: { title: string; description?: string; children: React.ReactNode; className?: string }) {
+function FormSection({ title, description, children, className }: { title?: string; description?: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={cn('space-y-4', className)}>
-      <div>
-        <h3 className="text-base font-semibold text-surface-900">{title}</h3>
-        {description && <p className="mt-1 text-sm text-surface-500">{description}</p>}
-      </div>
+      {(title || description) && (
+        <div>
+          {title && <h3 className="text-base font-semibold text-surface-900">{title}</h3>}
+          {description && <p className="mt-1 text-sm text-surface-500">{description}</p>}
+        </div>
+      )}
       {children}
     </div>
   );
@@ -110,19 +135,21 @@ function FormActions({ children, className, align = 'end' }: { children: React.R
 // SEARCH INPUT (with debounce)
 // ============================================================
 interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  onSearch: (value: string) => void;
+  onSearch?: (value: string) => void;
+  onChange?: (value: string) => void;
   debounceMs?: number;
 }
 
-function SearchInput({ onSearch, debounceMs = 300, className, ...props }: SearchInputProps) {
-  const [value, setValue] = React.useState(props.defaultValue as string || '');
+function SearchInput({ onSearch, onChange, debounceMs = 300, className, ...props }: SearchInputProps) {
+  const [value, setValue] = React.useState(props.defaultValue as string || props.value as string || '');
   const timerRef = React.useRef<NodeJS.Timeout>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setValue(val);
+    onChange?.(val);
     clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => onSearch(val), debounceMs);
+    timerRef.current = setTimeout(() => onSearch?.(val), debounceMs);
   };
 
   return (
@@ -212,12 +239,12 @@ function FileUpload({ accept, multiple, maxSize = 10 * 1024 * 1024, onFiles, cla
 // ============================================================
 function DateDisplay({ date, format = 'medium', className }: { date: Date | string; format?: 'short' | 'medium' | 'long' | 'full'; className?: string }) {
   const d = typeof date === 'string' ? new Date(date) : date;
-  const options: Intl.DateTimeFormatOptions = {
+  const options = ({
     short: { day: 'numeric', month: 'short' },
     medium: { day: 'numeric', month: 'short', year: 'numeric' },
     long: { day: 'numeric', month: 'long', year: 'numeric' },
     full: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
-  }[format]!;
+  }[format] as Intl.DateTimeFormatOptions);
 
   return (
     <time dateTime={d.toISOString()} className={cn('text-sm text-surface-600', className)}>

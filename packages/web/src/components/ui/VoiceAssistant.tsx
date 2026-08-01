@@ -165,7 +165,10 @@ export default function VoiceAssistant({
           stroke={isListening ? '#e74c3c' : '#2980b9'} strokeWidth="2"
           style={{ position: 'relative', zIndex: 1 }}>
           {isListening ? (
-            <rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" />
+            <>
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </>
           ) : (
             <><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="22" /></>
           )}

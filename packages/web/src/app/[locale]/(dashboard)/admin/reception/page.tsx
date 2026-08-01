@@ -15,7 +15,7 @@ interface ReceptionStaff {
   id: string;
   name: string;
   branch: string;
-  serviceStatus: ' متاح' | 'مشغول' | 'في استراحة' | 'غير متصل';
+  serviceStatus: 'متاح' | 'مشغول' | 'في استراحة' | 'غير متصل';
   patientsServed: number;
   avgServiceTime: number;
   performanceRating: number;
@@ -36,11 +36,11 @@ interface QueueItem {
 }
 
 const initialStaff: ReceptionStaff[] = [
-  { id: 'R-001', name: 'أحمد الراشد', branch: 'الفرع الرئيسي', serviceStatus: ' مشغول', patientsServed: 15, avgServiceTime: 4.2, performanceRating: 92, currentQueue: 3, totalServedToday: 15, satisfactionScore: 4.7 },
-  { id: 'R-002', name: 'سارة القحطاني', branch: 'الفرع الرئيسي', serviceStatus: ' متاح', patientsServed: 12, avgServiceTime: 3.8, performanceRating: 95, currentQueue: 0, totalServedToday: 12, satisfactionScore: 4.9 },
+  { id: 'R-001', name: 'أحمد الراشد', branch: 'الفرع الرئيسي', serviceStatus: 'مشغول', patientsServed: 15, avgServiceTime: 4.2, performanceRating: 92, currentQueue: 3, totalServedToday: 15, satisfactionScore: 4.7 },
+  { id: 'R-002', name: 'سارة القحطاني', branch: 'الفرع الرئيسي', serviceStatus: 'متاح', patientsServed: 12, avgServiceTime: 3.8, performanceRating: 95, currentQueue: 0, totalServedToday: 12, satisfactionScore: 4.9 },
   { id: 'R-003', name: 'هند المطيري', branch: 'فرع الشمال', serviceStatus: 'مشغول', patientsServed: 18, avgServiceTime: 5.1, performanceRating: 88, currentQueue: 2, totalServedToday: 18, satisfactionScore: 4.5 },
   { id: 'R-004', name: 'خالد الشمري', branch: 'فرع الشمال', serviceStatus: 'في استراحة', patientsServed: 10, avgServiceTime: 4.0, performanceRating: 90, currentQueue: 0, totalServedToday: 10, satisfactionScore: 4.6 },
-  { id: 'R-005', name: 'نورة الدوسري', branch: 'فرع الجنوب', serviceStatus: ' متاح', patientsServed: 14, avgServiceTime: 3.5, performanceRating: 96, currentQueue: 0, totalServedToday: 14, satisfactionScore: 4.8 },
+  { id: 'R-005', name: 'نورة الدوسري', branch: 'فرع الجنوب', serviceStatus: 'متاح', patientsServed: 14, avgServiceTime: 3.5, performanceRating: 96, currentQueue: 0, totalServedToday: 14, satisfactionScore: 4.8 },
   { id: 'R-006', name: 'عمر الحربي', branch: 'فرع الجنوب', serviceStatus: 'مشغول', patientsServed: 16, avgServiceTime: 4.8, performanceRating: 87, currentQueue: 4, totalServedToday: 16, satisfactionScore: 4.3 },
   { id: 'R-007', name: 'ريم الغامدي', branch: 'الفرع الرئيسي', serviceStatus: 'متاح', patientsServed: 11, avgServiceTime: 4.5, performanceRating: 91, currentQueue: 0, totalServedToday: 11, satisfactionScore: 4.7 },
   { id: 'R-008', name: 'ياسر العتيبي', branch: 'الفرع الرئيسي', serviceStatus: 'غير متصل', patientsServed: 0, avgServiceTime: 0, performanceRating: 0, currentQueue: 0, totalServedToday: 0, satisfactionScore: 0 },

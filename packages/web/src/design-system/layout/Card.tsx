@@ -21,30 +21,28 @@ function Card({
   as: Component = 'div',
   ...props
 }: CardProps) {
-  return (
-    <Component
-      className={cn(
-        'rounded-2xl bg-white',
-        bordered && 'border border-surface-100',
-        hover && [
-          'cursor-pointer transition-all duration-200',
-          'hover:shadow-lg hover:border-surface-200 hover:-translate-y-0.5',
-          'active:translate-y-0 active:shadow-md',
-        ],
-        elevated && 'shadow-lg',
-        !hover && 'shadow-sm',
-        {
-          'p-0': padding === 'none',
-          'p-4': padding === 'sm',
-          'p-5': padding === 'md',
-          'p-6': padding === 'lg',
-          'p-8': padding === 'xl',
-        },
-        className
-      )}
-      {...props}
-    />
-  );
+  return React.createElement(Component, {
+    className: cn(
+      'rounded-2xl bg-white',
+      bordered && 'border border-surface-100',
+      hover && [
+        'cursor-pointer transition-all duration-200',
+        'hover:shadow-lg hover:border-surface-200 hover:-translate-y-0.5',
+        'active:translate-y-0 active:shadow-md',
+      ],
+      elevated && 'shadow-lg',
+      !hover && 'shadow-sm',
+      {
+        'p-0': padding === 'none',
+        'p-4': padding === 'sm',
+        'p-5': padding === 'md',
+        'p-6': padding === 'lg',
+        'p-8': padding === 'xl',
+      },
+      className
+    ),
+    ...props,
+  });
 }
 
 // Card Sub-components
@@ -53,7 +51,7 @@ function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement
 }
 
 function CardTitle({ className, as: Component = 'h3', ...props }: React.HTMLAttributes<HTMLHeadingElement> & { as?: React.ElementType }) {
-  return <Component className={cn('text-lg font-semibold text-surface-900', className)} {...props} />;
+  return React.createElement(Component, { className: cn('text-lg font-semibold text-surface-900', className), ...props });
 }
 
 function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
@@ -71,14 +69,19 @@ function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement
 // ============================================================
 // STAT CARD
 // ============================================================
+type StatCardChange = number | string | { value: number; isPositive: boolean };
+type StatCardTrend = 'up' | 'down' | 'neutral' | string | number;
+
 interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
-  change?: number;
+  change?: StatCardChange;
   changeLabel?: string;
+  changeType?: 'positive' | 'negative' | 'neutral' | string;
   icon?: React.ReactNode;
   iconBg?: string;
-  trend?: 'up' | 'down' | 'neutral';
+  trend?: StatCardTrend;
+  trendUp?: boolean;
   loading?: boolean;
 }
 
@@ -88,6 +91,9 @@ function StatCard({
   value,
   change,
   changeLabel,
+  changeType,
+  trend,
+  trendUp,
   icon,
   iconBg = 'bg-brand-50',
   loading,
@@ -105,16 +111,59 @@ function StatCard({
           )}
           {change !== undefined && (
             <div className="mt-2 flex items-center gap-1.5">
-              <span
-                className={cn(
-                  'text-xs font-semibold',
-                  change > 0 ? 'text-success-600' : change < 0 ? 'text-danger-600' : 'text-surface-500'
-                )}
-              >
-                {change > 0 ? '↑' : change < 0 ? '↓' : '—'} {Math.abs(change)}%
-              </span>
+              {typeof change === 'number' ? (
+                <span
+                  className={cn(
+                    'text-xs font-semibold',
+                    changeType
+                      ? changeType === 'negative' ? 'text-danger-600' : changeType === 'positive' ? 'text-success-600' : 'text-surface-500'
+                      : change > 0 ? 'text-success-600' : change < 0 ? 'text-danger-600' : 'text-surface-500'
+                  )}
+                >
+                  {changeType
+                    ? `${changeType === 'positive' ? '↑' : changeType === 'negative' ? '↓' : '—'} ${Math.abs(change)}%`
+                    : `${change > 0 ? '↑' : change < 0 ? '↓' : '—'} ${Math.abs(change)}%`}
+                </span>
+              ) : typeof change === 'string' ? (
+                <span
+                  className={cn(
+                    'text-xs font-semibold',
+                    changeType
+                      ? changeType === 'negative' ? 'text-danger-600' : changeType === 'positive' ? 'text-success-600' : 'text-surface-500'
+                      : change.startsWith('-') ? 'text-danger-600' : change.startsWith('+') || change.startsWith('0') ? 'text-success-600' : 'text-surface-500'
+                  )}
+                >
+                  {change}
+                </span>
+              ) : (
+                <span className={cn('text-xs font-semibold', change.isPositive ? 'text-success-600' : 'text-danger-600')}>
+                  {change.isPositive ? '↑' : '↓'} {Math.abs(change.value)}%
+                </span>
+              )}
               {changeLabel && (
                 <span className="text-xs text-surface-400">{changeLabel}</span>
+              )}
+            </div>
+          )}
+          {trend !== undefined && (
+            <div className="mt-2 flex items-center gap-1.5">
+              {typeof trend === 'number' ? (
+                <span className={cn('text-xs font-semibold', trend > 0 ? 'text-success-600' : trend < 0 ? 'text-danger-600' : 'text-surface-500')}>
+                  {trend > 0 ? '↑' : trend < 0 ? '↓' : '—'} {Math.abs(trend)}%
+                </span>
+              ) : (
+                <span
+                  className={cn(
+                    'text-xs font-semibold',
+                    trendUp === undefined
+                      ? trend === 'up' ? 'text-success-600' : trend === 'down' ? 'text-danger-600' : 'text-surface-500'
+                      : trendUp ? 'text-success-600' : 'text-danger-600'
+                  )}
+                >
+                  {trendUp === undefined
+                    ? trend === 'up' ? '↑' : trend === 'down' ? '↓' : '—'
+                    : trendUp ? '↑' : '↓'} {trend}
+                </span>
               )}
             </div>
           )}

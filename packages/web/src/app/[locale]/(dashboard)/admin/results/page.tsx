@@ -363,15 +363,15 @@ export default function AdminResultsPage() {
 
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <SearchInput placeholder="بحث في سجل التدقيق..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-56" />
-              <select value={auditSeverity} onChange={e => setAuditSeverity(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm">
+              <SearchInput placeholder="بحث في سجل التدقيق..." value={searchQuery} onChange={(v) => setSearchQuery(v)} className="w-56" />
+              <select value={auditSeverity} onChange={(e) => setAuditSeverity(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm">
                 <option value="all">جميع المستويات</option>
                 <option value="info">معلومة</option>
                 <option value="warning">تنبيه</option>
                 <option value="critical">حرج</option>
               </select>
-              <input type="date" value={auditDateFrom} onChange={e => setAuditDateFrom(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
-              <input type="date" value={auditDateTo} onChange={e => setAuditDateTo(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
+              <input type="date" value={auditDateFrom} onChange={(e) => setAuditDateFrom(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
+              <input type="date" value={auditDateTo} onChange={(e) => setAuditDateTo(e.target.value)} className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" />
             </div>
             <Button variant="outline" size="sm" onClick={handleExportAudit} disabled={exporting}>
               {exporting ? <LoadingSpinner className="h-4 w-4" /> : <svg className="h-4 w-4 ms-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>}

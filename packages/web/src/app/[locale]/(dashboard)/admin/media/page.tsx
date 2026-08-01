@@ -118,7 +118,7 @@ export default function MediaPage() {
         </div>
         <div className="flex items-center gap-3">
           {selectedFiles.length > 0 && (
-            <Button variant="destructive" onClick={() => setSelectedFiles([])}>
+            <Button variant="danger" onClick={() => setSelectedFiles([])}>
               حذف المحدد ({selectedFiles.length})
             </Button>
           )}
@@ -164,7 +164,7 @@ export default function MediaPage() {
                 <SearchInput
                   placeholder="بحث في الملفات..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="flex-1"
                 />
                 <select
@@ -239,7 +239,7 @@ export default function MediaPage() {
                 <SearchInput
                   placeholder="بحث في الصور..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(v) => setSearchQuery(v)}
                   className="max-w-md"
                 />
               </div>
@@ -425,7 +425,7 @@ export default function MediaPage() {
               <Button className="w-full">تحميل الملف</Button>
               <Button variant="outline" className="w-full">نسخ الرابط</Button>
               <Button variant="outline" className="w-full">تعديل الوسوم</Button>
-              <Button variant="destructive" className="w-full">حذف الملف</Button>
+              <Button variant="danger" className="w-full">حذف الملف</Button>
             </div>
           </div>
         </div>

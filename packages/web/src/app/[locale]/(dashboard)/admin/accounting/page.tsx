@@ -56,14 +56,24 @@ const TRANSACTIONS_MOCK = [
   { id: 'TXN-006', date: '2026-07-23', account: 'الحساب الجاري - الراجحي', description: 'رواتب يوليو', debit: 0, credit: 485000 },
 ]
 
-const BAR_CHART_DATA = [
-  { label: 'يناير', value1: 720000, value2: 310000 },
-  { label: 'فبراير', value1: 680000, value2: 295000 },
-  { label: 'مارس', value1: 810000, value2: 330000 },
-  { label: 'أبريل', value1: 760000, value2: 320000 },
-  { label: 'مايو', value1: 830000, value2: 340000 },
-  { label: 'يونيو', value1: 870000, value2: 335000 },
-  { label: 'يوليو', value1: 892000, value2: 345000 },
+const BAR_CHART_REVENUE = [
+  { label: 'يناير', value: 720000, color: '#22c55e' },
+  { label: 'فبراير', value: 680000, color: '#22c55e' },
+  { label: 'مارس', value: 810000, color: '#22c55e' },
+  { label: 'أبريل', value: 760000, color: '#22c55e' },
+  { label: 'مايو', value: 830000, color: '#22c55e' },
+  { label: 'يونيو', value: 870000, color: '#22c55e' },
+  { label: 'يوليو', value: 892000, color: '#22c55e' },
+]
+
+const BAR_CHART_EXPENSES = [
+  { label: 'يناير', value: 310000, color: '#ef4444' },
+  { label: 'فبراير', value: 295000, color: '#ef4444' },
+  { label: 'مارس', value: 330000, color: '#ef4444' },
+  { label: 'أبريل', value: 320000, color: '#ef4444' },
+  { label: 'مايو', value: 340000, color: '#ef4444' },
+  { label: 'يونيو', value: 335000, color: '#ef4444' },
+  { label: 'يوليو', value: 345000, color: '#ef4444' },
 ]
 
 const DONUT_DATA = [
@@ -73,10 +83,10 @@ const DONUT_DATA = [
 
 type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'cancelled'
 
-const STATUS_MAP: Record<InvoiceStatus, { label: string; variant: 'success' | 'warning' | 'error' | 'secondary' }> = {
+const STATUS_MAP: Record<InvoiceStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'secondary' }> = {
   paid: { label: 'مدفوعة', variant: 'success' },
   pending: { label: 'معلقة', variant: 'warning' },
-  overdue: { label: 'متأخرة', variant: 'error' },
+  overdue: { label: 'متأخرة', variant: 'danger' },
   cancelled: { label: 'ملغاة', variant: 'secondary' },
 }
 
@@ -125,10 +135,10 @@ export default function AccountingPage() {
   )
 
   const stats = [
-    { title: 'الإيرادات الشهرية', value: formatCurrency(892000, 'SAR'), change: '+12.5%', changeType: 'positive' as const },
-    { title: 'المصروفات الشهرية', value: formatCurrency(345000, 'SAR'), change: '+3.2%', changeType: 'negative' as const },
-    { title: 'صافي الربح', value: formatCurrency(547000, 'SAR'), change: '+18.7%', changeType: 'positive' as const },
-    { title: 'الفواتير المعلقة', value: '23', change: '-5', changeType: 'positive' as const },
+    { title: 'الإيرادات الشهرية', value: formatCurrency(892000, 'SAR'), change: 12.5 },
+    { title: 'المصروفات الشهرية', value: formatCurrency(345000, 'SAR'), change: 3.2 },
+    { title: 'صافي الربح', value: formatCurrency(547000, 'SAR'), change: 18.7 },
+    { title: 'الفواتير المعلقة', value: '23', change: -5 },
   ]
 
   const addInvoiceItem = () => {
@@ -210,7 +220,6 @@ export default function AccountingPage() {
             title={stat.title}
             value={stat.value}
             change={stat.change}
-            changeType={stat.changeType}
           />
         ))}
       </div>
@@ -231,14 +240,22 @@ export default function AccountingPage() {
                 <CardTitle>الإيرادات مقابل المصروفات</CardTitle>
               </CardHeader>
               <CardContent>
-                <BarChart
-                  data={BAR_CHART_DATA}
-                  series={[
-                    { key: 'value1', label: 'الإيرادات', color: '#22c55e' },
-                    { key: 'value2', label: 'المصروفات', color: '#ef4444' },
-                  ]}
-                  height={300}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-3">الإيرادات</p>
+                    <BarChart
+                      data={BAR_CHART_REVENUE}
+                      height={220}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-3">المصروفات</p>
+                    <BarChart
+                      data={BAR_CHART_EXPENSES}
+                      height={220}
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -265,12 +282,12 @@ export default function AccountingPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <MetricRow label="نسبة الربح الإجمالي" value="61.3%" trend="up" />
-                  <MetricRow label="نسبة العائد على الأصول" value="23.5%" trend="up" />
-                  <MetricRow label="معدل التحصيل" value="87.2%" trend="down" />
-                  <MetricRow label="نسبة التدفق النقدي" value="158%" trend="up" />
-                  <MetricRow label="الديون على الذمة" value={formatCurrency(423000, 'SAR')} trend="down" />
-                  <MetricRow label="الاحتياطي النقدي" value={formatCurrency(3230000, 'SAR')} trend="up" />
+                  <MetricRow label="نسبة الربح الإجمالي" value="61.3%" change={1} />
+                  <MetricRow label="نسبة العائد على الأصول" value="23.5%" change={1} />
+                  <MetricRow label="معدل التحصيل" value="87.2%" change={-1} />
+                  <MetricRow label="نسبة التدفق النقدي" value="158%" change={1} />
+                  <MetricRow label="الديون على الذمة" value={formatCurrency(423000, 'SAR')} change={-1} />
+                  <MetricRow label="الاحتياطي النقدي" value={formatCurrency(3230000, 'SAR')} change={1} />
                 </div>
               </CardContent>
             </Card>
@@ -283,8 +300,7 @@ export default function AccountingPage() {
               <CardTitle>إدارة الفواتير</CardTitle>
               <div className="flex items-center gap-2">
                 <SearchInput
-                  value={searchQuery}
-                  onChange={setSearchQuery}
+                  onSearch={setSearchQuery}
                   placeholder="بحث بالعميل أو رقم الفاتورة..."
                 />
                 <Button variant="primary" onClick={() => setCreateInvoiceOpen(true)}>
@@ -358,8 +374,8 @@ export default function AccountingPage() {
                                   <span className="mr-2">{Math.max(0, Math.ceil((new Date(inv.dueDate).getTime() - Date.now()) / 86400000))} يوم</span>
                                 </div>
                                 <div className="flex gap-2">
-                                  <Button size="sm" variant="outline">إرسال تذكير</Button>
-                                  <Button size="sm" variant="outline">تصدير PDF</Button>
+                                  <Button size="sm" variant="outline-brand">إرسال تذكير</Button>
+                                  <Button size="sm" variant="outline-brand">تصدير PDF</Button>
                                 </div>
                               </div>
                             </td>
@@ -603,7 +619,7 @@ export default function AccountingPage() {
                           <td className="py-3 px-4 font-mono text-xs">{acc.id}</td>
                           <td className="py-3 px-4 font-medium">{acc.name}</td>
                           <td className="py-3 px-4">
-                            <Badge variant={acc.type.includes('أصول') ? 'info' : acc.type === 'خصوم' ? 'error' : 'secondary'}>
+                            <Badge variant={acc.type.includes('أصول') ? 'info' : acc.type === 'خصوم' ? 'danger' : 'secondary'}>
                               {acc.type}
                             </Badge>
                           </td>
@@ -657,7 +673,7 @@ export default function AccountingPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={createInvoiceOpen} onOpenChange={setCreateInvoiceOpen}>
+      <Dialog open={createInvoiceOpen} onClose={() => setCreateInvoiceOpen(false)}>
         <DialogHeader>
           <DialogTitle>إنشاء فاتورة جديدة</DialogTitle>
         </DialogHeader>
@@ -715,7 +731,7 @@ export default function AccountingPage() {
                   </div>
                 </div>
               ))}
-              <Button size="sm" variant="outline" onClick={addInvoiceItem}>
+              <Button size="sm" variant="outline-brand" onClick={addInvoiceItem}>
                 + إضافة بند
               </Button>
             </div>
@@ -734,7 +750,7 @@ export default function AccountingPage() {
         </DialogFooter>
       </Dialog>
 
-      <Dialog open={expenseFormOpen} onOpenChange={setExpenseFormOpen}>
+      <Dialog open={expenseFormOpen} onClose={() => setExpenseFormOpen(false)}>
         <DialogHeader>
           <DialogTitle>إضافة مصروف جديد</DialogTitle>
         </DialogHeader>
@@ -782,9 +798,9 @@ export default function AccountingPage() {
 
       <ConfirmDialog
         open={confirmProcessOpen}
-        onOpenChange={setConfirmProcessOpen}
+        onClose={() => setConfirmProcessOpen(false)}
         title="تأكيد المعالجة"
-        message="هل أنت متأكد من معالجة جميع الفواتير المعلقة؟ لا يمكن التراجع عن هذا الإجراء."
+        description="هل أنت متأكد من معالجة جميع الفواتير المعلقة؟ لا يمكن التراجع عن هذا الإجراء."
         onConfirm={() => setConfirmProcessOpen(false)}
         variant="warning"
       />

@@ -204,7 +204,7 @@ export default function WhatsAppPage() {
                 <CardHeader>
                   <div className="space-y-3">
                     <CardTitle>المحادثات</CardTitle>
-                    <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث..." />
+                    <SearchInput value={searchQuery} onChange={(v) => setSearchQuery(v)} placeholder="بحث..." />
                     <div className="flex gap-1">
                       {['الكل', 'active', 'pending', 'closed'].map((s) => (
                         <button

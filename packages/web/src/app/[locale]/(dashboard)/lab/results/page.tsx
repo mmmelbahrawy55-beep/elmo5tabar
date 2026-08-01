@@ -352,7 +352,7 @@ export default function LabResultsPage() {
             <TabsTrigger value="batch">عمليات جماعية</TabsTrigger>
           </TabsList>
         </Tabs>
-        <SearchInput placeholder="بحث..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-56" />
+        <SearchInput placeholder="بحث..." value={searchQuery} onChange={(v) => setSearchQuery(v)} className="w-56" />
       </div>
 
       {['queue', 'draft', 'review', 'batch'].map(tab => (

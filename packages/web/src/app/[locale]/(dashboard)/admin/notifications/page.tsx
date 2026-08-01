@@ -68,6 +68,7 @@ interface Campaign {
   status: string;
   sent: number;
   read: number;
+  readRate?: number;
   createdAt: string;
 }
 

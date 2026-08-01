@@ -18,6 +18,8 @@ import {
 
 interface DashboardData {
   today: { orders: number; appointments: number; revenue: number };
+  completedReportsToday?: number;
+  pending?: { orders: number };
   recentOrders: Array<{
     id: string;
     orderNumber: string;

@@ -21,7 +21,7 @@ interface BookingSummaryLocal {
   total: number;
 }
 
-interface AppointmentBookingState {
+export interface AppointmentBookingState {
   currentStep: BookingStep;
   completedSteps: BookingStep[];
   isAnimating: boolean;

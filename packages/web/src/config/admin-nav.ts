@@ -1,10 +1,10 @@
 import {
   LayoutDashboard, BarChart3, DollarSign, Calendar, Users, UserCog, Stethoscope,
   ClipboardList, Building2, TestTube2, Package, FileText, FileCheck, Archive,
-  Calculator, Wallet, Shield, Handshake, Megaphone, Search, Globe, Image,
+  Calculator, Wallet, Shield, Megaphone, Search, Globe, Image,
   BookOpen, Tag, Percent, Bell, Mail, MessageSquare, Phone, Key, Lock,
   ScrollText, Activity, Wifi, Server, ShieldCheck, Settings, Brain,
-  UserPlus, Reception, Building, UserCheck, BadgeCheck,
+  UserPlus, Building, UserCheck, BadgeCheck,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -58,7 +58,7 @@ export const adminNavSections: { title: string; items: NavItem[] }[] = [
   {
     title: 'الشراكات والتسويق',
     items: [
-      { label: 'الشركاء', href: '/admin/partners', icon: Handshake, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { label: 'الشركاء', href: '/admin/partners', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
       { label: 'التسويق', href: '/admin/marketing', icon: Megaphone, roles: ['SUPER_ADMIN', 'ADMIN'] },
       { label: 'تحسين محركات البحث', href: '/admin/seo', icon: Search, roles: ['SUPER_ADMIN', 'ADMIN'] },
       { label: 'إدارة المحتوى', href: '/admin/cms', icon: Globe, roles: ['SUPER_ADMIN', 'ADMIN'] },

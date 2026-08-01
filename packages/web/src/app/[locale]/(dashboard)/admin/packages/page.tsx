@@ -193,10 +193,10 @@ export default function PackagesManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="إجمالي الحزم" value={formatNumber(packages.length)} icon="📦" trend={{ value: 15, isPositive: true }} />
-        <StatCard title="حزم نشطة" value={formatNumber(packages.filter(p => p.isActive).length)} icon="✅" trend={{ value: 10, isPositive: true }} />
+        <StatCard title="إجمالي الحزم" value={formatNumber(packages.length)} icon="📦" change={{ value: 15, isPositive: true }} />
+        <StatCard title="حزم نشطة" value={formatNumber(packages.filter(p => p.isActive).length)} icon="✅" change={{ value: 10, isPositive: true }} />
         <StatCard title="متوسط الخصم" value={`%${averageDiscount}`} icon="💰" />
-        <StatCard title="إجمالي الاستخدامات" value={formatNumber(totalUsage)} icon="📊" trend={{ value: 22, isPositive: true }} />
+        <StatCard title="إجمالي الاستخدامات" value={formatNumber(totalUsage)} icon="📊" change={{ value: 22, isPositive: true }} />
       </div>
 
       <div className="flex items-center gap-4">

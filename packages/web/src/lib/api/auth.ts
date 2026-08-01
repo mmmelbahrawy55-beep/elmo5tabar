@@ -177,6 +177,17 @@ class AuthClient {
     });
   }
 
+  async untrustDevice(id: string) {
+    return this.request(`/auth/devices/${id}/trust`, {
+      method: 'PATCH',
+      body: JSON.stringify({ trusted: false }),
+    });
+  }
+
+  async getDeviceHistory(deviceId: string) {
+    return this.request(`/auth/devices/${deviceId}/history`);
+  }
+
   async getMe(): Promise<User> {
     return this.request('/auth/me');
   }

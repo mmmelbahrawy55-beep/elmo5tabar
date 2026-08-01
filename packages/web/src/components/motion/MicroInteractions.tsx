@@ -20,7 +20,7 @@ export function MicroButton({
         'inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white border border-surface-200 text-surface-700 shadow-sm hover:bg-surface-50 transition-colors',
         className
       )}
-      {...props}
+      {...(props as Record<string, unknown>)}
     >
       {children}
     </motion.button>
