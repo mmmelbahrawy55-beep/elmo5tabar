@@ -1,0 +1,13 @@
+node_modules
+dist
+.next
+.env
+.env.local
+.git
+*.log
+coverage
+.nyc_output
+packages/web
+packages/ai-service
+packages/mobile
+packages/shared

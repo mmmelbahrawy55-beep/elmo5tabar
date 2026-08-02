@@ -48,6 +48,12 @@ RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/packages/backend/prisma ./prisma
+
+RUN npm install prisma --no-save 2>/dev/null || true
+
+COPY packages/backend/start.sh ./start.sh
+RUN chmod +x ./start.sh
 
 RUN mkdir -p uploads logs && chown -R almokhtabar:almokhtabar /app
 
@@ -58,4 +64,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:3001/api/v1/health || exit 1
 
-CMD ["node", "dist/main.js"]
+CMD ["./start.sh"]
