@@ -79,7 +79,7 @@ export default function PatientDashboard() {
   const fetchDashboard = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'}/analytics/dashboard`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/analytics/dashboard`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const result = await res.json();

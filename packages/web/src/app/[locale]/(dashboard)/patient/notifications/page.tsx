@@ -139,7 +139,7 @@ export default function PatientNotificationsPage() {
     if (!token) return;
     setConnectionStatus('connecting');
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${process.env.NEXT_PUBLIC_WS_HOST || 'localhost:3001'}/notifications`;
+    const wsUrl = `${protocol}//${window.location.host}/notifications`;
     let ws: WebSocket | null = null;
     let reconnectTimer: NodeJS.Timeout;
 
