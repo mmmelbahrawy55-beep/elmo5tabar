@@ -23,13 +23,13 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY packages/backend/package*.json ./
 
 RUN npm ci --ignore-scripts
 
-COPY . .
+COPY packages/backend/ .
 
-RUN npx nest build
+RUN npx prisma generate && npx nest build
 
 # ---------------------------------------------------------------------------
 # Stage 2: Production
@@ -46,6 +46,8 @@ COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 RUN mkdir -p uploads logs && chown -R almokhtabar:almokhtabar /app
 
