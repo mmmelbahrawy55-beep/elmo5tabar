@@ -65,6 +65,13 @@ interface BookingData {
 }
 
 // ---------------------------------------------------------------------------
+// Spring Config
+// ---------------------------------------------------------------------------
+
+const spring = { type: 'spring' as const, damping: 25, stiffness: 120 };
+const springSnappy = { type: 'spring' as const, damping: 20, stiffness: 200 };
+
+// ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
 
@@ -144,7 +151,7 @@ function formatTimeLabel(t: string) {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: { opacity: 1, y: 0, transition: { ...spring, duration: 0.6 } },
 };
 
 const stagger = {
@@ -153,36 +160,25 @@ const stagger = {
 
 const slideVariants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 400 : -400,
+    x: direction > 0 ? 300 : -300,
     opacity: 0,
-    scale: 0.96,
-    filter: 'blur(8px)',
+    scale: 0.97,
+    filter: 'blur(6px)',
   }),
   center: {
     x: 0,
     opacity: 1,
     scale: 1,
     filter: 'blur(0px)',
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: spring,
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? -400 : 400,
+    x: direction > 0 ? -300 : 300,
     opacity: 0,
-    scale: 0.96,
-    filter: 'blur(8px)',
-    transition: { duration: 0.4, ease: [0.55, 0.06, 0.68, 0.19] },
+    scale: 0.97,
+    filter: 'blur(6px)',
+    transition: { duration: 0.3, ease: [0.55, 0.06, 0.68, 0.19] },
   }),
-};
-
-const glowPulse = {
-  animate: {
-    boxShadow: [
-      '0 0 20px rgba(14,165,233,0.15)',
-      '0 0 40px rgba(14,165,233,0.25)',
-      '0 0 20px rgba(14,165,233,0.15)',
-    ],
-    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-  },
 };
 
 // ---------------------------------------------------------------------------
@@ -202,12 +198,12 @@ function GlassCard({
     <motion.div
       variants={fadeUp}
       className={cn(
-        'relative rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl shadow-2xl shadow-black/20 overflow-hidden',
-        glow && 'border-sky-500/30 shadow-sky-500/10',
+        'relative rounded-3xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl shadow-2xl shadow-black/30 overflow-hidden',
+        glow && 'border-[#38bdf8]/20 shadow-[#38bdf8]/5',
         className
       )}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent pointer-events-none" />
       <div className="relative z-10">{children}</div>
     </motion.div>
   );
@@ -319,21 +315,23 @@ export default function BookAppointmentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pb-32" dir="rtl">
+    <div className="min-h-screen pb-32" style={{ backgroundColor: '#0a0a0f' }} dir="rtl">
+      {/* Ambient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-500/[0.03] rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(56,189,248,0.04)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full blur-[100px]" style={{ backgroundColor: 'rgba(52,211,153,0.03)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[140px]" style={{ backgroundColor: 'rgba(56,189,248,0.02)' }} />
       </div>
 
       {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-white/10 bg-gray-950/80 backdrop-blur-2xl">
+      <div className="sticky top-0 z-40 backdrop-blur-2xl" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(10,10,15,0.85)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <motion.button
             whileHover={{ x: 4 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => (step > 1 ? goPrev() : router.back())}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 transition-colors"
+            style={{ color: '#94a3b8' }}
           >
             <ArrowRight className="w-5 h-5" />
             <span className="text-sm font-medium hidden sm:inline">
@@ -342,16 +340,16 @@ export default function BookAppointmentPage() {
           </motion.button>
 
           <div className="text-center">
-            <h1 className="text-lg font-bold text-white">حجز موعد جديد</h1>
-            <p className="text-xs text-gray-500">خطوة {step} من 4</p>
+            <h1 className="text-lg font-bold" style={{ color: '#e2e8f0' }}>حجز موعد جديد</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>خطوة {step} من 4</p>
           </div>
 
           <div className="w-16" />
         </div>
       </div>
 
-      {/* Premium Progress Indicator */}
-      <div className="max-w-4xl mx-auto px-4 pt-6">
+      {/* Progress Indicator */}
+      <div className="max-w-4xl mx-auto px-4 pt-8">
         <div className="flex items-center gap-3">
           {[1, 2, 3, 4].map((s) => (
             <React.Fragment key={s}>
@@ -359,33 +357,35 @@ export default function BookAppointmentPage() {
                 className="flex flex-col items-center gap-2"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: s * 0.1 }}
+                transition={{ delay: s * 0.1, ...spring }}
               >
                 <motion.div
                   initial={false}
                   animate={
                     s === step
-                      ? { scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }
-                      : { scale: 1, rotate: 0 }
+                      ? { scale: [1, 1.15, 1] }
+                      : { scale: 1 }
                   }
-                  transition={
-                    s === step
-                      ? { repeat: Infinity, duration: 2.5, ease: 'easeInOut' }
-                      : { duration: 0.3 }
-                  }
+                  transition={s === step ? { repeat: Infinity, duration: 2.5, ease: 'easeInOut' } : spring}
                   className={cn(
-                    'w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-bold transition-all duration-500 border-2 relative',
+                    'w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-bold relative',
                     s < step
-                      ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-500/30'
+                      ? 'text-white'
                       : s === step
-                        ? 'bg-gradient-to-br from-sky-400 to-sky-600 border-sky-400 text-white shadow-lg shadow-sky-500/40'
-                        : 'bg-white/5 border-white/10 text-gray-500'
+                        ? 'text-white'
+                        : 'text-gray-600'
                   )}
+                  style={{
+                    backgroundColor: s < step ? '#34d399' : s === step ? '#38bdf8' : 'rgba(255,255,255,0.04)',
+                    border: `2px solid ${s < step ? '#34d399' : s === step ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`,
+                    boxShadow: s < step ? '0 4px 20px rgba(52,211,153,0.3)' : s === step ? '0 4px 20px rgba(56,189,248,0.35)' : 'none',
+                  }}
                 >
                   {s === step && (
                     <motion.div
-                      className="absolute inset-0 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600"
-                      animate={{ opacity: [0.3, 0.6, 0.3] }}
+                      className="absolute inset-0 rounded-2xl"
+                      style={{ backgroundColor: '#38bdf8' }}
+                      animate={{ opacity: [0.2, 0.5, 0.2] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
                   )}
@@ -394,7 +394,7 @@ export default function BookAppointmentPage() {
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
+                        transition={{ ...springSnappy }}
                       >
                         <Check className="w-5 h-5" />
                       </motion.div>
@@ -404,10 +404,8 @@ export default function BookAppointmentPage() {
                   </span>
                 </motion.div>
                 <span
-                  className={cn(
-                    'text-[10px] font-semibold transition-colors duration-300',
-                    s <= step ? 'text-sky-400' : 'text-gray-600'
-                  )}
+                  className="text-[10px] font-semibold transition-colors duration-300"
+                  style={{ color: s <= step ? '#38bdf8' : '#475569' }}
                 >
                   {s === 1 && 'التاريخ والفرع'}
                   {s === 2 && 'الوقت'}
@@ -416,7 +414,7 @@ export default function BookAppointmentPage() {
                 </span>
               </motion.div>
               {s < 4 && (
-                <div className="flex-1 h-0.5 mt-[-20px] rounded-full overflow-hidden bg-white/10">
+                <div className="flex-1 h-0.5 mt-[-20px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: '0%' }}
@@ -426,8 +424,8 @@ export default function BookAppointmentPage() {
                     transition={{ duration: 0.6, ease: 'easeInOut' }}
                     style={{
                       background: s < step
-                        ? 'linear-gradient(90deg, #10B981, #34D399)'
-                        : 'linear-gradient(90deg, #0EA5E9, #38BDF8)',
+                        ? 'linear-gradient(90deg, #34d399, #34d399)'
+                        : 'linear-gradient(90deg, #38bdf8, #38bdf8)',
                     }}
                   />
                 </div>
@@ -438,7 +436,7 @@ export default function BookAppointmentPage() {
       </div>
 
       {/* Step Content */}
-      <div className="max-w-4xl mx-auto px-4 mt-8 relative overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4 mt-10 relative overflow-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           {step === 1 && (
             <motion.div
@@ -511,27 +509,31 @@ export default function BookAppointmentPage() {
       </div>
 
       {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-white/10 bg-gray-950/90 backdrop-blur-2xl">
+      <div className="fixed bottom-0 inset-x-0 z-40 backdrop-blur-2xl" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(10,10,15,0.92)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-gray-400">
+          <div className="flex items-center gap-4 text-sm">
             {selectedBranch && (
               <motion.span
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
+                transition={spring}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
               >
-                <MapPin className="w-4 h-4 text-sky-400" />
-                <span className="text-white/70">{selectedBranch.name}</span>
+                <MapPin className="w-4 h-4" style={{ color: '#38bdf8' }} />
+                <span style={{ color: 'rgba(226,232,240,0.6)' }}>{selectedBranch.name}</span>
               </motion.span>
             )}
             {selectedTests.length > 0 && (
               <motion.span
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
+                transition={spring}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
               >
-                <FlaskConical className="w-4 h-4 text-teal-400" />
-                <span className="text-white/70">{selectedTests.length} تحليل</span>
+                <FlaskConical className="w-4 h-4" style={{ color: '#34d399' }} />
+                <span style={{ color: 'rgba(226,232,240,0.6)' }}>{selectedTests.length} تحليل</span>
               </motion.span>
             )}
           </div>
@@ -540,7 +542,9 @@ export default function BookAppointmentPage() {
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-xl font-bold bg-gradient-to-l from-sky-400 to-teal-400 bg-clip-text text-transparent"
+              transition={spring}
+              className="text-xl font-bold"
+              style={{ color: '#38bdf8' }}
             >
               {total.toFixed(0)} ج.م
             </motion.span>
@@ -551,25 +555,24 @@ export default function BookAppointmentPage() {
             whileTap={canProceed ? { scale: 0.97 } : {}}
             onClick={goNext}
             disabled={!canProceed || isBooking}
-            className={cn(
-              'relative px-8 py-3 rounded-2xl font-bold text-sm transition-all duration-300 overflow-hidden',
-              canProceed && !isBooking
-                ? 'bg-gradient-to-l from-sky-500 to-teal-500 text-white shadow-xl shadow-sky-500/25'
-                : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/10'
-            )}
+            transition={spring}
+            className="relative px-8 py-3 rounded-2xl font-bold text-sm overflow-hidden"
+            style={{
+              backgroundColor: canProceed && !isBooking ? '#38bdf8' : 'rgba(255,255,255,0.04)',
+              color: canProceed && !isBooking ? '#0a0a0f' : '#475569',
+              border: canProceed && !isBooking ? 'none' : '1px solid rgba(255,255,255,0.06)',
+              boxShadow: canProceed && !isBooking ? '0 4px 24px rgba(56,189,248,0.3)' : 'none',
+              cursor: canProceed && !isBooking ? 'pointer' : 'not-allowed',
+            }}
           >
-            {canProceed && !isBooking && (
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-l from-sky-400 to-teal-400 opacity-0 hover:opacity-100 transition-opacity"
-              />
-            )}
             <span className="relative z-10 flex items-center gap-2">
               {isBooking ? (
                 <>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                    className="w-4 h-4 border-2 rounded-full"
+                    style={{ borderColor: '#0a0a0f', borderTopColor: 'transparent' }}
                   />
                   جاري التأكيد...
                 </>
@@ -607,6 +610,7 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
   const today = new Date();
   const [viewMonth, setViewMonth] = React.useState(today.getMonth());
   const [viewYear, setViewYear] = React.useState(today.getFullYear());
+  const [monthDirection, setMonthDirection] = React.useState(0);
 
   const dayHeaders = ['سبت', 'أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة'];
   const monthNames = [
@@ -639,57 +643,75 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
 
   const canGoPrev = viewYear > today.getFullYear() || (viewYear === today.getFullYear() && viewMonth > today.getMonth());
 
+  const navigateMonth = (dir: number) => {
+    setMonthDirection(dir);
+    if (dir === -1) {
+      if (viewMonth === 0) {
+        setViewMonth(11);
+        setViewYear(viewYear - 1);
+      } else {
+        setViewMonth(viewMonth - 1);
+      }
+    } else {
+      if (viewMonth === 11) {
+        setViewMonth(0);
+        setViewYear(viewYear + 1);
+      } else {
+        setViewMonth(viewMonth + 1);
+      }
+    }
+  };
+
   return (
     <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-8">
       {/* Calendar Card */}
       <GlassCard>
-        <div className="px-6 py-5 border-b border-white/10">
+        <div className="px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-3">
             <motion.div
               whileHover={{ rotate: 15 }}
-              className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center shadow-lg shadow-sky-500/30"
+              transition={springSnappy}
+              className="w-11 h-11 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', boxShadow: '0 4px 16px rgba(56,189,248,0.3)' }}
             >
               <Calendar className="w-5 h-5 text-white" />
             </motion.div>
             <div>
-              <h2 className="text-xl font-bold text-white">اختر التاريخ والفرع</h2>
-              <p className="text-sm text-gray-400">حدد موعدك وأقرب فرع</p>
+              <h2 className="text-xl font-bold" style={{ color: '#e2e8f0' }}>اختر التاريخ والفرع</h2>
+              <p className="text-sm" style={{ color: '#94a3b8' }}>حدد موعدك وأقرب فرع</p>
             </div>
           </div>
         </div>
 
         <div className="p-6 md:p-8">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-8">
             <motion.button
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                if (viewMonth === 0) {
-                  setViewMonth(11);
-                  setViewYear(viewYear - 1);
-                } else {
-                  setViewMonth(viewMonth - 1);
-                }
-              }}
+              transition={springSnappy}
+              onClick={() => navigateMonth(-1)}
               disabled={!canGoPrev}
-              className={cn(
-                'p-2.5 rounded-xl transition-all border',
-                canGoPrev
-                  ? 'hover:bg-white/10 text-gray-300 border-white/10'
-                  : 'text-gray-600 cursor-not-allowed border-transparent'
-              )}
+              className="p-2.5 rounded-xl transition-all"
+              style={{
+                backgroundColor: canGoPrev ? 'rgba(255,255,255,0.04)' : 'transparent',
+                border: '1px solid rgba(255,255,255,0.06)',
+                color: canGoPrev ? '#e2e8f0' : '#334155',
+                cursor: canGoPrev ? 'pointer' : 'not-allowed',
+              }}
             >
               <ChevronRight className="w-5 h-5" />
             </motion.button>
             <AnimatePresence mode="wait">
               <motion.h3
                 key={`${viewMonth}-${viewYear}`}
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: monthDirection > 0 ? -12 : 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="text-lg font-bold text-white"
+                exit={{ opacity: 0, y: monthDirection > 0 ? 12 : -12 }}
+                transition={spring}
+                className="text-lg font-bold"
+                style={{ color: '#e2e8f0' }}
               >
                 {monthNames[viewMonth]} {viewYear}
               </motion.h3>
@@ -698,24 +720,19 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                if (viewMonth === 11) {
-                  setViewMonth(0);
-                  setViewYear(viewYear + 1);
-                } else {
-                  setViewMonth(viewMonth + 1);
-                }
-              }}
-              className="p-2.5 rounded-xl hover:bg-white/10 text-gray-300 transition-all border border-white/10"
+              transition={springSnappy}
+              onClick={() => navigateMonth(1)}
+              className="p-2.5 rounded-xl transition-all"
+              style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0' }}
             >
               <ChevronLeft className="w-5 h-5" />
             </motion.button>
           </div>
 
           {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-1.5 mb-2">
+          <div className="grid grid-cols-7 gap-1.5 mb-3">
             {dayHeaders.map((d) => (
-              <div key={d} className="text-center text-xs font-bold text-gray-500 py-2">
+              <div key={d} className="text-center text-xs font-bold py-2" style={{ color: '#64748b' }}>
                 {d}
               </div>
             ))}
@@ -740,32 +757,36 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
                 <motion.button
                   key={day}
                   type="button"
-                  whileHover={available && !isPast ? { scale: 1.15, y: -2 } : {}}
-                  whileTap={available && !isPast ? { scale: 0.9 } : {}}
+                  whileHover={available && !isPast ? { scale: 1.12, y: -2 } : {}}
+                  whileTap={available && !isPast ? { scale: 0.92 } : {}}
+                  transition={springSnappy}
                   disabled={isPast || !available}
                   onClick={() => !isPast && available && onSelectDate(iso)}
-                  className={cn(
-                    'relative aspect-square flex flex-col items-center justify-center rounded-2xl text-sm font-semibold transition-all duration-300 border',
-                    isPast || !available
-                      ? 'bg-white/[0.02] cursor-not-allowed border-transparent text-gray-600'
+                  className="relative aspect-square flex flex-col items-center justify-center rounded-2xl text-sm font-semibold transition-all duration-300"
+                  style={{
+                    backgroundColor: isPast || !available
+                      ? 'rgba(255,255,255,0.015)'
                       : isSelected
-                        ? 'bg-gradient-to-br from-sky-500 to-teal-500 text-white border-sky-400/50 shadow-lg shadow-sky-500/30'
-                        : 'bg-white/[0.04] hover:bg-white/[0.08] cursor-pointer border-white/10 text-gray-300 hover:text-white hover:border-white/20'
-                  )}
+                        ? 'linear-gradient(135deg, #38bdf8, #34d399)'
+                        : 'rgba(255,255,255,0.03)',
+                    border: isSelected ? '1px solid rgba(56,189,248,0.4)' : '1px solid transparent',
+                    boxShadow: isSelected ? '0 4px 20px rgba(56,189,248,0.25)' : 'none',
+                    color: isPast || !available ? '#334155' : isSelected ? '#ffffff' : '#94a3b8',
+                    cursor: isPast || !available ? 'not-allowed' : 'pointer',
+                    opacity: isPast || !available ? 0.3 : 1,
+                  }}
                 >
                   <span className="relative z-10">{day}</span>
                   {isToday && !isSelected && (
                     <motion.div
-                      className="absolute inset-0 rounded-2xl border-2 border-sky-400/50"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      className="absolute inset-0 rounded-2xl"
+                      style={{ border: '2px solid rgba(56,189,248,0.4)' }}
+                      animate={{ opacity: [0.4, 0.8, 0.4] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
                   )}
                   {isToday && !isSelected && (
-                    <span className="text-[8px] text-sky-400 font-bold mt-0.5">اليوم</span>
-                  )}
-                  {available && !isPast && !isSelected && dayData && (
-                    <span className="text-[7px] text-emerald-400/70 leading-none mt-0.5">{dayData.count}</span>
+                    <span className="text-[8px] font-bold mt-0.5" style={{ color: '#38bdf8' }}>اليوم</span>
                   )}
                 </motion.button>
               );
@@ -773,17 +794,17 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-5 text-xs text-gray-500 mt-5">
+          <div className="flex flex-wrap gap-5 text-xs mt-6" style={{ color: '#64748b' }}>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-lg bg-white/[0.04] border border-white/10" />
+              <div className="w-3 h-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }} />
               <span>متاح</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-lg bg-white/[0.02] border border-transparent" />
+              <div className="w-3 h-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.015)' }} />
               <span>غير متاح</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-lg bg-gradient-to-br from-sky-500 to-teal-500" />
+              <div className="w-3 h-3 rounded-lg" style={{ background: 'linear-gradient(135deg, #38bdf8, #34d399)' }} />
               <span>مختار</span>
             </div>
           </div>
@@ -792,17 +813,19 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
           <AnimatePresence>
             {selectedDate && (
               <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                initial={{ opacity: 0, y: 10, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="mt-6 p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center gap-3"
+                exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                transition={spring}
+                className="mt-6 p-4 rounded-2xl flex items-center gap-3"
+                style={{ backgroundColor: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.15)' }}
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/20">
-                  <Calendar className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', boxShadow: '0 4px 12px rgba(56,189,248,0.2)' }}>
+                  <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-bold text-sky-300">تم اختيار التاريخ</p>
-                  <p className="text-sm text-sky-400/80">{formatDateAr(new Date(selectedDate))}</p>
+                  <p className="font-bold" style={{ color: '#38bdf8' }}>تم اختيار التاريخ</p>
+                  <p className="text-sm" style={{ color: 'rgba(56,189,248,0.7)' }}>{formatDateAr(new Date(selectedDate))}</p>
                 </div>
               </motion.div>
             )}
@@ -812,8 +835,8 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
 
       {/* Branch Selection */}
       <motion.div variants={fadeUp}>
-        <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-sky-400" />
+        <h3 className="text-lg font-bold mb-5 flex items-center gap-2" style={{ color: '#e2e8f0' }}>
+          <MapPin className="w-5 h-5" style={{ color: '#38bdf8' }} />
           اختر الفرع
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -825,25 +848,27 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
                 type="button"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, ...spring }}
                 whileHover={{ y: -6, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onSelectBranch(branch)}
-                className={cn(
-                  'relative p-6 rounded-3xl border-2 text-right transition-all duration-500 bg-white/[0.04] backdrop-blur-sm group',
-                  isSelected
-                    ? 'border-sky-500/50 shadow-xl shadow-sky-500/10 bg-sky-500/[0.08]'
-                    : 'border-white/10 hover:border-white/20 hover:bg-white/[0.06]'
-                )}
+                className="relative p-6 rounded-3xl text-right transition-all duration-500 group"
+                style={{
+                  backgroundColor: isSelected ? 'rgba(56,189,248,0.06)' : 'rgba(255,255,255,0.025)',
+                  backdropFilter: 'blur(12px)',
+                  border: isSelected ? '2px solid rgba(56,189,248,0.35)' : '2px solid rgba(255,255,255,0.06)',
+                  boxShadow: isSelected ? '0 8px 32px rgba(56,189,248,0.1)' : 'none',
+                }}
               >
                 {isSelected && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
-                    className="absolute top-4 left-4 w-7 h-7 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/30"
+                    transition={{ ...springSnappy }}
+                    className="absolute top-4 left-4 w-7 h-7 rounded-xl flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', boxShadow: '0 4px 12px rgba(56,189,248,0.3)' }}
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="w-4 h-4 text-white" />
                   </motion.div>
                 )}
 
@@ -853,17 +878,17 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
                   transition={{ duration: 0.5 }}
                   style={{
                     background: isSelected
-                      ? 'linear-gradient(135deg, #0EA5E9, #14B8A6)'
-                      : 'rgba(255,255,255,0.05)',
+                      ? 'linear-gradient(135deg, #38bdf8, #14b8a6)'
+                      : 'rgba(255,255,255,0.04)',
                   }}
                 >
-                  <MapPin className={cn('w-6 h-6 transition-colors', isSelected ? 'text-white' : 'text-gray-400')} />
+                  <MapPin className={cn('w-6 h-6 transition-colors')} style={{ color: isSelected ? '#ffffff' : '#64748b' }} />
                 </motion.div>
 
-                <h4 className="font-bold text-white text-base mb-1.5">{branch.name}</h4>
-                <p className="text-sm text-gray-400 leading-relaxed mb-3">{branch.address}</p>
+                <h4 className="font-bold text-base mb-1.5" style={{ color: '#e2e8f0' }}>{branch.name}</h4>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: '#94a3b8' }}>{branch.address}</p>
 
-                <div className="flex items-center gap-2 text-sky-400/80 text-xs font-medium">
+                <div className="flex items-center gap-2 text-xs font-medium" style={{ color: 'rgba(56,189,248,0.7)' }}>
                   <Phone className="w-3.5 h-3.5" />
                   <span>{branch.phone}</span>
                 </div>
@@ -872,8 +897,8 @@ function Step1DateBranch({ selectedDate, onSelectDate, selectedBranch, onSelectB
                   className="absolute top-0 right-0 w-1 h-full rounded-r-3xl transition-all duration-300"
                   style={{
                     background: isSelected
-                      ? 'linear-gradient(180deg, #0EA5E9, #14B8A6)'
-                      : 'rgba(255,255,255,0.1)',
+                      ? 'linear-gradient(180deg, #38bdf8, #14b8a6)'
+                      : 'rgba(255,255,255,0.06)',
                   }}
                 />
               </motion.button>
@@ -921,41 +946,42 @@ function Step2Time({ selectedDate, selectedTime, onSelectTime }: Step2Props) {
       {/* Date Header */}
       <GlassCard>
         <div className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-teal-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #38bdf8, #14b8a6)', boxShadow: '0 4px 16px rgba(56,189,248,0.2)' }}>
             <Calendar className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">التاريخ المختار</p>
-            <p className="font-bold text-white text-lg">{formatDateAr(new Date(selectedDate))}</p>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>التاريخ المختار</p>
+            <p className="font-bold text-lg" style={{ color: '#e2e8f0' }}>{formatDateAr(new Date(selectedDate))}</p>
           </div>
         </div>
       </GlassCard>
 
       {/* Section Title */}
       <motion.div variants={fadeUp} className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">اختر الموعد</h2>
-        <p className="text-gray-400">حدد الوقت المناسب لزورتك</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>اختر الموعد</h2>
+        <p style={{ color: '#94a3b8' }}>حدد الوقت المناسب لزورتك</p>
       </motion.div>
 
       {/* Morning Slots */}
       <GlassCard>
-        <div className="px-6 py-4 border-b border-white/10">
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-3">
             <motion.div
               animate={{ rotate: [0, 15, -15, 0] }}
               transition={{ duration: 4, repeat: Infinity }}
-              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', boxShadow: '0 4px 12px rgba(251,191,36,0.2)' }}
             >
               <Zap className="w-5 h-5 text-white" />
             </motion.div>
             <div>
-              <h3 className="font-bold text-white">الصباح</h3>
-              <p className="text-xs text-gray-400">08:00 ص — 12:00 م</p>
+              <h3 className="font-bold" style={{ color: '#e2e8f0' }}>الصباح</h3>
+              <p className="text-xs" style={{ color: '#94a3b8' }}>08:00 ص — 12:00 م</p>
             </div>
           </div>
         </div>
         <div className="p-4">
-          <div className="grid grid-cols-4 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-4 gap-2.5">
             {morning.map((slot, i) => (
               <TimeSlotButton
                 key={slot.time}
@@ -971,23 +997,24 @@ function Step2Time({ selectedDate, selectedTime, onSelectTime }: Step2Props) {
 
       {/* Evening Slots */}
       <GlassCard>
-        <div className="px-6 py-4 border-b border-white/10">
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-3">
             <motion.div
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 3, repeat: Infinity }}
-              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #818cf8, #7c3aed)', boxShadow: '0 4px 12px rgba(129,140,248,0.2)' }}
             >
               <Star className="w-5 h-5 text-white" />
             </motion.div>
             <div>
-              <h3 className="font-bold text-white">المساء</h3>
-              <p className="text-xs text-gray-400">04:00 م — 08:00 م</p>
+              <h3 className="font-bold" style={{ color: '#e2e8f0' }}>المساء</h3>
+              <p className="text-xs" style={{ color: '#94a3b8' }}>04:00 م — 08:00 م</p>
             </div>
           </div>
         </div>
         <div className="p-4">
-          <div className="grid grid-cols-4 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-4 gap-2.5">
             {evening.map((slot, i) => (
               <TimeSlotButton
                 key={slot.time}
@@ -1005,17 +1032,19 @@ function Step2Time({ selectedDate, selectedTime, onSelectTime }: Step2Props) {
       <AnimatePresence>
         {selectedTime && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="p-5 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center gap-4"
+            exit={{ opacity: 0, y: 10, scale: 0.97 }}
+            transition={spring}
+            className="p-5 rounded-2xl flex items-center gap-4"
+            style={{ backgroundColor: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.15)' }}
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/20">
-              <Clock className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', boxShadow: '0 4px 12px rgba(56,189,248,0.2)' }}>
+              <Clock className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="font-bold text-sky-300">الوقت المختار</p>
-              <p className="text-lg text-white font-semibold">
+              <p className="font-bold" style={{ color: '#38bdf8' }}>الوقت المختار</p>
+              <p className="text-lg font-semibold" style={{ color: '#e2e8f0' }}>
                 {slots.find((s) => s.time === selectedTime)?.label}
               </p>
             </div>
@@ -1040,38 +1069,40 @@ function TimeSlotButton({
   return (
     <motion.button
       type="button"
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay, type: 'spring', stiffness: 300 }}
-      whileHover={slot.available ? { scale: 1.1, y: -2 } : {}}
-      whileTap={slot.available ? { scale: 0.9 } : {}}
+      transition={{ delay, ...springSnappy }}
+      whileHover={slot.available ? { scale: 1.08, y: -2 } : {}}
+      whileTap={slot.available ? { scale: 0.92 } : {}}
       disabled={!slot.available}
       onClick={() => onSelect(slot.time)}
-      className={cn(
-        'flex flex-col items-center gap-1 p-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 border relative overflow-hidden',
-        isSelected
-          ? 'bg-gradient-to-br from-sky-500 to-teal-500 text-white border-sky-400/50 shadow-xl shadow-sky-500/30'
+      className="flex flex-col items-center gap-1 p-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 relative overflow-hidden"
+      style={{
+        backgroundColor: isSelected
+          ? '#38bdf8'
           : slot.available
-            ? 'bg-white/[0.04] text-gray-300 border-white/10 hover:border-sky-500/30 hover:bg-white/[0.08] hover:text-white'
-            : 'bg-white/[0.02] text-gray-600 border-transparent cursor-not-allowed line-through'
-      )}
+            ? 'rgba(255,255,255,0.03)'
+            : 'rgba(255,255,255,0.015)',
+        border: isSelected
+          ? '1px solid rgba(56,189,248,0.4)'
+          : '1px solid rgba(255,255,255,0.06)',
+        boxShadow: isSelected ? '0 4px 20px rgba(56,189,248,0.3)' : 'none',
+        color: isSelected ? '#0a0a0f' : slot.available ? '#e2e8f0' : '#334155',
+        cursor: slot.available ? 'pointer' : 'not-allowed',
+        opacity: slot.available ? 1 : 0.4,
+      }}
     >
-      {isSelected && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-sky-400/20 to-teal-400/20"
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      )}
       <span className="relative z-10 text-xs">{slot.label}</span>
       {slot.available && !isSelected && (
-        <span className="relative z-10 text-[8px] text-emerald-400/70 font-medium">متاح</span>
+        <span className="relative z-10 text-[8px] font-medium" style={{ color: '#34d399' }}>متاح</span>
       )}
       {isSelected && (
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="relative z-10 w-1.5 h-1.5 rounded-full bg-white mt-0.5"
+          transition={springSnappy}
+          className="relative z-10 w-1.5 h-1.5 rounded-full mt-0.5"
+          style={{ backgroundColor: '#0a0a0f' }}
         />
       )}
     </motion.button>
@@ -1126,10 +1157,10 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
 
   const categoryColor = (cat: string) => {
     switch (cat) {
-      case 'تحاليل الدم': return 'from-rose-400 to-pink-500';
-      case 'تحاليل البول': return 'from-blue-400 to-indigo-500';
-      case 'تحاليل مناعية': return 'from-emerald-400 to-teal-500';
-      default: return 'from-sky-400 to-sky-600';
+      case 'تحاليل الدم': return 'linear-gradient(135deg, #fb7185, #ec4899)';
+      case 'تحاليل البول': return 'linear-gradient(135deg, #60a5fa, #6366f1)';
+      case 'تحاليل مناعية': return 'linear-gradient(135deg, #34d399, #14b8a6)';
+      default: return 'linear-gradient(135deg, #38bdf8, #0ea5e9)';
     }
   };
 
@@ -1137,18 +1168,19 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
     <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6">
       {/* Header Card */}
       <GlassCard>
-        <div className="px-6 py-5 border-b border-white/10">
+        <div className="px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-3">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
-              className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #34d399, #14b8a6)', boxShadow: '0 4px 16px rgba(52,211,153,0.3)' }}
             >
               <FlaskConical className="w-5 h-5 text-white" />
             </motion.div>
             <div>
-              <h2 className="text-xl font-bold text-white">اختر التحاليل المخبرية</h2>
-              <p className="text-sm text-gray-400">
+              <h2 className="text-xl font-bold" style={{ color: '#e2e8f0' }}>اختر التحاليل المخبرية</h2>
+              <p className="text-sm" style={{ color: '#94a3b8' }}>
                 {selectedTests.length > 0
                   ? `تم اختيار ${selectedTests.length} تحليل — الإجمالي: ${total} ج.م`
                   : 'اختر التحاليل المطلوبة'}
@@ -1160,21 +1192,35 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
         <div className="p-6 md:p-8">
           {/* Search */}
           <div className="relative mb-6">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#64748b' }} />
             <input
               type="text"
               placeholder="ابحث عن تحليل..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pr-12 pl-10 py-3.5 rounded-2xl border border-white/10 bg-white/[0.04] focus:border-sky-500/50 focus:bg-white/[0.06] focus:ring-2 focus:ring-sky-500/20 outline-none transition-all text-right text-white placeholder-gray-500"
+              className="w-full pr-12 pl-10 py-3.5 rounded-2xl outline-none transition-all text-right text-white placeholder-gray-500"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(56,189,248,0.4)';
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
+              }}
             />
             {searchQuery && (
               <motion.button
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
+                transition={springSnappy}
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: '#64748b' }}
               >
                 <X className="w-4 h-4" />
               </motion.button>
@@ -1188,23 +1234,32 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
               const selectedCount = tests.filter((t) => selectedTests.some((s) => s.id === t.id)).length;
 
               return (
-                <div key={category} className="border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]">
+                <div
+                  key={category}
+                  className="rounded-2xl overflow-hidden"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+                >
                   <motion.button
                     type="button"
-                    whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+                    whileHover={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
                     onClick={() => setExpandedCategory(isExpanded && !searchQuery ? null : category)}
                     className="w-full px-5 py-4 flex items-center justify-between transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={cn('w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center text-white shadow-lg', categoryColor(category))}>
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
+                        style={{ background: categoryColor(category), boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}
+                      >
                         {categoryIcon(category)}
                       </div>
-                      <span className="font-bold text-white">{category}</span>
+                      <span className="font-bold" style={{ color: '#e2e8f0' }}>{category}</span>
                       {selectedCount > 0 && (
                         <motion.span
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="bg-gradient-to-br from-sky-400 to-teal-400 text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-lg shadow-sky-500/20"
+                          transition={springSnappy}
+                          className="text-white text-xs px-2.5 py-1 rounded-full font-bold"
+                          style={{ background: 'linear-gradient(135deg, #38bdf8, #34d399)', boxShadow: '0 2px 8px rgba(56,189,248,0.2)' }}
                         >
                           {selectedCount}
                         </motion.span>
@@ -1212,9 +1267,9 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
                     </div>
                     <motion.div
                       animate={{ rotate: isExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={spring}
                     >
-                      <ChevronLeft className="w-5 h-5 text-gray-400" />
+                      <ChevronLeft className="w-5 h-5" style={{ color: '#64748b' }} />
                     </motion.div>
                   </motion.button>
 
@@ -1236,49 +1291,55 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
                                 type="button"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.05 }}
+                                transition={{ delay: i * 0.05, ...spring }}
                                 whileHover={{ scale: 1.01, x: -2 }}
                                 whileTap={{ scale: 0.99 }}
                                 onClick={() => onToggleTest(test)}
-                                className={cn(
-                                  'w-full p-4 rounded-2xl border-2 text-right transition-all duration-300 flex items-center justify-between gap-3 group',
-                                  isSelected
-                                    ? 'border-sky-500/50 bg-sky-500/[0.08] shadow-lg shadow-sky-500/10'
-                                    : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'
-                                )}
+                                className="w-full p-4 rounded-2xl text-right transition-all duration-300 flex items-center justify-between gap-3 group"
+                                style={{
+                                  backgroundColor: isSelected ? 'rgba(56,189,248,0.06)' : 'rgba(255,255,255,0.02)',
+                                  border: isSelected ? '2px solid rgba(56,189,248,0.35)' : '2px solid rgba(255,255,255,0.06)',
+                                  boxShadow: isSelected ? '0 4px 16px rgba(56,189,248,0.08)' : 'none',
+                                }}
                               >
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <h4 className="font-bold text-white text-sm">{test.name}</h4>
+                                    <h4 className="font-bold text-sm" style={{ color: '#e2e8f0' }}>{test.name}</h4>
                                     {test.requiresFasting && (
                                       <motion.span
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-semibold border border-amber-500/20"
+                                        transition={springSnappy}
+                                        className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                        style={{ backgroundColor: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}
                                       >
                                         صيام
                                       </motion.span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-400">{test.description}</p>
+                                  <p className="text-xs" style={{ color: '#94a3b8' }}>{test.description}</p>
                                 </div>
                                 <div className="flex items-center gap-3 flex-shrink-0">
-                                  <span className="font-bold text-teal-400 text-sm whitespace-nowrap">
+                                  <span className="font-bold text-sm whitespace-nowrap" style={{ color: '#34d399' }}>
                                     {test.price} ج.م
                                   </span>
                                   <motion.div
-                                    className={cn(
-                                      'w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all duration-300',
-                                      isSelected
-                                        ? 'bg-gradient-to-br from-sky-400 to-teal-400 border-transparent shadow-lg shadow-sky-500/20'
-                                        : 'border-white/20 group-hover:border-white/30'
-                                    )}
+                                    className="w-7 h-7 rounded-xl flex items-center justify-center transition-all duration-300"
+                                    style={{
+                                      backgroundColor: isSelected
+                                        ? '#38bdf8'
+                                        : 'rgba(255,255,255,0.04)',
+                                      border: isSelected
+                                        ? 'none'
+                                        : '2px solid rgba(255,255,255,0.1)',
+                                      boxShadow: isSelected ? '0 2px 8px rgba(56,189,248,0.3)' : 'none',
+                                    }}
                                   >
                                     {isSelected && (
                                       <motion.div
                                         initial={{ scale: 0, rotate: -90 }}
                                         animate={{ scale: 1, rotate: 0 }}
-                                        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                        transition={{ ...springSnappy, damping: 15 }}
                                       >
                                         <Check className="w-4 h-4 text-white" />
                                       </motion.div>
@@ -1303,17 +1364,19 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
       <AnimatePresence>
         {selectedTests.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            className="rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl p-6 shadow-2xl"
+            exit={{ opacity: 0, y: 30, scale: 0.97 }}
+            transition={spring}
+            className="rounded-3xl p-6"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)' }}
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-300 font-semibold flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-sky-400" />
+              <span className="font-semibold flex items-center gap-2" style={{ color: '#e2e8f0' }}>
+                <Sparkles className="w-4 h-4" style={{ color: '#38bdf8' }} />
                 التحاليل المختارة ({selectedTests.length})
               </span>
-              <span className="text-xs text-gray-500">اضغط لإزالة</span>
+              <span className="text-xs" style={{ color: '#64748b' }}>اضغط لإزالة</span>
             </div>
             <div className="flex flex-wrap gap-2 mb-5">
               {selectedTests.map((test) => (
@@ -1325,21 +1388,25 @@ function Step3Tests({ selectedTests, onToggleTest, total }: Step3Props) {
                   exit={{ scale: 0 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  transition={springSnappy}
                   onClick={() => onToggleTest(test)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.06] text-sky-300 text-xs font-medium border border-white/10 hover:bg-white/[0.1] hover:border-sky-500/30 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+                  style={{ backgroundColor: 'rgba(56,189,248,0.08)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.15)' }}
                 >
                   <span>{test.name}</span>
                   <X className="w-3 h-3" />
                 </motion.button>
               ))}
             </div>
-            <div className="border-t border-white/10 pt-4 flex items-center justify-between">
-              <span className="text-gray-300 font-semibold">الإجمالي</span>
+            <div className="pt-4 flex items-center justify-between" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="font-semibold" style={{ color: '#e2e8f0' }}>الإجمالي</span>
               <motion.span
                 key={total}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="text-3xl font-bold bg-gradient-to-l from-sky-400 to-teal-400 bg-clip-text text-transparent"
+                transition={spring}
+                className="text-3xl font-bold"
+                style={{ color: '#38bdf8' }}
               >
                 {total} ج.م
               </motion.span>
@@ -1371,13 +1438,14 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-          className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-violet-500/30"
+          transition={{ ...springSnappy, stiffness: 300 }}
+          className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4"
+          style={{ background: 'linear-gradient(135deg, #8b5cf6, #a855f7)', boxShadow: '0 8px 24px rgba(139,92,246,0.3)' }}
         >
           <CheckCircle2 className="w-8 h-8 text-white" />
         </motion.div>
-        <h2 className="text-2xl font-bold text-white mb-2">تأكيد الحجز</h2>
-        <p className="text-gray-400">راجع تفاصيل الحجز قبل التأكيد</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>تأكيد الحجز</h2>
+        <p style={{ color: '#94a3b8' }}>راجع تفاصيل الحجز قبل التأكيد</p>
       </motion.div>
 
       {/* Summary Card */}
@@ -1387,16 +1455,17 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10"
+            transition={{ delay: 0.1, ...spring }}
+            className="flex items-center gap-4 p-4 rounded-2xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', boxShadow: '0 4px 12px rgba(56,189,248,0.2)' }}>
               <Calendar className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">التاريخ والوقت</p>
-              <p className="font-bold text-white">{formatDateAr(new Date(date))}</p>
-              <p className="text-sm text-sky-400 font-semibold">{formatTimeLabel(time)}</p>
+              <p className="text-xs" style={{ color: '#94a3b8' }}>التاريخ والوقت</p>
+              <p className="font-bold" style={{ color: '#e2e8f0' }}>{formatDateAr(new Date(date))}</p>
+              <p className="text-sm font-semibold" style={{ color: '#38bdf8' }}>{formatTimeLabel(time)}</p>
             </div>
           </motion.div>
 
@@ -1404,16 +1473,17 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10"
+            transition={{ delay: 0.2, ...spring }}
+            className="flex items-center gap-4 p-4 rounded-2xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #34d399, #14b8a6)', boxShadow: '0 4px 12px rgba(52,211,153,0.2)' }}>
               <MapPin className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">الفرع</p>
-              <p className="font-bold text-white">{branch.name}</p>
-              <p className="text-sm text-gray-400">{branch.address}</p>
+              <p className="text-xs" style={{ color: '#94a3b8' }}>الفرع</p>
+              <p className="font-bold" style={{ color: '#e2e8f0' }}>{branch.name}</p>
+              <p className="text-sm" style={{ color: '#94a3b8' }}>{branch.address}</p>
             </div>
           </motion.div>
 
@@ -1421,12 +1491,13 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="p-5 rounded-2xl bg-white/[0.04] border border-white/10"
+            transition={{ delay: 0.3, ...spring }}
+            className="p-5 rounded-2xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
             <div className="flex items-center gap-2 mb-4">
-              <FlaskConical className="w-5 h-5 text-teal-400" />
-              <p className="font-bold text-white">التحاليل المختارة ({tests.length})</p>
+              <FlaskConical className="w-5 h-5" style={{ color: '#34d399' }} />
+              <p className="font-bold" style={{ color: '#e2e8f0' }}>التحاليل المختارة ({tests.length})</p>
             </div>
             <div className="space-y-2.5">
               {tests.map((test, i) => (
@@ -1434,20 +1505,21 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
                   key={test.id}
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + i * 0.05 }}
-                  className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0"
+                  transition={{ delay: 0.4 + i * 0.05, ...spring }}
+                  className="flex items-center justify-between py-2.5 last:border-0"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                 >
                   <div className="flex items-center gap-2.5">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.5 + i * 0.05, type: 'spring' }}
+                      transition={{ delay: 0.5 + i * 0.05, ...spring }}
                     >
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4" style={{ color: '#34d399' }} />
                     </motion.div>
-                    <span className="text-sm text-gray-300">{test.name}</span>
+                    <span className="text-sm" style={{ color: '#e2e8f0' }}>{test.name}</span>
                   </div>
-                  <span className="text-sm font-bold text-white">{test.price} ج.م</span>
+                  <span className="text-sm font-bold" style={{ color: '#e2e8f0' }}>{test.price} ج.م</span>
                 </motion.div>
               ))}
             </div>
@@ -1455,21 +1527,23 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
 
           {/* Total */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-            className="p-6 rounded-2xl bg-gradient-to-br from-sky-500/10 to-teal-500/10 border border-sky-500/20"
+            transition={{ delay: 0.5, ...spring }}
+            className="p-6 rounded-2xl"
+            style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.08), rgba(52,211,153,0.08))', border: '1px solid rgba(56,189,248,0.15)' }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">المبلغ الإجمالي</p>
-                <p className="text-xs text-gray-500 mt-0.5">شامل جميع التحاليل المختارة</p>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>المبلغ الإجمالي</p>
+                <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>شامل جميع التحاليل المختارة</p>
               </div>
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-                className="text-4xl font-bold bg-gradient-to-l from-sky-400 to-teal-400 bg-clip-text text-transparent"
+                transition={{ delay: 0.6, ...spring, stiffness: 200 }}
+                className="text-4xl font-bold"
+                style={{ color: '#38bdf8' }}
               >
                 {total} ج.م
               </motion.span>
@@ -1481,13 +1555,14 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3"
+              transition={{ delay: 0.7, ...spring }}
+              className="p-4 rounded-2xl flex items-start gap-3"
+              style={{ backgroundColor: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.15)' }}
             >
-              <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#fbbf24' }} />
               <div>
-                <p className="font-bold text-amber-300 text-sm">ملاحظة: بعض التحاليل تتطلب صيام</p>
-                <p className="text-xs text-amber-400/70 mt-1">
+                <p className="font-bold text-sm" style={{ color: '#fbbf24' }}>ملاحظة: بعض التحاليل تتطلب صيام</p>
+                <p className="text-xs mt-1" style={{ color: 'rgba(251,191,36,0.7)' }}>
                   يرجى الصيام لمدة 8-12 ساعة قبل موعدك. يُسمح بشرب الماء فقط.
                 </p>
               </div>
@@ -1498,11 +1573,12 @@ function Step4Confirm({ date, time, branch, tests, total }: Step4Props) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="p-4 rounded-2xl bg-white/[0.03] border border-white/10"
+            transition={{ delay: 0.8, ...spring }}
+            className="p-4 rounded-2xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Shield className="w-4 h-4 flex-shrink-0 text-sky-400" />
+            <div className="flex items-center gap-2 text-sm" style={{ color: '#94a3b8' }}>
+              <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#38bdf8' }} />
               <span>جميع التحاليل معتمدة من وزارة الصحة</span>
             </div>
           </motion.div>
@@ -1526,10 +1602,10 @@ interface SuccessPageProps {
 
 function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointments }: SuccessPageProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pb-32" dir="rtl">
+    <div className="min-h-screen pb-32" style={{ backgroundColor: '#0a0a0f' }} dir="rtl">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(52,211,153,0.04)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full blur-[100px]" style={{ backgroundColor: 'rgba(56,189,248,0.03)' }} />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 pt-12 relative z-10">
@@ -1537,6 +1613,7 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={spring}
           className="flex flex-col items-center mb-10"
         >
           <motion.div
@@ -1559,7 +1636,7 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
                 transition={{ duration: 1.2, delay: 0.5 + i * 0.06, ease: 'easeOut' }}
                 className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
                 style={{
-                  backgroundColor: i % 4 === 0 ? '#0EA5E9' : i % 4 === 1 ? '#10B981' : i % 4 === 2 ? '#14B8A6' : '#F59E0B',
+                  backgroundColor: i % 4 === 0 ? '#38bdf8' : i % 4 === 1 ? '#34d399' : i % 4 === 2 ? '#14b8a6' : '#fbbf24',
                 }}
               />
             ))}
@@ -1567,8 +1644,8 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
             <svg width="140" height="140" viewBox="0 0 140 140" className="relative z-10">
               <defs>
                 <linearGradient id="successGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#14B8A6" />
+                  <stop offset="0%" stopColor="#34d399" />
+                  <stop offset="100%" stopColor="#14b8a6" />
                 </linearGradient>
               </defs>
               <motion.circle
@@ -1599,11 +1676,11 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 1.2, ...spring }}
             className="text-center"
           >
-            <h2 className="text-3xl font-bold text-white mb-2">تم تأكيد حجزك بنجاح!</h2>
-            <p className="text-gray-400">سيتم إرسال تفاصيل الحجز إلى هاتفك</p>
+            <h2 className="text-3xl font-bold mb-2" style={{ color: '#e2e8f0' }}>تم تأكيد حجزك بنجاح!</h2>
+            <p style={{ color: '#94a3b8' }}>سيتم إرسال تفاصيل الحجز إلى هاتفك</p>
           </motion.div>
         </motion.div>
 
@@ -1611,25 +1688,28 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4 }}
-          className="mb-8 p-6 rounded-3xl bg-gradient-to-br from-sky-500/10 to-teal-500/10 border border-sky-500/20 text-center"
+          transition={{ delay: 1.4, ...spring }}
+          className="mb-8 p-6 rounded-3xl text-center"
+          style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.08), rgba(52,211,153,0.08))', border: '1px solid rgba(56,189,248,0.15)' }}
         >
-          <p className="text-sm font-medium text-sky-400 mb-3">رقم الحجز</p>
+          <p className="text-sm font-medium mb-3" style={{ color: '#38bdf8' }}>رقم الحجز</p>
           <div className="flex items-center justify-center gap-3">
-            <span className="text-3xl font-bold text-white font-mono tracking-wider">{booking.id}</span>
+            <span className="text-3xl font-bold font-mono tracking-wider" style={{ color: '#e2e8f0' }}>{booking.id}</span>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              transition={springSnappy}
               onClick={onCopyId}
-              className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all"
+              className="p-2.5 rounded-xl transition-all"
+              style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.06)' }}
               title="نسخ رقم الحجز"
             >
               {copiedId ? (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                  <Check className="w-5 h-5 text-emerald-400" />
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={springSnappy}>
+                  <Check className="w-5 h-5" style={{ color: '#34d399' }} />
                 </motion.div>
               ) : (
-                <Copy className="w-5 h-5 text-sky-400" />
+                <Copy className="w-5 h-5" style={{ color: '#38bdf8' }} />
               )}
             </motion.button>
           </div>
@@ -1639,49 +1719,50 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.6 }}
-          className="mb-8 rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6"
+          transition={{ delay: 1.6, ...spring }}
+          className="mb-8 rounded-3xl p-6"
+          style={{ backgroundColor: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)' }}
         >
-          <h3 className="text-lg font-bold text-white mb-5">تفاصيل الموعد</h3>
+          <h3 className="text-lg font-bold mb-5" style={{ color: '#e2e8f0' }}>تفاصيل الموعد</h3>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-sky-400" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(56,189,248,0.08)' }}>
+                <Calendar className="w-5 h-5" style={{ color: '#38bdf8' }} />
               </div>
               <div>
-                <p className="text-xs text-gray-500">التاريخ</p>
-                <p className="font-semibold text-white">{formatDateAr(new Date(booking.date))}</p>
+                <p className="text-xs" style={{ color: '#64748b' }}>التاريخ</p>
+                <p className="font-semibold" style={{ color: '#e2e8f0' }}>{formatDateAr(new Date(booking.date))}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-sky-400" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(56,189,248,0.08)' }}>
+                <Clock className="w-5 h-5" style={{ color: '#38bdf8' }} />
               </div>
               <div>
-                <p className="text-xs text-gray-500">الوقت</p>
-                <p className="font-semibold text-white">{formatTimeLabel(booking.time)}</p>
+                <p className="text-xs" style={{ color: '#64748b' }}>الوقت</p>
+                <p className="font-semibold" style={{ color: '#e2e8f0' }}>{formatTimeLabel(booking.time)}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-sky-400" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(56,189,248,0.08)' }}>
+                <MapPin className="w-5 h-5" style={{ color: '#38bdf8' }} />
               </div>
               <div>
-                <p className="text-xs text-gray-500">الفرع</p>
-                <p className="font-semibold text-white">{booking.branch.name}</p>
-                <p className="text-sm text-gray-400">{booking.branch.address}</p>
+                <p className="text-xs" style={{ color: '#64748b' }}>الفرع</p>
+                <p className="font-semibold" style={{ color: '#e2e8f0' }}>{booking.branch.name}</p>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>{booking.branch.address}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(52,211,153,0.08)' }}>
+                <CreditCard className="w-5 h-5" style={{ color: '#34d399' }} />
               </div>
               <div>
-                <p className="text-xs text-gray-500">المبلغ المدفوع</p>
-                <p className="font-bold text-lg text-emerald-400">{booking.total} ج.م</p>
+                <p className="text-xs" style={{ color: '#64748b' }}>المبلغ المدفوع</p>
+                <p className="font-bold text-lg" style={{ color: '#34d399' }}>{booking.total} ج.م</p>
               </div>
             </div>
           </div>
@@ -1691,18 +1772,19 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8 }}
-          className="mb-8 rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6"
+          transition={{ delay: 1.8, ...spring }}
+          className="mb-8 rounded-3xl p-6"
+          style={{ backgroundColor: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)' }}
         >
-          <h3 className="text-lg font-bold text-white mb-4">التحاليل ({booking.tests.length})</h3>
+          <h3 className="text-lg font-bold mb-4" style={{ color: '#e2e8f0' }}>التحاليل ({booking.tests.length})</h3>
           <div className="space-y-2.5">
             {booking.tests.map((test) => (
-              <div key={test.id} className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0">
+              <div key={test.id} className="flex items-center justify-between py-2.5 last:border-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="text-sm text-gray-300">{test.name}</span>
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34d399' }} />
+                  <span className="text-sm" style={{ color: '#e2e8f0' }}>{test.name}</span>
                 </div>
-                <span className="text-sm font-bold text-white">{test.price} ج.م</span>
+                <span className="text-sm font-bold" style={{ color: '#e2e8f0' }}>{test.price} ج.م</span>
               </div>
             ))}
           </div>
@@ -1712,18 +1794,17 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.0 }}
+          transition={{ delay: 2.0, ...spring }}
           className="flex flex-col sm:flex-row gap-4 mb-10"
         >
           <motion.button
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
+            transition={spring}
             onClick={onNewBooking}
-            className="flex-1 py-4 rounded-2xl bg-gradient-to-l from-sky-500 to-teal-500 text-white font-bold text-lg shadow-xl shadow-sky-500/25 hover:shadow-2xl transition-all relative overflow-hidden"
+            className="flex-1 py-4 rounded-2xl font-bold text-lg relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #38bdf8, #14b8a6)', color: '#0a0a0f', boxShadow: '0 8px 24px rgba(56,189,248,0.25)' }}
           >
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-l from-sky-400 to-teal-400 opacity-0 hover:opacity-100 transition-opacity"
-            />
             <span className="relative z-10 flex items-center justify-center gap-2">
               <Sparkles className="w-5 h-5" />
               حجز موعد جديد
@@ -1732,8 +1813,10 @@ function SuccessPage({ booking, onCopyId, copiedId, onNewBooking, onViewAppointm
           <motion.button
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
+            transition={spring}
             onClick={onViewAppointments}
-            className="flex-1 py-4 rounded-2xl border-2 border-white/20 text-white font-bold text-lg hover:bg-white/5 transition-all"
+            className="flex-1 py-4 rounded-2xl font-bold text-lg transition-all"
+            style={{ backgroundColor: 'transparent', border: '2px solid rgba(255,255,255,0.12)', color: '#e2e8f0' }}
           >
             مواعيدي
           </motion.button>
