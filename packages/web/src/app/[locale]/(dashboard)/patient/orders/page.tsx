@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Clock, CheckCircle2, AlertCircle, Search, Filter, ChevronDown, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface Order {
   id: string;
@@ -30,6 +31,8 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
 };
 
 export default function OrdersPage() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -43,7 +46,7 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access_token');
       const params = new URLSearchParams({ page: String(page), limit: '10' });
       if (statusFilter) params.set('status', statusFilter);
 
@@ -111,7 +114,7 @@ export default function OrdersPage() {
           <FileText className="h-16 w-16 mx-auto text-surface-300 mb-4" />
           <h3 className="text-lg font-semibold text-surface-700">لا توجد طلبات</h3>
           <p className="text-sm text-surface-500 mt-2">لم تقم بأي طلب بعد</p>
-          <Link href="/ar/patient/tests" className="mt-4 inline-flex btn-primary">
+          <Link href={`/${locale}/patient/tests`} className="mt-4 inline-flex btn-primary">
             اطلب تحليلاً الآن
           </Link>
         </div>

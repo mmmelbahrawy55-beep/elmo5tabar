@@ -272,8 +272,8 @@ export default function DashboardLayout({
   const isAdmin = !user?.role || (user?.role !== 'PATIENT' && user?.role !== 'DOCTOR' && user?.role !== 'RECEPTIONIST');
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     router.push(`/${locale}/login`);
   };
@@ -572,7 +572,7 @@ export default function DashboardLayout({
                   </div>
                   <div className="p-2 space-y-1">
                     <Link
-                      href="/ar/admin/settings"
+                      href={`/${locale}/admin/settings`}
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                       onClick={() => setShowProfile(false)}
                     >

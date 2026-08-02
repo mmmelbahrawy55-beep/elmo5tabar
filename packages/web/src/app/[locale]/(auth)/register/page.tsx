@@ -262,8 +262,8 @@ export default function RegisterPage() {
     }
   };
 
-  const handleOAuth = (provider: string) => {
-    const { authClient } = require('@/lib/api/auth');
+  const handleOAuth = async (provider: string) => {
+    const { authClient } = await import('@/lib/api/auth');
     window.location.href = authClient.getOAuthUrl(provider);
   };
 

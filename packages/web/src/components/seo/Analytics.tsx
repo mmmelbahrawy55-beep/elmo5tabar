@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { siteConfig } from '@/lib/seo/config';
 
-const GA_ID = siteConfig.verification.googleAnalytics;
+const GA_ID = siteConfig.verification.googleAnalytics as string;
 
 export function GoogleAnalytics() {
   if (!GA_ID || GA_ID.startsWith('G-')) return null;
@@ -70,7 +70,7 @@ export function PageViewTracker() {
 }
 
 export function MetaPixel() {
-  const pixelId = siteConfig.verification.facebookPixel;
+  const pixelId = siteConfig.verification.facebookPixel as string;
   if (!pixelId || pixelId.startsWith('X')) return null;
 
   return (

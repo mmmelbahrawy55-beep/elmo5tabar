@@ -13,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -32,7 +32,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) {
           throw new Error('No refresh token');
         }
@@ -42,16 +42,19 @@ api.interceptors.response.use(
         });
 
         const { accessToken, refreshToken: newRefreshToken } = data.data;
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', newRefreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
-        window.location.href = '/ar/login';
+        if (typeof window !== 'undefined') {
+          const locale = window.location.pathname.split('/')[1] || 'ar';
+          window.location.href = `/${locale}/login`;
+        }
         return Promise.reject(refreshError);
       }
     }

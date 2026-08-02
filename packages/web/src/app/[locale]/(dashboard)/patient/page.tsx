@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   FileText,
   TestTube2,
@@ -69,6 +70,8 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function PatientDashboard() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -78,7 +81,7 @@ export default function PatientDashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/analytics/dashboard`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -159,7 +162,7 @@ export default function PatientDashboard() {
         <div className="lg:col-span-2 card p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-surface-900">الطلبات الأخيرة</h2>
-            <Link href="/ar/patient/orders" className="text-sm font-medium text-brand-500 hover:text-brand-600 flex items-center gap-1">
+            <Link href={`/${locale}/patient/orders`} className="text-sm font-medium text-brand-500 hover:text-brand-600 flex items-center gap-1">
               عرض الكل
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -169,7 +172,7 @@ export default function PatientDashboard() {
               <div className="text-center py-12 text-surface-400">
                 <FlaskConical className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm">لا توجد طلبات بعد</p>
-                <Link href="/ar/patient/tests" className="mt-3 inline-flex btn-primary btn-sm">
+                <Link href={`/${locale}/patient/tests`} className="mt-3 inline-flex btn-primary btn-sm">
                   اطلب تحليلاً الآن
                 </Link>
               </div>
@@ -180,7 +183,7 @@ export default function PatientDashboard() {
         <div className="card p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-surface-900">المواعيد القادمة</h2>
-            <Link href="/ar/patient/appointments" className="text-sm font-medium text-brand-500 hover:text-brand-600">
+            <Link href={`/${locale}/patient/appointments`} className="text-sm font-medium text-brand-500 hover:text-brand-600">
               إدارة
             </Link>
           </div>
@@ -198,7 +201,7 @@ export default function PatientDashboard() {
       <div className="mt-6 card p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-surface-900">التقارير الأخيرة</h2>
-          <Link href="/ar/patient/reports" className="text-sm font-medium text-brand-500 hover:text-brand-600 flex items-center gap-1">
+          <Link href={`/${locale}/patient/reports`} className="text-sm font-medium text-brand-500 hover:text-brand-600 flex items-center gap-1">
             عرض الكل
             <ArrowLeft className="h-4 w-4" />
           </Link>

@@ -120,7 +120,7 @@ export function middleware(request: NextRequest) {
 
   // ─── 8. Canonical header ───
   const canonicalPath = `/${currentLocale}${restPath}`;
-  response.headers.set('Link', `<${siteConfig.url}${canonicalPath}>; rel="canonical"`);
+  response.headers.append('Link', `<${siteConfig.url}${canonicalPath}>; rel="canonical"`);
   response.headers.set('x-locale', currentLocale);
 
   // ─── 9. Security headers ───

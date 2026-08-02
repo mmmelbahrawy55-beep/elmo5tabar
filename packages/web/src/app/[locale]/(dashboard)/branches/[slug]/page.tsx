@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,6 +68,8 @@ const daysAr = ["الأحد", "الإثنين", "الثلاثاء", "الأرب�
 
 export default function BranchDetailPage() {
   const params = useParams();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const slug = params?.slug as string;
   const branch = getBranchBySlug(slug);
 
@@ -110,7 +112,7 @@ export default function BranchDetailPage() {
             عذراً، لم نتمكن من العثور على الفرع المطلوب
           </p>
           <Link
-            href="/ar/branches"
+            href={`/${locale}/branches`}
             className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold font-arabic hover:bg-indigo-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -169,12 +171,12 @@ export default function BranchDetailPage() {
           <div className="relative h-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col justify-end pb-10">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-white/60 text-sm font-arabic mb-6">
-              <Link href="/ar" className="hover:text-white transition-colors">
+              <Link href={`/${locale}`} className="hover:text-white transition-colors">
                 الرئيسية
               </Link>
               <ChevronRight className="w-3 h-3" />
               <Link
-                href="/ar/branches"
+                href={`/${locale}/branches`}
                 className="hover:text-white transition-colors"
               >
                 الفروع

@@ -42,10 +42,10 @@ export const siteConfig = {
   },
 
   verification: {
-    google: 'YOUR_GOOGLE_SEARCH_CONSOLE_CODE',
-    bing: 'YOUR_BING_WEBMASTER_CODE',
-    googleAnalytics: 'G-XXXXXXXXXX',
-    facebookPixel: 'XXXXXXXXXXXXXXX',
+    google: '',
+    bing: '',
+    googleAnalytics: '',
+    facebookPixel: '',
   },
 
   seo: {

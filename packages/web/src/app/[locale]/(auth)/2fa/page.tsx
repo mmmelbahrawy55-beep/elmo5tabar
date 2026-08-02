@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { authClient } from '@/lib/api/auth';
 
 interface Toast {
@@ -12,6 +12,8 @@ interface Toast {
 
 export default function TwoFactorPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
 
   const t = (key: string): string => {
     const tr: Record<string, string> = {
@@ -99,7 +101,7 @@ export default function TwoFactorPage() {
       try {
         await authClient.verify2FA(backupCode);
         addToast(t('twoFactorEnabled'), 'success');
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
       } catch (err: any) {
         addToast(err.message || t('verifyFailed'));
       } finally {
@@ -119,7 +121,7 @@ export default function TwoFactorPage() {
           setShowBackupCodes(true);
         } else {
           addToast(t('twoFactorEnabled'), 'success');
-          router.push('/dashboard');
+          router.push(`/${locale}/dashboard`);
         }
       } catch (err: any) {
         addToast(err.message || t('verifyFailed'));
@@ -193,7 +195,7 @@ export default function TwoFactorPage() {
             <button
               onClick={() => {
                 addToast(t('twoFactorEnabled'), 'success');
-                router.push('/dashboard');
+                router.push(`/${locale}/dashboard`);
               }}
               className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
             >

@@ -38,7 +38,8 @@ class NotificationClient {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       if (typeof window !== 'undefined') {
-        window.location.href = '/ar/login';
+        const locale = window.location.pathname.split('/')[1] || 'ar';
+        window.location.href = `/${locale}/login`;
       }
       throw new Error('Session expired');
     }

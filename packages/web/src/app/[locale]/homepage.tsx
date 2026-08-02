@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // ============================================================
 // ANIMATION UTILITIES
@@ -153,6 +154,8 @@ function Preloader({ onComplete }: { onComplete: () => void }) {
 // 2. NAVIGATION
 // ============================================================
 function Navigation({ scrolled }: { scrolled: boolean }) {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   return (
@@ -204,7 +207,7 @@ function Navigation({ scrolled }: { scrolled: boolean }) {
                 EN
               </button>
               <Link
-                href="/ar/register"
+                href={`/${locale}/register`}
                 className="hidden sm:flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 احجز الآن
@@ -257,7 +260,7 @@ function Navigation({ scrolled }: { scrolled: boolean }) {
                 className="mt-8"
               >
                 <Link
-                  href="/ar/register"
+                  href={`/${locale}/register`}
                   className="flex items-center justify-center rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3.5 text-base font-semibold text-white"
                 >
                   احجز الآن
@@ -275,6 +278,8 @@ function Navigation({ scrolled }: { scrolled: boolean }) {
 // 3. HERO SECTION
 // ============================================================
 function HeroSection() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 400], [1, 0]);
@@ -355,7 +360,7 @@ function HeroSection() {
                 className="mt-8 flex flex-wrap gap-4"
               >
                 <Link
-                  href="/ar/register"
+                  href={`/${locale}/register`}
                   className="flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-bold text-[#023E8A] shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   احجز الآن
@@ -364,7 +369,7 @@ function HeroSection() {
                   </svg>
                 </Link>
                 <Link
-                  href="/ar/patient/tests"
+                   href={`/${locale}/patient/tests`}
                   className="flex items-center gap-2 rounded-xl border-2 border-white/30 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10 transition-all hover:border-white/50"
                 >
                   تصفح التحاليل
@@ -701,6 +706,8 @@ function WhyChooseSection() {
 // 8. HOME VISIT
 // ============================================================
 function HomeVisitSection() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   return (
     <Section className="py-20 lg:py-28">
       <Container>
@@ -763,7 +770,7 @@ function HomeVisitSection() {
               ))}
             </div>
             <Link
-              href="/ar/book"
+               href={`/${locale}/book`}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               احجز فحص منزلي
@@ -1068,6 +1075,8 @@ function PremiumFooter() {
 // MAIN HOMEPAGE
 // ============================================================
 export default function HomePage() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const [loading, setLoading] = React.useState(true);
   const [scrolled, setScrolled] = React.useState(false);
 

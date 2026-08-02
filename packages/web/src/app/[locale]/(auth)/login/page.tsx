@@ -143,7 +143,7 @@ export default function LoginPage() {
         setShow2FAModal(true);
       } else {
         addToast(t('loginSuccess'), 'success');
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
       }
     } catch (err: any) {
       const msg = err.message || t('loginFailed');
@@ -178,7 +178,7 @@ export default function LoginPage() {
       const { authClient } = await import('@/lib/api/auth');
       await authClient.verifyOTP(otpCode, otpEmailOrPhone);
       addToast(t('loginSuccess'), 'success');
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
     } catch (err: any) {
       addToast(err.message || t('otpVerifyFailed'));
     } finally {
@@ -194,7 +194,7 @@ export default function LoginPage() {
       await authClient.verify2FA(twoFactorCode);
       setShow2FAModal(false);
       addToast(t('loginSuccess'), 'success');
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
     } catch (err: any) {
       addToast(err.message || t('twoFactorVerifyFailed'));
     } finally {
@@ -202,8 +202,8 @@ export default function LoginPage() {
     }
   };
 
-  const handleOAuth = (provider: string) => {
-    const { authClient } = require('@/lib/api/auth');
+  const handleOAuth = async (provider: string) => {
+    const { authClient } = await import('@/lib/api/auth');
     window.location.href = authClient.getOAuthUrl(provider);
   };
 
@@ -408,7 +408,7 @@ export default function LoginPage() {
 
       {/* Biometric */}
       <button
-        onClick={() => addToast('جاري التحقق...', 'success')}
+        onClick={() => addToast(t('biometricNotSupported'), 'warning')}
         className="w-full mt-4 py-3 px-4 bg-white dark:bg-surface-800 border-2 border-surface-200 dark:border-surface-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 text-surface-600 dark:text-surface-300"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
