@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Search,
@@ -62,9 +63,11 @@ const itemVariants = {
 };
 
 function DepartmentCard({ dept }: { dept: Department }) {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   return (
     <motion.div variants={itemVariants}>
-      <Link href={`/departments/${dept.id}`} className="block">
+      <Link href={`/${locale}/departments/${dept.id}`} className="block">
         <div
           className={cn(
             'group relative overflow-hidden rounded-2xl border border-surface-200 bg-white transition-all duration-300',
@@ -136,9 +139,11 @@ function DepartmentCard({ dept }: { dept: Department }) {
 }
 
 function DepartmentRow({ dept }: { dept: Department }) {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   return (
     <motion.div variants={itemVariants}>
-      <Link href={`/departments/${dept.id}`} className="block">
+      <Link href={`/${locale}/departments/${dept.id}`} className="block">
         <div
           className={cn(
             'group flex items-center gap-4 rounded-2xl border border-surface-200 bg-white px-5 py-4 transition-all duration-200',

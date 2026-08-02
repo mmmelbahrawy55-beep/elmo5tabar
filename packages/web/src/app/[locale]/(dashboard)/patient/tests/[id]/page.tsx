@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowRight, Heart, GitCompareArrows, ShoppingCart, Check, Clock,
@@ -50,6 +50,8 @@ function FAQAccordion({ faqs }: { faqs: LabTest['faqs'] }) {
 export default function TestDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const testId = params?.id as string;
 
   const test = getTestById(testId);
@@ -70,7 +72,7 @@ export default function TestDetailPage() {
         <TestTube2 className="mb-4 h-12 w-12 text-surface-300" />
         <h2 className="text-lg font-bold text-surface-700">التحليل غير موجود</h2>
         <p className="mt-1 text-sm text-surface-500">لم نتمكن من العثور على هذا التحليل</p>
-        <Link href="/patient/tests" className="mt-4 text-sm font-semibold text-brand-500 hover:text-brand-600">
+        <Link href={`/${locale}/patient/tests`} className="mt-4 text-sm font-semibold text-brand-500 hover:text-brand-600">
           العودة للكتالوج
         </Link>
       </div>
@@ -93,7 +95,7 @@ export default function TestDetailPage() {
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         {/* Breadcrumb */}
         <nav className="mb-5 flex items-center gap-2 text-xs text-surface-400">
-          <Link href="/patient/tests" className="hover:text-brand-500 transition-colors">الكتالوج</Link>
+          <Link href={`/${locale}/patient/tests`} className="hover:text-brand-500 transition-colors">الكتالوج</Link>
           <span>/</span>
           <span className="text-surface-600">{catMeta?.nameAr}</span>
           <span>/</span>

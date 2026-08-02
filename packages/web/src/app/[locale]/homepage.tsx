@@ -852,6 +852,8 @@ function TestimonialsSection() {
 // 10. BOOKING CTA
 // ============================================================
 function BookingCTASection() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   return (
     <Section bg="dark" className="py-20 lg:py-28">
       <Container>
@@ -869,7 +871,7 @@ function BookingCTASection() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/ar/register"
+              href={`/${locale}/register`}
               className="flex items-center gap-2 rounded-xl bg-white px-10 py-4 text-base font-bold text-[#023E8A] shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               احجز موعدك الآن

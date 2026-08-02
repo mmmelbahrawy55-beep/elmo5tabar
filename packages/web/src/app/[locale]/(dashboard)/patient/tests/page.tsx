@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Search, SlidersHorizontal, Grid3X3, List, TestTube2, Clock,
   Heart, GitCompareArrows, ChevronDown, X, Check, Star,
@@ -311,6 +312,8 @@ function TestRow({
 
 
 export default function TestsCatalogPage() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const filters = useTestCatalogStore((s) => s.filters);
   const viewMode = useTestCatalogStore((s) => s.viewMode);
   const setFilter = useTestCatalogStore((s) => s.setFilter);
@@ -660,7 +663,7 @@ export default function TestsCatalogPage() {
         ) : viewMode === 'grid' ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {displayTests.map((test) => (
-              <Link key={test.id} href={`/patient/tests/${test.id}`}>
+              <Link key={test.id} href={`/${locale}/patient/tests/${test.id}`}>
                 <TestCard
                   test={test}
                   isInCart={cartItems.some((i) => i.testId === test.id)}
@@ -676,7 +679,7 @@ export default function TestsCatalogPage() {
         ) : (
           <div className="space-y-2">
             {displayTests.map((test) => (
-              <Link key={test.id} href={`/patient/tests/${test.id}`}>
+              <Link key={test.id} href={`/${locale}/patient/tests/${test.id}`}>
                 <TestRow
                   test={test}
                   isInCart={cartItems.some((i) => i.testId === test.id)}
@@ -722,7 +725,7 @@ export default function TestsCatalogPage() {
 
               <div className="flex items-center gap-2">
                 <Link
-                  href={`/patient/tests/compare?ids=${compareIds.join(',')}`}
+                  href={`/${locale}/patient/tests/compare?ids=${compareIds.join(',')}`}
                   className="flex h-9 items-center gap-1.5 rounded-xl bg-brand-500 px-4 text-xs font-bold text-white hover:bg-brand-600 transition-colors"
                 >
                   <Eye className="h-3.5 w-3.5" />

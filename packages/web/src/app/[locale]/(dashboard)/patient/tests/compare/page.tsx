@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   X, ArrowRight, Plus, TestTube2, Clock, FlaskConical, DollarSign,
@@ -16,6 +16,8 @@ import type { LabTest } from '@/types/test';
 function CompareContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const idsParam = searchParams.get('ids') || '';
   const ids = idsParam.split(',').filter(Boolean);
 
@@ -39,7 +41,7 @@ function CompareContent() {
         <h2 className="text-lg font-bold text-surface-700">لا توجد تحاليل للمقارنة</h2>
         <p className="mt-1 text-sm text-surface-500">أضف تحاليل من الكتالوج ثم عد هنا للمقارنة</p>
         <Link
-          href="/patient/tests"
+              href={`/${locale}/patient/tests`}
           className="mt-5 flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-600 transition-colors"
         >
           <ArrowRight className="h-4 w-4 rotate-180" />
@@ -180,7 +182,7 @@ function CompareContent() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="/patient/tests"
+          href={`/${locale}/patient/tests`}
               className="flex items-center gap-1.5 rounded-xl border border-surface-200 bg-white px-3.5 py-2 text-xs font-semibold text-surface-600 hover:bg-surface-50 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -210,8 +212,8 @@ function CompareContent() {
                     onClick={() => {
                       removeFromCompare(test.id);
                       const newIds = effectiveIds.filter((id) => id !== test.id);
-                      if (newIds.length > 0) router.replace(`/patient/tests/compare?ids=${newIds.join(',')}`);
-                      else router.push('/patient/tests');
+                      if (newIds.length > 0) router.replace(`/${locale}/patient/tests/compare?ids=${newIds.join(',')}`);
+                      else router.push(`/${locale}/patient/tests`);
                     }}
                     className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-surface-100 text-surface-400 hover:bg-danger-50 hover:text-danger-500 transition-colors"
                   >

@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
@@ -28,6 +28,8 @@ const Separator = () => <div className="border-t border-surface-100" />
 
 export default function DepartmentDetailPage() {
   const params = useParams()
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'ar'
   const slug = params.slug as string
   const dept = getDepartmentBySlug(slug)
 
@@ -40,7 +42,7 @@ export default function DepartmentDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
         <h1 className="text-2xl font-bold text-surface-800">القسم غير موجود</h1>
         <Link
-          href={`/departments`}
+          href={`/${locale}/departments`}
           className="inline-flex items-center gap-2 text-brand-500 hover:text-brand-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -64,11 +66,11 @@ export default function DepartmentDetailPage() {
     >
       {/* Breadcrumb */}
       <nav className="text-xs text-surface-400 mb-6">
-        <Link href="/" className="hover:text-brand-500 transition-colors">
+        <Link href={`/${locale}`} className="hover:text-brand-500 transition-colors">
           الرئيسية
         </Link>
         <span className="mx-2">/</span>
-        <Link href="/departments" className="hover:text-brand-500 transition-colors">
+        <Link href={`/${locale}/departments`} className="hover:text-brand-500 transition-colors">
           الأقسام
         </Link>
         <span className="mx-2">/</span>

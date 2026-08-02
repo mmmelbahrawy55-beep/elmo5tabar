@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -64,6 +64,8 @@ const STEP_TIPS: Record<number, { icon: React.ReactNode; text: string }[]> = {
 
 export default function BookAppointmentPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const booking = useAppointmentBooking();
   const { userLocation, requestLocation } = useLocationStore();
   const [lang] = React.useState<'ar' | 'en'>('ar');
@@ -124,12 +126,12 @@ export default function BookAppointmentPage() {
 
   const handleViewAppointments = React.useCallback(() => {
     booking.resetBooking();
-    router.push('/ar/patient/appointments');
+    router.push(`/${locale}/patient/appointments`);
   }, [booking, router]);
 
   const handleGoHome = React.useCallback(() => {
     booking.resetBooking();
-    router.push('/ar/patient');
+    router.push(`/${locale}/patient`);
   }, [booking, router]);
 
   const summary = booking.calculateSummary();

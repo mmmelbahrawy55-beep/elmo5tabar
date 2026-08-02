@@ -338,7 +338,7 @@ export default function AdminFinanceDashboard() {
       <div className="bg-card rounded-xl border p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{t('finance.fraudAlerts', 'تنبيهات الاحتيال')}</h2>
-          <Link href="/fraud/alerts" className="text-sm text-primary hover:underline">
+          <Link href="#" className="text-sm text-primary hover:underline">
             {t('finance.viewAll', 'عرض الكل')}
           </Link>
         </div>

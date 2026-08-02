@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from '@/lib/i18n';
 import { paymentClient } from '@/lib/api/payments';
 import { toast } from 'sonner';
@@ -88,6 +88,8 @@ const INSTALLMENT_OPTIONS = [
 export default function CheckoutPage() {
   const t = useTranslations();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
 
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
@@ -331,7 +333,7 @@ export default function CheckoutPage() {
 
       const result = await paymentClient.processPayment(payload);
       toast.success('Payment processed successfully');
-      router.push(`/payments/${result.paymentId || result.id}`);
+      router.push(`/${locale}/patient/payments`);
     } catch (err: any) {
       toast.error(err.message || 'Payment failed');
     } finally {
