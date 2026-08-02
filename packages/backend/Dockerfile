@@ -2,11 +2,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY packages/backend/package*.json ./
 
 RUN npm ci --ignore-scripts
 
-COPY . .
+COPY packages/backend/ .
 
 RUN npx prisma generate && npx nest build
 
