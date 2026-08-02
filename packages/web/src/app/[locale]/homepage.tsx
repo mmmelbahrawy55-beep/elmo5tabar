@@ -4,10 +4,12 @@ import * as React from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  Microscope, TestTube2, Activity, Dna, Droplets, Shield, Clock,
+  MapPin, Phone, Mail, Calendar, ChevronLeft, ChevronRight, Star,
+  Award, Zap, Users, Target, TrendingUp,
+} from 'lucide-react';
 
-// ============================================================
-// ANIMATION UTILITIES
-// ============================================================
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
@@ -15,7 +17,7 @@ const fadeUp = {
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
 };
 
 const scaleIn = {
@@ -23,56 +25,16 @@ const scaleIn = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] } },
 };
 
-const slideInRight = {
-  hidden: { opacity: 0, x: 60 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
-};
-
-// ============================================================
-// ANIMATED COUNTER HOOK
-// ============================================================
-function useCounter(end: number, duration = 2000, startOnView = true) {
-  const [count, setCount] = React.useState(0);
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [hasStarted, setHasStarted] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!startOnView) { setHasStarted(true); return; }
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && !hasStarted) setHasStarted(true); },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [startOnView, hasStarted]);
-
-  React.useEffect(() => {
-    if (!hasStarted) return;
-    let start = 0;
-    const increment = end / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) { setCount(end); clearInterval(timer); }
-      else setCount(Math.floor(start));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [hasStarted, end, duration]);
-
-  return { count, ref };
-}
-
-// ============================================================
-// SECTION WRAPPER
-// ============================================================
-function Section({ children, className = '', id, bg = 'white' }: { children: React.ReactNode; className?: string; id?: string; bg?: string }) {
-  const bgClasses: Record<string, string> = {
-    white: 'bg-white',
-    light: 'bg-surface-50',
-    dark: 'bg-gradient-to-br from-[#023E8A] to-[#0077B6] text-white',
-    navy: 'bg-[#023E8A] text-white',
+function Section({ children, className = '', id, bg = 'white' }: {
+  children: React.ReactNode; className?: string; id?: string; bg?: string;
+}) {
+  const bgMap: Record<string, string> = {
+    white: 'bg-white dark:bg-gray-950',
+    light: 'bg-surface-50 dark:bg-gray-900',
+    dark: 'bg-gradient-to-br from-brand-600 to-brand-500 text-white',
   };
   return (
-    <section id={id} className={`relative overflow-hidden ${bgClasses[bg] || bg} ${className}`}>
+    <section id={id} className={`relative overflow-hidden ${bgMap[bg] || bg} ${className}`}>
       {children}
     </section>
   );
@@ -83,145 +45,56 @@ function Container({ children, className = '' }: { children: React.ReactNode; cl
 }
 
 // ============================================================
-// 1. PRELOADER
-// ============================================================
-function Preloader({ onComplete }: { onComplete: () => void }) {
-  const [progress, setProgress] = React.useState(0);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) { clearInterval(timer); setTimeout(onComplete, 400); return 100; }
-        return p + 2;
-      });
-    }, 30);
-    return () => clearInterval(timer);
-  }, [onComplete]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#023E8A]"
-      exit={{ opacity: 0, scale: 1.05 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-        className="flex flex-col items-center gap-6"
-      >
-        <div className="relative">
-          <svg className="h-16 w-16" viewBox="0 0 64 64" fill="none">
-            <motion.path
-              d="M32 8 L32 24 M24 24 L40 24 M20 24 L20 48 C20 52 24 56 32 56 C40 56 44 52 44 48 L44 24"
-              stroke="#10B981"
-              strokeWidth="3"
-              strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-            />
-            <motion.circle
-              cx="32" cy="16" r="3"
-              fill="#F59E0B"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.8, duration: 0.3 }}
-            />
-          </svg>
-        </div>
-        <motion.h1
-          className="text-2xl font-bold text-white"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          المختبر
-        </motion.h1>
-        <div className="w-48 h-1 bg-white/20 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-gradient-to-r from-[#10B981] to-[#F59E0B] rounded-full"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-sm text-white/60">{progress}%</p>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// ============================================================
-// 2. NAVIGATION
+// 1. NAVIGATION
 // ============================================================
 function Navigation({ scrolled }: { scrolled: boolean }) {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const navItems = ['الخدمات', 'الأجهزة', 'الفروع', 'لماذا نحن'];
 
   return (
     <>
-      <header
-        className={`fixed top-0 inset-x-0 z-[100] transition-all duration-300 ${
-          scrolled
-            ? 'bg-white/80 backdrop-blur-xl border-b border-surface-100 shadow-sm'
-            : 'bg-transparent'
-        }`}
-      >
+      <header className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${
+        scrolled
+          ? 'bg-white/90 dark:bg-gray-950/90 backdrop-blur-2xl border-b border-surface-100 dark:border-gray-800 shadow-lg shadow-black/5'
+          : 'bg-transparent'
+      }`}>
         <Container>
           <div className="flex h-16 items-center justify-between lg:h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 3L9 11M15 3L15 11M6 11L6 19C6 21 9 23 12 23C15 23 18 21 18 19L18 11M6 11H18" strokeLinecap="round" />
-                </svg>
+            <Link href={`/${locale}`} className="flex items-center gap-3 group">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-white shadow-lg shadow-brand-500/30">
+                <TestTube2 className="h-5 w-5" />
               </div>
-              <span className={`text-lg font-bold ${scrolled ? 'text-surface-900' : 'text-white'}`}>
-                المختبر
-              </span>
+              <div className="flex flex-col">
+                <span className={`text-lg font-bold leading-tight transition-colors ${scrolled ? 'text-surface-900 dark:text-white' : 'text-white'}`}>
+                  المختبر
+                </span>
+                <span className={`text-[10px] leading-tight transition-colors ${scrolled ? 'text-surface-500' : 'text-white/60'}`}>
+                  Al Mokhtabar
+                </span>
+              </div>
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {['الخدمات', 'التحاليل', 'الفروع', 'من نحن', 'تواصل معنا'].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item}`}
-                  className={`text-sm font-medium transition-colors hover:text-brand-500 ${
-                    scrolled ? 'text-surface-700' : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  {item}
-                </a>
+            <nav className="hidden lg:flex items-center gap-1">
+              {navItems.map((item) => (
+                <a key={item} href={`#${item}`} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-brand-50 dark:hover:bg-brand-500/10 ${
+                  scrolled ? 'text-surface-600 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400' : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}>{item}</a>
               ))}
             </nav>
 
-            {/* Actions */}
             <div className="flex items-center gap-3">
-              <button className={`hidden sm:flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-                scrolled ? 'text-surface-600 hover:bg-surface-100' : 'text-white/80 hover:text-white'
-              }`}>
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" />
-                </svg>
-                EN
-              </button>
-              <Link
-                href={`/${locale}/register`}
-                className="hidden sm:flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                احجز الآن
+              <Link href={`/${locale}/register`}
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                <Calendar className="h-4 w-4" />احجز الآن
               </Link>
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className={`lg:hidden rounded-xl p-2 ${scrolled ? 'text-surface-700' : 'text-white'}`}
-              >
-                <svg className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                  {mobileOpen ? (
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  ) : (
-                    <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                  )}
+              <button onClick={() => setMobileOpen(!mobileOpen)}
+                className={`lg:hidden rounded-xl p-2 transition-colors ${scrolled ? 'text-surface-700 dark:text-white hover:bg-surface-100' : 'text-white hover:bg-white/10'}`}>
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  {mobileOpen
+                    ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />}
                 </svg>
               </button>
             </div>
@@ -229,44 +102,22 @@ function Navigation({ scrolled }: { scrolled: boolean }) {
         </Container>
       </header>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[99] bg-white lg:hidden"
-          >
-            <div className="flex flex-col p-6 pt-20">
-              {['الخدمات', 'التحاليل', 'الفروع', 'من نحن', 'تواصل معنا'].map((item, i) => (
-                <motion.a
-                  key={item}
-                  href={`#${item}`}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="py-4 text-lg font-medium text-surface-900 border-b border-surface-100"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item}
-                </motion.a>
-              ))}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mt-8"
-              >
-                <Link
-                  href={`/${locale}/register`}
-                  className="flex items-center justify-center rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3.5 text-base font-semibold text-white"
-                >
-                  احجز الآن
-                </Link>
-              </motion.div>
-            </div>
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 top-16 z-[99] bg-white dark:bg-gray-950 lg:hidden">
+            <Container className="py-6">
+              <nav className="flex flex-col gap-2">
+                {navItems.map((item, i) => (
+                  <motion.a key={item} href={`#${item}`}
+                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                    className="py-3 px-4 text-lg font-medium text-surface-900 dark:text-white rounded-xl hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors"
+                    onClick={() => setMobileOpen(false)}>
+                    {item}
+                  </motion.a>
+                ))}
+              </nav>
+            </Container>
           </motion.div>
         )}
       </AnimatePresence>
@@ -275,187 +126,127 @@ function Navigation({ scrolled }: { scrolled: boolean }) {
 }
 
 // ============================================================
-// 3. HERO SECTION
+// 2. HERO SECTION
 // ============================================================
 function HeroSection() {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const y = useTransform(scrollY, [0, 600], [0, 200]);
+  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#023E8A] via-[#0077B6] to-[#0096C7]">
-      {/* Animated Background */}
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#023E8A] via-brand-600 to-accent-500">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(16,185,129,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(245,158,11,0.1),transparent_50%)]" />
-        {/* Floating particles */}
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-white/5"
-            style={{
-              width: Math.random() * 100 + 20,
-              height: Math.random() * 100 + 20,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              x: [0, 15, 0],
-              opacity: [0.05, 0.15, 0.05],
-            }}
-            transition={{
-              duration: Math.random() * 5 + 5,
-              repeat: Infinity,
-              delay: Math.random() * 3,
-            }}
-          />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(6,182,212,0.2),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(14,165,233,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+        {Array.from({ length: 15 }).map((_, i) => (
+          <motion.div key={i} className="absolute rounded-full bg-white/5"
+            style={{ width: Math.random() * 120 + 40, height: Math.random() * 120 + 40, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+            animate={{ y: [0, -40, 0], x: [0, 20, 0], opacity: [0.03, 0.1, 0.03] }}
+            transition={{ duration: Math.random() * 6 + 6, repeat: Infinity, delay: Math.random() * 4 }} />
         ))}
       </div>
 
       <motion.div style={{ y, opacity }} className="relative z-10 w-full">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-32 lg:py-0">
-            {/* Text Content */}
             <div className="text-white">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-medium border border-white/20 mb-6"
-              >
-                <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-                معتمد دولياً — ISO 15189 & CAP
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-medium border border-white/20 mb-8">
+                <span className="h-2 w-2 rounded-full bg-accent-500 animate-pulse" />
+                أحدث الأجهزة والتقنيات الطبية
               </motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight"
-              >
-                دقة في كل
-                <br />
-                <span className="bg-gradient-to-r from-[#10B981] to-[#F59E0B] bg-clip-text text-transparent">
-                  تفصيلة
+              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}
+                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+                المختبر<br />
+                <span className="bg-gradient-to-r from-accent-400 to-white bg-clip-text text-transparent">
+                  منصة التحاليل الطبية
                 </span>
               </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-6 text-lg sm:text-xl text-white/70 max-w-lg leading-relaxed"
-              >
-                أكثر من 500 فحص مخبري، نتائج خلال ساعات، 45 فرع في المملكة العربية السعودية.
-                صحتك أمانة، ونحن نضمن لك الدقة.
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                className="mt-6 text-lg sm:text-xl text-white/70 max-w-lg leading-relaxed">
+                أحدث الأجهزة والتقنيات الطبية لنتائج دقيقة وموثوقة. أكثر من 500 فحص مخبري في 45 فرع.
               </motion.p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="mt-8 flex flex-wrap gap-4"
-              >
-                <Link
-                  href={`/${locale}/register`}
-                  className="flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-bold text-[#023E8A] shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  احجز الآن
-                  <svg className="h-5 w-5 rotate-180" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+                className="mt-10 flex flex-wrap gap-4">
+                <Link href={`/${locale}/register`}
+                  className="flex items-center gap-3 rounded-2xl bg-white px-8 py-4 text-base font-bold text-brand-600 shadow-2xl hover:shadow-3xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+                  <Calendar className="h-5 w-5" />احجز الآن
                 </Link>
-                <Link
-                   href={`/${locale}/patient/tests`}
-                  className="flex items-center gap-2 rounded-xl border-2 border-white/30 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10 transition-all hover:border-white/50"
-                >
+                <Link href={`/${locale}/patient/tests`}
+                  className="flex items-center gap-2 rounded-2xl border-2 border-white/30 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10 transition-all hover:border-white/50">
                   تصفح التحاليل
                 </Link>
               </motion.div>
 
-              {/* Trust Badges */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="mt-12 flex flex-wrap gap-4"
-              >
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
+                className="mt-12 flex flex-wrap gap-3">
                 {[
-                  { icon: '🏅', label: 'ISO 15189' },
-                  { icon: '🏆', label: 'CAP' },
-                  { icon: '📊', label: '+15,000 فحص شهرياً' },
-                  { icon: '⭐', label: '4.9 تقييم' },
-                ].map((badge) => (
-                  <div
-                    key={badge.label}
-                    className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-sm px-4 py-2.5 border border-white/10"
-                  >
-                    <span className="text-lg">{badge.icon}</span>
-                    <span className="text-sm font-medium text-white/80">{badge.label}</span>
+                  { icon: <Award className="h-4 w-4" />, label: 'ISO 15189' },
+                  { icon: <Star className="h-4 w-4" />, label: 'تقييم 4.9' },
+                  { icon: <Zap className="h-4 w-4" />, label: '+15,000 فحص شهرياً' },
+                ].map((b) => (
+                  <div key={b.label} className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-sm px-4 py-2.5 border border-white/10">
+                    <span className="text-accent-400">{b.icon}</span>
+                    <span className="text-sm font-medium text-white/80">{b.label}</span>
                   </div>
                 ))}
               </motion.div>
             </div>
 
-            {/* Hero Visual */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="hidden lg:flex items-center justify-center"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }} className="hidden lg:flex items-center justify-center">
               <div className="relative">
-                {/* Glass Card */}
-                <div className="relative w-96 h-96 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-8 flex flex-col items-center justify-center">
-                  <svg className="w-40 h-40 text-white/90" viewBox="0 0 120 120" fill="none">
-                    <path d="M60 10 L60 45 M45 45 L75 45 M40 45 L40 85 C40 95 48 105 60 105 C72 105 80 95 80 85 L80 45" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                    <circle cx="60" cy="25" r="6" fill="#10B981" />
-                    <circle cx="55" cy="75" r="4" fill="#F59E0B" opacity="0.8" />
-                    <circle cx="65" cy="80" r="3" fill="#10B981" opacity="0.6" />
-                    <circle cx="60" cy="68" r="3.5" fill="#F59E0B" opacity="0.7" />
-                  </svg>
-                  <div className="mt-6 text-center">
-                    <p className="text-2xl font-bold text-white">500+</p>
-                    <p className="text-sm text-white/60">فحص مخبري</p>
-                  </div>
+                <div className="relative w-[420px] h-[420px] rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-8 flex flex-col items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+                  <Microscope className="w-32 h-32 text-white/90 mb-6" strokeWidth={1} />
+                  <p className="text-3xl font-bold text-white mb-1">500+</p>
+                  <p className="text-sm text-white/60">فحص مخبري</p>
                 </div>
 
-                {/* Floating Elements */}
-                <motion.div
-                  className="absolute -top-4 -left-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-3 shadow-xl"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-[#10B981] flex items-center justify-center">
-                      <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
+                <motion.div className="absolute -top-6 -right-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 px-5 py-4 shadow-xl"
+                  animate={{ y: [0, -12, 0] }} transition={{ duration: 3, repeat: Infinity }}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-accent-500 flex items-center justify-center">
+                      <Activity className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-white">نتيجة جاهزة</p>
-                      <p className="text-[10px] text-white/60">CBC — أحمد محمد</p>
+                      <p className="text-xs font-semibold text-white">جهاز تحليل الدم الآلي</p>
+                      <p className="text-[10px] text-white/60">نتائج خلال 30 دقيقة</p>
                     </div>
                   </div>
                 </motion.div>
 
-                <motion.div
-                  className="absolute -bottom-4 -right-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-3 shadow-xl"
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-[#F59E0B] flex items-center justify-center">
-                      <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                <motion.div className="absolute -bottom-6 -left-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 px-5 py-4 shadow-xl"
+                  animate={{ y: [0, 12, 0] }} transition={{ duration: 4, repeat: Infinity, delay: 1 }}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-brand-400 flex items-center justify-center">
+                      <Dna className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-white">تقييم 4.9</p>
-                      <p className="text-[10px] text-white/60">من 2,340 مريض</p>
+                      <p className="text-xs font-semibold text-white">جهاز PCR</p>
+                      <p className="text-[10px] text-white/60">دقة 99.9%</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div className="absolute top-1/2 -left-10 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 px-5 py-4 shadow-xl"
+                  animate={{ y: [0, -8, 0] }} transition={{ duration: 3.5, repeat: Infinity, delay: 0.5 }}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white">معتمد دولياً</p>
+                      <p className="text-[10px] text-white/60">ISO & CAP</p>
                     </div>
                   </div>
                 </motion.div>
@@ -465,22 +256,15 @@ function HeroSection() {
         </Container>
       </motion.div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="text-xs text-white/50">اكتشف المزيد</span>
-          <svg className="h-5 w-5 text-white/50" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+        <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}
+          className="flex flex-col items-center gap-2">
+          <span className="text-xs text-white/50 font-medium">اكتشف المزيد</span>
+          <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-1.5">
+            <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-1.5 h-1.5 rounded-full bg-white/60" />
+          </div>
         </motion.div>
       </motion.div>
     </section>
@@ -488,159 +272,155 @@ function HeroSection() {
 }
 
 // ============================================================
-// 4. TRUST INDICATORS
+// 3. LAB DEVICES SHOWCASE
 // ============================================================
-function TrustIndicators() {
-  const items = [
-    { icon: '🏅', title: 'ISO 15189', subtitle: 'معتمد دولياً' },
-    { icon: '🏆', title: 'CAP', subtitle: 'College of American Pathologists' },
-    { icon: '🏛️', title: 'CBAHI', subtitle: 'هيئة التأهيل الصحية' },
-    { icon: '📋', title: 'ZATCA', subtitle: 'متوافق مع الزكاة والضريبة' },
+function LabDevicesSection() {
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [startX, setStartX] = React.useState(0);
+  const [scrollLeft, setScrollLeft] = React.useState(0);
+
+  const devices = [
+    { name: 'جهاز تحليل الدم الآلي', desc: 'تحليل شامل لعناصر الدم بنتائج دقيقة خلال 30 دقيقة', icon: <Activity className="h-8 w-8" />, gradient: 'from-red-500 to-pink-600', bg: 'from-red-50 to-pink-50 dark:from-red-950/50 dark:to-pink-950/50' },
+    { name: 'جهاز التحليل الكيميائي', desc: 'قياس مستويات السكر والكوليسترول والإنزيمات بدقة عالية', icon: <TestTube2 className="h-8 w-8" />, gradient: 'from-blue-500 to-indigo-600', bg: 'from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50' },
+    { name: 'الجهاز المجهري الرقمي', desc: 'فحص عينات الدم والأنسجة بتقنية رقمية متطورة', icon: <Microscope className="h-8 w-8" />, gradient: 'from-purple-500 to-violet-600', bg: 'from-purple-50 to-violet-50 dark:from-purple-950/50 dark:to-violet-950/50' },
+    { name: 'جهاز التفاعل البوليني PCR', desc: 'كشف الأمراض والعدوى بدقة 99.9% في وقت قياسي', icon: <Dna className="h-8 w-8" />, gradient: 'from-emerald-500 to-teal-600', bg: 'from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50' },
+    { name: 'جهاز تحليل البول الآلي', desc: 'تحليل شامل ودقيق لعينات البول بأحدث التقنيات', icon: <Droplets className="h-8 w-8" />, gradient: 'from-amber-500 to-orange-600', bg: 'from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50' },
+    { name: 'جهاز التحليل المناعي', desc: 'قياس الأجسام المضادة وأضداد الفيروسات والبكتيريا', icon: <Shield className="h-8 w-8" />, gradient: 'from-cyan-500 to-sky-600', bg: 'from-cyan-50 to-sky-50 dark:from-cyan-950/50 dark:to-sky-950/50' },
+    { name: 'جهاز تحليل الهرمونات', desc: 'قياس مستويات الهرمونات بدقة فائقة لتشخيص شامل', icon: <TrendingUp className="h-8 w-8" />, gradient: 'from-rose-500 to-red-600', bg: 'from-rose-50 to-red-50 dark:from-rose-950/50 dark:to-red-950/50' },
   ];
 
-  return (
-    <Section bg="light" className="py-6 border-b border-surface-100">
-      <Container>
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          className="flex flex-wrap items-center justify-center gap-6 lg:gap-12"
-        >
-          {items.map((item) => (
-            <motion.div
-              key={item.title}
-              variants={fadeUp}
-              className="flex items-center gap-3 px-4 py-2"
-            >
-              <span className="text-2xl">{item.icon}</span>
-              <div>
-                <p className="text-sm font-bold text-surface-900">{item.title}</p>
-                <p className="text-xs text-surface-500">{item.subtitle}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </Container>
-    </Section>
-  );
-}
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.pageX - (scrollRef.current?.offsetLeft || 0));
+    setScrollLeft(scrollRef.current?.scrollLeft || 0);
+  };
 
-// ============================================================
-// 5. STATISTICS
-// ============================================================
-function StatisticsSection() {
-  const stats = [
-    { end: 15247, suffix: '+', label: 'فحص شهرياً', labelEn: 'Tests per Month' },
-    { end: 98.7, suffix: '%', label: 'دقة النتائج', labelEn: 'Accuracy Rate' },
-    { end: 45, suffix: '', label: 'فرع في المملكة', labelEn: 'Branches' },
-    { end: 150000, suffix: '+', label: 'مريض سعيد', labelEn: 'Happy Patients' },
-  ];
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - (scrollRef.current?.offsetLeft || 0);
+    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  };
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let animId: number;
+    const autoScroll = () => {
+      if (el && !isDragging) {
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth) el.scrollLeft = 0;
+        else el.scrollLeft += 0.5;
+      }
+      animId = requestAnimationFrame(autoScroll);
+    };
+    animId = requestAnimationFrame(autoScroll);
+    return () => cancelAnimationFrame(animId);
+  }, [isDragging]);
+
+  const scroll = (dir: 'left' | 'right') => {
+    scrollRef.current?.scrollBy({ left: dir === 'right' ? 340 : -340, behavior: 'smooth' });
+  };
 
   return (
-    <Section bg="dark" className="py-20 lg:py-28">
+    <Section id="الأجهزة" bg="light" className="py-20 lg:py-28">
       <Container>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-            أرقام تتحدث عن <span className="text-[#10B981]">جودتنا</span>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full bg-brand-50 dark:bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 mb-4">
+            <Microscope className="h-4 w-4" />أحدث الأجهزة الطبية
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-white">
+            أجهزتنا <span className="text-brand-600 dark:text-brand-400">المتطورة</span>
           </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-lg text-white/60">
-            Numbers That Speak Our Quality
+          <motion.p variants={fadeUp} className="mt-4 text-lg text-surface-500 dark:text-gray-400 max-w-2xl mx-auto">
+            نستخدم أحدث الأجهزة والتقنيات الطبية المعتمدة دولياً لضمان دقة النتائج
           </motion.p>
         </motion.div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {stats.map((stat) => {
-            const { count, ref } = useCounter(stat.end);
-            return (
-              <motion.div
-                key={stat.label}
-                ref={ref}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 p-6 lg:p-8"
-              >
-                <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-mono">
-                  {count.toLocaleString('ar-SA')}{stat.suffix}
-                </p>
-                <p className="mt-2 text-sm font-medium text-white/80">{stat.label}</p>
-                <p className="text-xs text-white/40">{stat.labelEn}</p>
-              </motion.div>
-            );
-          })}
-        </div>
       </Container>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end gap-2">
+        <button onClick={() => scroll('right')} className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-surface-200 dark:border-gray-700 text-surface-600 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 hover:text-brand-600 transition-colors shadow-sm">
+          <ChevronRight className="h-5 w-5" />
+        </button>
+        <button onClick={() => scroll('left')} className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-surface-200 dark:border-gray-700 text-surface-600 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 hover:text-brand-600 transition-colors shadow-sm">
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div ref={scrollRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}
+        onMouseUp={() => setIsDragging(false)} onMouseLeave={() => setIsDragging(false)}
+        className={`flex gap-6 overflow-x-auto pb-6 px-4 sm:px-6 lg:px-8 scrollbar-hide ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        style={{ scrollbarWidth: 'none' as const }}>
+        <style>{`.scrollbar-hide::-webkit-scrollbar{display:none}`}</style>
+        <div className="shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
+        {devices.map((d, i) => (
+          <motion.div key={d.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="shrink-0 w-[300px] sm:w-[320px]">
+            <div className={`group relative rounded-3xl bg-gradient-to-br ${d.bg} border border-surface-100 dark:border-gray-800 p-6 h-[320px] flex flex-col justify-between hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden`}>
+              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${d.gradient}`} />
+              <div>
+                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${d.gradient} text-white shadow-lg mb-5`}>
+                  {d.icon}
+                </div>
+                <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{d.name}</h3>
+                <p className="text-sm text-surface-500 dark:text-gray-400 leading-relaxed">{d.desc}</p>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-medium text-brand-600 dark:text-brand-400 group-hover:gap-3 transition-all">
+                <span>المزيد من التفاصيل</span>
+                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+        <div className="shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
+      </div>
     </Section>
   );
 }
 
 // ============================================================
-// 6. SERVICES
+// 4. SERVICES SECTION
 // ============================================================
 function ServicesSection() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
   const services = [
-    { icon: '🩸', title: 'تحليل الدم', titleEn: 'Hematology', tests: 15, price: '150', color: 'from-red-500 to-red-600' },
-    { icon: '🧪', title: 'التحاليل الكيميائية', titleEn: 'Chemistry', tests: 22, price: '200', color: 'from-blue-500 to-blue-600' },
-    { icon: '⚗️', title: 'التحاليل الهرمونية', titleEn: 'Endocrinology', tests: 12, price: '320', color: 'from-purple-500 to-purple-600' },
-    { icon: '🦠', title: 'البكتريولوجيا', titleEn: 'Microbiology', tests: 18, price: '250', color: 'from-green-500 to-green-600' },
-    { icon: '🛡️', title: 'المناعة', titleEn: 'Immunology', tests: 10, price: '280', color: 'from-yellow-500 to-yellow-600' },
-    { icon: '🧬', title: 'الوراثة', titleEn: 'Genetics', tests: 8, price: '450', color: 'from-cyan-500 to-cyan-600' },
+    { icon: <TestTube2 className="h-6 w-6" />, title: 'التحاليل المخبرية', desc: 'أكثر من 500 فحص مخبري شامل في مختلف التخصصات الطبية مع نتائج دقيقة وموثوقة', color: 'from-brand-500 to-brand-600', link: '#' },
+    { icon: <Users className="h-6 w-6" />, title: 'الفحص المنزلي', desc: 'خدمة فحص منزلي على مدار الساعة مع فريق طبي معتمد ومعدات متطورة', color: 'from-accent-500 to-cyan-600', link: '#' },
+    { icon: <Calendar className="h-6 w-6" />, title: 'حجز المواعيد', desc: 'احجز موعدك بسهولة عبر الإنترنت واختار الفرع والوقت المناسب لك', color: 'from-emerald-500 to-teal-600', link: `/${locale}/register` },
   ];
 
   return (
     <Section id="الخدمات" className="py-20 lg:py-28">
       <Container>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900">
-            خدماتنا <span className="text-brand-600">المخبرية</span>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full bg-brand-50 dark:bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 mb-4">
+            خدماتنا المتكاملة
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-white">
+            خدماتنا <span className="text-brand-600 dark:text-brand-400">المخبرية</span>
           </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-lg text-surface-500 max-w-2xl mx-auto">
-            نقدم أكثر من 500 فحص مخبري في مختلف التخصصات الطبية
+          <motion.p variants={fadeUp} className="mt-4 text-lg text-surface-500 dark:text-gray-400 max-w-2xl mx-auto">
+            نقدم مجموعة شاملة من الخدمات المخبرية عالية الجودة
           </motion.p>
         </motion.div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {services.map((service) => (
-            <motion.div
-              key={service.title}
-              variants={scaleIn}
-              className="group relative rounded-2xl border border-surface-100 bg-white p-6 shadow-sm hover:shadow-xl hover:border-brand-200 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${service.color} text-2xl shadow-lg`}>
-                {service.icon}
-              </div>
-              <h3 className="mt-4 text-lg font-bold text-surface-900 group-hover:text-brand-600 transition-colors">
-                {service.title}
-              </h3>
-              <p className="mt-1 text-sm text-surface-500">{service.titleEn}</p>
-              <div className="mt-4 flex items-center gap-4">
-                <span className="text-xs font-medium text-surface-400">{service.tests} فحص</span>
-                <span className="text-sm font-bold text-brand-600">من {service.price} ر.س</span>
-              </div>
-              <a href="#" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors">
-                المزيد
-                <svg className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </a>
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {services.map((s) => (
+            <motion.div key={s.title} variants={scaleIn}>
+              <Link href={s.link} className="block group">
+                <div className="relative rounded-3xl bg-white dark:bg-gray-900 border border-surface-100 dark:border-gray-800 p-8 h-full hover:shadow-xl hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-500 hover:-translate-y-1">
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${s.color} text-white shadow-lg mb-6`}>{s.icon}</div>
+                  <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-3 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{s.title}</h3>
+                  <p className="text-surface-500 dark:text-gray-400 leading-relaxed mb-6">{s.desc}</p>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-brand-600 dark:text-brand-400 group-hover:gap-3 transition-all">
+                    <span>اعرف المزيد</span>
+                    <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                  </div>
+                  <div className={`absolute top-0 left-0 w-full h-1 rounded-t-3xl bg-gradient-to-r ${s.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                </div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>
@@ -650,249 +430,158 @@ function ServicesSection() {
 }
 
 // ============================================================
-// 7. WHY CHOOSE US
+// 5. BRANCHES / LOCATIONS
+// ============================================================
+function BranchesSection() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
+  const branches = [
+    { name: 'فرع الرياض — العليا', address: 'شارع التحلية، حي العليا، الرياض', hours: 'السبت - الخميس: 7 ص - 10 م', phone: '+966 50 123 4567', isMain: true },
+    { name: 'فرع جدة — الروضة', address: 'شارع الأمير سلطان، حي الروضة، جدة', hours: 'السبت - الخميس: 7 ص - 10 م', phone: '+966 50 234 5678', isMain: false },
+    { name: 'فرع الدمام — الشاطئ', address: 'شارع الشاطئ، حي الشاطئ، الدمام', hours: 'السبت - الخميس: 8 ص - 9 م', phone: '+966 50 345 6789', isMain: false },
+    { name: 'فرع مكة المكرمة — العزيزية', address: 'شارع العزيزية، حي العزيزية، مكة المكرمة', hours: 'السبت - الخميس: 7 ص - 10 م', phone: '+966 50 456 7890', isMain: false },
+  ];
+
+  return (
+    <Section id="الفروع" bg="light" className="py-20 lg:py-28">
+      <Container>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full bg-brand-50 dark:bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 mb-4">
+            <MapPin className="h-4 w-4" />فروعنا
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-white">
+            فروعنا <span className="text-brand-600 dark:text-brand-400">قريبة منك</span>
+          </motion.h2>
+          <motion.p variants={fadeUp} className="mt-4 text-lg text-surface-500 dark:text-gray-400 max-w-2xl mx-auto">
+            أكثر من 45 فرع في المملكة العربية السعودية لخدمتك
+          </motion.p>
+        </motion.div>
+
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {branches.map((b) => (
+            <motion.div key={b.name} variants={fadeUp}
+              className={`relative rounded-3xl bg-white dark:bg-gray-900 border p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                b.isMain ? 'border-brand-200 dark:border-brand-500/30 ring-2 ring-brand-500/10' : 'border-surface-100 dark:border-gray-800'
+              }`}>
+              {b.isMain && (
+                <div className="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-brand-500 to-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
+                  الفرع الرئيسي
+                </div>
+              )}
+              <div className="mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 mb-4">
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2">{b.name}</h3>
+              </div>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-surface-400 dark:text-gray-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-surface-500 dark:text-gray-400">{b.address}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-surface-400 dark:text-gray-500 shrink-0" />
+                  <p className="text-sm text-surface-500 dark:text-gray-400">{b.hours}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-surface-400 dark:text-gray-500 shrink-0" />
+                  <p className="text-sm text-surface-500 dark:text-gray-400" dir="ltr">{b.phone}</p>
+                </div>
+              </div>
+              <Link href={`/${locale}/register`}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-50 dark:bg-brand-500/10 px-5 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 dark:hover:text-white transition-all">
+                <Calendar className="h-4 w-4" />احجز في هذا الفرع
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </Container>
+    </Section>
+  );
+}
+
+// ============================================================
+// 6. WHY CHOOSE US
 // ============================================================
 function WhyChooseSection() {
   const reasons = [
-    { icon: '🎯', title: 'دقة عالية', desc: 'نظام ضمان جودة متعدد الطبقات يضمن دقة 98.7% في جميع النتائج' },
-    { icon: '⚡', title: 'سرعة النتائج', desc: 'نتائج جاهزة خلال 2-24 ساعة حسب نوع الفحص' },
-    { icon: '🔒', title: 'أمان البيانات', desc: 'تشفير من الدرجة العسكرية وتوافق مع نظام حماية البيانات الشخصية' },
-    { icon: '🤖', title: 'تحليل ذكي', desc: 'ذكاء اصطناعي يحلل نتائجك ويقدم توصيات مخصصة' },
-    { icon: '💰', title: 'أسعار منافسة', desc: 'أسعار واضحة بدون تكاليف مخفية، ونوفر باقات مخفضة' },
-    { icon: '📱', title: 'تجربة رقمية', desc: 'احجز، تتبع، وحمل نتائجك من تطبيقناบน هاتفك' },
+    { icon: <Target className="h-6 w-6" />, title: 'دقة النتائج', desc: 'نظام ضمان جودة متعدد الطبقات يضمن دقة 99.7% في جميع النتائج المخبرية', color: 'from-brand-500 to-brand-600' },
+    { icon: <Zap className="h-6 w-6" />, title: 'سرعة التحويل', desc: 'نتائج جاهزة خلال 2-24 ساعة حسب نوع الفحص مع إشعارات فورية', color: 'from-accent-500 to-cyan-600' },
+    { icon: <Users className="h-6 w-6" />, title: 'فريق متخصص', desc: 'أطباء وفنيون مختبرات معتمدون بخبرة تزيد عن 15 عاماً في مجال التحاليل', color: 'from-emerald-500 to-teal-600' },
+    { icon: <Microscope className="h-6 w-6" />, title: 'أحدث الأجهزة', desc: 'أجهزة مخبرية من أفضل الماركات العالمية مع صيانة دورية وتحديث مستمر', color: 'from-purple-500 to-violet-600' },
   ];
 
   return (
-    <Section bg="light" className="py-20 lg:py-28">
+    <Section id="لماذا نحن" className="py-20 lg:py-28">
       <Container>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900">
-            لماذا <span className="text-brand-600">المختبر</span>؟
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full bg-brand-50 dark:bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 mb-4">
+            <Award className="h-4 w-4" />لماذا المختبر؟
+          </motion.div>
+          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-white">
+            لماذا <span className="text-brand-600 dark:text-brand-400">تختارنا</span>؟
           </motion.h2>
+          <motion.p variants={fadeUp} className="mt-4 text-lg text-surface-500 dark:text-gray-400 max-w-2xl mx-auto">
+            نلتزم بأعلى معايير الجودة لتقديم أفضل خدمات التحاليل الطبية
+          </motion.p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reasons.map((reason, i) => (
-            <motion.div
-              key={reason.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="relative rounded-2xl bg-white p-6 shadow-sm border border-surface-100 hover:shadow-lg transition-shadow"
-            >
-              <span className="absolute top-4 left-4 text-5xl font-bold text-brand-50/80 font-mono">
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {reasons.map((r, i) => (
+            <motion.div key={r.title} variants={fadeUp}
+              className="group relative rounded-3xl bg-white dark:bg-gray-900 border border-surface-100 dark:border-gray-800 p-6 text-center hover:shadow-xl hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-500 hover:-translate-y-1">
+              <div className="absolute -top-3 -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-surface-100 dark:bg-gray-800 text-xs font-bold text-surface-500 dark:text-gray-400">
                 {String(i + 1).padStart(2, '0')}
-              </span>
-              <div className="relative">
-                <span className="text-3xl">{reason.icon}</span>
-                <h3 className="mt-3 text-lg font-bold text-surface-900">{reason.title}</h3>
-                <p className="mt-2 text-sm text-surface-500 leading-relaxed">{reason.desc}</p>
               </div>
+              <div className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${r.color} text-white shadow-lg mb-5 group-hover:scale-110 transition-transform`}>
+                {r.icon}
+              </div>
+              <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-3 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{r.title}</h3>
+              <p className="text-sm text-surface-500 dark:text-gray-400 leading-relaxed">{r.desc}</p>
             </motion.div>
           ))}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-// ============================================================
-// 8. HOME VISIT
-// ============================================================
-function HomeVisitSection() {
-  const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'ar';
-  return (
-    <Section className="py-20 lg:py-28">
-      <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            <div className="aspect-[4/3] rounded-3xl bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center overflow-hidden">
-              <div className="text-center p-8">
-                <div className="text-8xl mb-4">🏥</div>
-                <p className="text-brand-600 font-semibold">فحص منزلي</p>
-              </div>
-            </div>
-            {/* Floating card */}
-            <motion.div
-              className="absolute -bottom-6 -left-6 rounded-2xl bg-white p-4 shadow-xl border border-surface-100"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-[#10B981] flex items-center justify-center">
-                  <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-surface-900">متاح 24/7</p>
-                  <p className="text-xs text-surface-500">خدمة على مدار الساعة</p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: -60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-surface-900">
-              فحوصات منزلية
-              <br />
-              <span className="text-brand-600">صحتك تأتي أولاً</span>
-            </h2>
-            <p className="mt-4 text-lg text-surface-500 leading-relaxed">
-              فريق طبي معتمد يزورك في منزلك أو مكتبك. معدات متنقلة متطورة ونتائج خلال 24 ساعة.
-            </p>
-            <div className="mt-8 space-y-4">
-              {['فريق طبي معتمد وذو خبرة', 'معدات متنقلة بأحدث التقنيات', 'نتائج جاهزة خلال 24 ساعة', 'خدمة على مدار الساعة طوال أيام الأسبوع'].map((item) => (
-                <div key={item} className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#10B981]/10">
-                    <svg className="h-3.5 w-3.5 text-[#10B981]" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-surface-700">{item}</span>
-                </div>
-              ))}
-            </div>
-            <Link
-               href={`/${locale}/patient/appointments/book`}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              احجز فحص منزلي
-              <svg className="h-5 w-5 rotate-180" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
-          </motion.div>
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-// ============================================================
-// 9. TESTIMONIALS
-// ============================================================
-function TestimonialsSection() {
-  const testimonials = [
-    { name: 'أحمد محمد', text: 'خدمة ممتازة ونتائج سريعة. الموظفون محترفون وودودون. أنصح الجميع بالتعامل مع المختبر.', rating: 5, avatar: 'أ' },
-    { name: 'فاطمة العلي', text: 'تجربة رائعة من الحجز حتى استلام النتائج. التطبيق سهل جداً والنتائج واضحة ومفصّلة.', rating: 5, avatar: 'ف' },
-    { name: 'خالد الشمري', text: 'الدقة في النتائج مذهلة. استخدمت خدمة الفحص المنزلي وكانت ممتازة. شكراً لكم.', rating: 5, avatar: 'خ' },
-    { name: 'نورة الحربي', text: 'أفضل مختبر تعاملت معه. الأسعار معقولة والجودة عالية. النتائج جاهزة بسرعة.', rating: 5, avatar: 'ن' },
-  ];
-
-  return (
-    <Section bg="light" className="py-20 lg:py-28">
-      <Container>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900">
-            ماذا يقول <span className="text-brand-600">مرضانا</span>؟
-          </motion.h2>
-          <motion.div variants={fadeUp} className="mt-4 flex items-center justify-center gap-2">
-            <span className="text-lg">⭐</span>
-            <span className="text-lg font-bold text-surface-900">4.9</span>
-            <span className="text-sm text-surface-500">— تقييم Google من 2,340 مراجعة</span>
-          </motion.div>
         </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-2xl bg-white p-6 shadow-sm border border-surface-100 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex gap-1 mb-3">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <span key={j} className="text-[#F59E0B]">⭐</span>
-                ))}
-              </div>
-              <p className="text-sm text-surface-600 leading-relaxed mb-4">"{t.text}"</p>
-              <div className="flex items-center gap-3 pt-4 border-t border-surface-100">
-                <div className="h-10 w-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-sm">
-                  {t.avatar}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-surface-900">{t.name}</p>
-                  <p className="text-xs text-surface-500">مريض معتمد ✓</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
       </Container>
     </Section>
   );
 }
 
 // ============================================================
-// 10. BOOKING CTA
+// 7. BOOKING CTA
 // ============================================================
 function BookingCTASection() {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
+
   return (
     <Section bg="dark" className="py-20 lg:py-28">
       <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center">
+          <motion.div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white/80 mb-6">
+            <Calendar className="h-4 w-4" />احجز الآن
+          </motion.div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            احجز فحصك المخبري <span className="text-[#10B981]">الآن</span>
+            احجز موعدك <span className="text-accent-400">الآن</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto mb-10">
             لا تنتظر. احجز فحصك في أي فرع أو اطلب خدمة الفحص المنزلي. النتائج جاهزة خلال ساعات.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href={`/${locale}/register`}
-              className="flex items-center gap-2 rounded-xl bg-white px-10 py-4 text-base font-bold text-[#023E8A] shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              احجز موعدك الآن
-              <svg className="h-5 w-5 rotate-180" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+            <Link href={`/${locale}/register`}
+              className="flex items-center gap-3 rounded-2xl bg-white px-10 py-4 text-base font-bold text-brand-600 shadow-2xl hover:shadow-3xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+              <Calendar className="h-5 w-5" />احجز موعدك الآن
             </Link>
-            <a
-              href="tel:+966501234567"
-              className="flex items-center gap-2 rounded-xl border-2 border-white/30 px-10 py-4 text-base font-semibold text-white hover:bg-white/10 transition-all"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
-              اتصل بنا
+            <a href="tel:+966501234567"
+              className="flex items-center gap-2 rounded-2xl border-2 border-white/30 px-10 py-4 text-base font-semibold text-white hover:bg-white/10 transition-all">
+              <Phone className="h-5 w-5" />اتصل بنا
             </a>
           </div>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-8 text-white/50 text-sm">
-            <span className="flex items-center gap-2">📞 +966 50 123 4567</span>
-            <span className="flex items-center gap-2">📧 info@almokhtabar.com</span>
-            <span className="flex items-center gap-2">🏢 45 فرع في المملكة</span>
+          <div className="flex flex-wrap items-center justify-center gap-8 text-white/50 text-sm">
+            <div className="flex items-center gap-2"><Clock className="h-4 w-4" /><span>السبت - الخميس: 7 صباحاً - 10 مساءً</span></div>
+            <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><span dir="ltr">+966 50 123 4567</span></div>
+            <div className="flex items-center gap-2"><Mail className="h-4 w-4" /><span>info@almokhtabar.com</span></div>
           </div>
         </motion.div>
       </Container>
@@ -901,188 +590,86 @@ function BookingCTASection() {
 }
 
 // ============================================================
-// 11. CONTACT SECTION
+// 8. FOOTER
 // ============================================================
-function ContactSection() {
-  return (
-    <Section id="تواصل معنا" className="py-20 lg:py-28">
-      <Container>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-surface-900">
-            تواصل <span className="text-brand-600">معنا</span>
-          </motion.h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl bg-white p-8 shadow-sm border border-surface-100"
-          >
-            <form className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1.5">الاسم</label>
-                  <input className="w-full rounded-xl border border-surface-200 px-4 py-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1.5">البريد الإلكتروني</label>
-                  <input type="email" className="w-full rounded-xl border border-surface-200 px-4 py-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">الرسالة</label>
-                <textarea rows={4} className="w-full rounded-xl border border-surface-200 px-4 py-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none" />
-              </div>
-              <button
-                type="button"
-                className="w-full rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.01] active:scale-[0.99]"
-              >
-                إرسال الرسالة
-              </button>
-            </form>
-          </motion.div>
-
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
-            {[
-              { icon: '📍', title: 'العنوان', value: 'الرياض، المملكة العربية السعودية' },
-              { icon: '📞', title: 'الهاتف', value: '+966 50 123 4567' },
-              { icon: '📧', title: 'البريد', value: 'info@almokhtabar.com' },
-              { icon: '⏰', title: 'ساعات العمل', value: 'السبت - الخميس: 7 صباحاً - 10 مساءً' },
-            ].map((item) => (
-              <div key={item.title} className="flex items-start gap-4 rounded-xl bg-surface-50 p-5">
-                <span className="text-2xl">{item.icon}</span>
-                <div>
-                  <p className="text-sm font-semibold text-surface-900">{item.title}</p>
-                  <p className="text-sm text-surface-500 mt-0.5">{item.value}</p>
-                </div>
-              </div>
-            ))}
-            <div className="flex items-center gap-3">
-              {['𝕏', 'IG', 'FB', 'YT', 'WA'].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-100 text-sm font-bold text-surface-600 hover:bg-brand-50 hover:text-brand-600 transition-colors"
-                >
-                  {social}
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-// ============================================================
-// 12. FOOTER
-// ============================================================
-function PremiumFooter() {
+function FooterSection() {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
-
   const footerLinks: Record<string, { label: string; href: string }[]> = {
-    'المختبر': [
+    المختبر: [
       { label: 'من نحن', href: '#' },
-      { label: 'الفروع', href: '#' },
+      { label: 'الفروع', href: '#الفروع' },
       { label: 'الوظائف', href: '#' },
       { label: 'الأخبار', href: '#' },
-      { label: 'تواصل معنا', href: '#تواصل معنا' },
     ],
-    'الخدمات': [
-      { label: 'تحليل الدم', href: '#' },
-      { label: 'التحاليل الكيميائية', href: '#' },
-      { label: 'التحاليل الهرمونية', href: '#' },
-      { label: 'البكتريولوجيا', href: '#' },
-      { label: 'المناعة', href: '#' },
+    الخدمات: [
+      { label: 'التحاليل المخبرية', href: '#الخدمات' },
+      { label: 'الفحص المنزلي', href: '#' },
+      { label: 'حجز المواعيد', href: `/${locale}/register` },
+      { label: 'باقات التحاليل', href: '#' },
     ],
-    'المرضى': [
-      { label: 'حجز موعد', href: `/${locale}/patient/appointments/book` },
-      { label: 'تصفح التحاليل', href: `/${locale}/patient/tests` },
-      { label: 'طلباتي', href: `/${locale}/patient/appointments` },
-      { label: 'تقاريري', href: `/${locale}/patient/tests` },
-      { label: 'الفواتير', href: '#' },
-    ],
-    'الدعم': [
+    الدعم: [
       { label: 'الأسئلة الشائعة', href: '#' },
       { label: 'الشروط والأحكام', href: `/${locale}/terms` },
       { label: 'سياسة الخصوصية', href: `/${locale}/privacy` },
-      { label: 'الإبلاغ عن مشكلة', href: '#' },
+      { label: 'تواصل معنا', href: '#' },
     ],
   };
 
   return (
-    <footer className="bg-[#023E8A] text-white">
+    <footer className="bg-gray-950 text-white">
       <Container className="py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand */}
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
-                <svg className="h-5 w-5 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 3L9 11M15 3L15 11M6 11L6 19C6 21 9 23 12 23C15 23 18 21 18 19L18 11M6 11H18" strokeLinecap="round" />
-                </svg>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-white">
+                <TestTube2 className="h-5 w-5" />
               </div>
-              <span className="text-lg font-bold">المختبر</span>
+              <div>
+                <span className="text-lg font-bold">المختبر</span>
+                <span className="block text-[10px] text-gray-400">Al Mokhtabar</span>
+              </div>
             </div>
-            <p className="text-sm text-white/60 leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed mb-6">
               معامل تحليل طبي معتمدة دولياً تقدم أكثر من 500 فحص مخبري في 45 فرع بالمملكة.
             </p>
-            <div className="mt-6 flex gap-3">
-              {['App Store', 'Google Play'].map((store) => (
-                <a
-                  key={store}
-                  href="#"
-                  className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20 transition-colors"
-                >
-                  {store === 'App Store' ? '🍎' : '▶️'} {store}
+            <div className="flex gap-3">
+              {['X', 'IG', 'FB', 'YT', 'WA'].map((s) => (
+                <a key={s} href="#"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 text-xs font-bold text-gray-400 hover:bg-brand-500 hover:text-white transition-colors">
+                  {s}
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Link Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
               <h4 className="text-sm font-bold text-white mb-4">{title}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-sm text-white/50 hover:text-white transition-colors">
-                      {link.label}
-                    </a>
+                    <a href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">{link.label}</a>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/40">
-            © 2026 المختبر — Al Mokhtabar. جميع الحقوق محفوظة.
-          </p>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-white/40">🏅 ISO 15189 | 🏆 CAP | 📋 ZATCA</span>
-          </div>
-        </div>
       </Container>
+
+      <div className="border-t border-gray-800">
+        <Container className="py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-500">© 2026 المختبر — Al Mokhtabar. جميع الحقوق محفوظة.</p>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <span>🏅 ISO 15189</span>
+              <span>🏆 CAP</span>
+              <span>📋 ZATCA</span>
+            </div>
+          </div>
+        </Container>
+      </div>
     </footer>
   );
 }
@@ -1091,38 +678,24 @@ function PremiumFooter() {
 // MAIN HOMEPAGE
 // ============================================================
 export default function HomePage() {
-  const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'ar';
-  const [loading, setLoading] = React.useState(true);
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 80);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <>
-      <AnimatePresence>
-        {loading && <Preloader onComplete={() => setLoading(false)} />}
-      </AnimatePresence>
-
-      {!loading && (
-        <main>
-          <Navigation scrolled={scrolled} />
-          <HeroSection />
-          <TrustIndicators />
-          <StatisticsSection />
-          <ServicesSection />
-          <HomeVisitSection />
-          <WhyChooseSection />
-          <TestimonialsSection />
-          <BookingCTASection />
-          <ContactSection />
-          <PremiumFooter />
-        </main>
-      )}
-    </>
+    <main className="min-h-screen bg-white dark:bg-gray-950">
+      <Navigation scrolled={scrolled} />
+      <HeroSection />
+      <LabDevicesSection />
+      <ServicesSection />
+      <BranchesSection />
+      <WhyChooseSection />
+      <BookingCTASection />
+      <FooterSection />
+    </main>
   );
 }

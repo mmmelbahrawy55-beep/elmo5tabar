@@ -463,6 +463,14 @@ export default function LoginPage() {
         </Link>
       </p>
 
+      {/* Staff login link */}
+      <Link
+        href={`/${locale}/staff-login`}
+        className="mt-3 block text-center text-sm text-surface-400 dark:text-surface-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+      >
+        موظف؟ سجّل دخول الموظفين
+      </Link>
+
       {/* 2FA Modal */}
       {show2FAModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-[fade-in_0.2s_ease-out]" dir="rtl">
