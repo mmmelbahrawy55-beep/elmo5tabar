@@ -61,13 +61,13 @@ export default function LoginPage() {
 
   const t = (key: string): string => {
     const translations: Record<string, string> = {
-      email: 'البريد الإلكتروني',
-      emailRequired: 'البريد الإلكتروني مطلوب',
-      emailInvalid: 'البريد الإلكتروني غير صالح',
+      phone: 'رقم الهاتف',
+      phoneRequired: 'رقم الهاتف مطلوب',
+      phoneInvalid: 'رقم الهاتف غير صالح',
       password: 'كلمة المرور',
       passwordRequired: 'كلمة المرور مطلوبة',
-      passwordMinLength: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-      emailOrPhoneRequired: 'البريد الإلكتروني أو رقم الهاتف مطلوب',
+      passwordMinLength: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+      emailOrPhoneRequired: 'رقم الهاتف مطلوب',
       loginSuccess: 'تم تسجيل الدخول بنجاح',
       loginFailed: 'فشل تسجيل الدخول',
       otpSent: 'تم إرسال رمز OTP',
@@ -95,7 +95,8 @@ export default function LoginPage() {
   };
 
   const [mode, setMode] = useState<'password' | 'otp'>('password');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+20');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [otpEmailOrPhone, setOtpEmailOrPhone] = useState('');
@@ -122,10 +123,10 @@ export default function LoginPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (mode === 'password') {
-      if (!email) newErrors.email = t('emailRequired');
-      else if (!validateEmail(email)) newErrors.email = t('emailInvalid');
+      if (!phone) newErrors.phone = t('phoneRequired');
+      else if (!/^\d{8,15}$/.test(phone)) newErrors.phone = t('phoneInvalid');
       if (!password) newErrors.password = t('passwordRequired');
-      else if (password.length < 8) newErrors.password = t('passwordMinLength');
+      else if (password.length < 6) newErrors.password = t('passwordMinLength');
     } else {
       if (!otpEmailOrPhone) newErrors.otpEmailOrPhone = t('emailOrPhoneRequired');
     }
@@ -138,7 +139,7 @@ export default function LoginPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const result = await login(email, password);
+      const result = await login(`${countryCode}${phone}`, password);
       if (result.requiresTwoFactor) {
         setShow2FAModal(true);
       } else {
@@ -248,14 +249,43 @@ export default function LoginPage() {
       {/* Form */}
       {mode === 'password' ? (
         <form onSubmit={handlePasswordLogin} className="space-y-4">
-          <AnimatedInput
-            label={t('email')}
-            type="email"
-            value={email}
-            onChange={setEmail}
-            error={errors.email}
-            icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>}
-          />
+          <div>
+            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">رقم الهاتف <span className="text-danger-500">*</span></label>
+            <div className="flex gap-2">
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="w-32 px-3 py-3 rounded-xl border-2 border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800/50 text-surface-900 dark:text-white text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+              >
+                {[
+                  { code: '+20', flag: '🇪🇬' },
+                  { code: '+966', flag: '🇸🇦' },
+                  { code: '+971', flag: '🇦🇪' },
+                  { code: '+965', flag: '🇰🇼' },
+                  { code: '+973', flag: '🇧🇭' },
+                  { code: '+968', flag: '🇴🇲' },
+                  { code: '+974', flag: '🇶🇦' },
+                  { code: '+961', flag: '🇱🇧' },
+                  { code: '+962', flag: '🇯🇴' },
+                  { code: '+218', flag: '🇱🇾' },
+                ].map((cc) => (
+                  <option key={cc.code} value={cc.code}>{cc.flag} {cc.code}</option>
+                ))}
+              </select>
+              <div className="relative flex-1">
+                <svg className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="1012345678"
+                  dir="ltr"
+                  className="w-full ps-10 pe-4 py-3 rounded-xl border-2 border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800/50 text-surface-900 dark:text-white text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+            {errors.phone && <p className="mt-1.5 text-xs text-danger-500 flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>{errors.phone}</p>}
+          </div>
 
           <div className="relative">
             <AnimatedInput

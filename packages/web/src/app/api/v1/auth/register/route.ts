@@ -13,25 +13,25 @@ function generateId() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, phone, firstNameAr, lastNameAr, firstNameEn, lastNameEn } = body;
+    const { phone, password, firstNameAr, lastNameAr } = body;
 
-    if (!email || !password) {
-      return NextResponse.json({ message: 'البريد الإلكتروني وكلمة المرور مطلوبان' }, { status: 400 });
+    if (!phone || !password) {
+      return NextResponse.json({ message: 'رقم الهاتف وكلمة المرور مطلوبان' }, { status: 400 });
     }
 
-    if (Object.values(users).find(u => u.email === email)) {
-      return NextResponse.json({ message: 'البريد الإلكتروني مستخدم بالفعل' }, { status: 409 });
+    if (Object.values(users).find(u => u.phone === phone)) {
+      return NextResponse.json({ message: 'رقم الهاتف مستخدم بالفعل' }, { status: 409 });
     }
 
     const userId = generateId();
     const user = {
       id: userId,
-      email,
-      phone: phone || '',
-      firstNameAr: firstNameAr || '',
-      lastNameAr: lastNameAr || '',
-      firstNameEn: firstNameEn || '',
-      lastNameEn: lastNameEn || '',
+      email: '',
+      phone,
+      firstNameAr: firstNameAr || 'مستخدم',
+      lastNameAr: lastNameAr || 'جديد',
+      firstNameEn: '',
+      lastNameEn: '',
       role: 'PATIENT',
       avatarUrl: null,
       twoFactorEnabled: false,
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    users[email] = { ...user, password };
+    users[phone] = { ...user, password };
 
     const accessToken = generateToken();
     const refreshToken = generateToken();

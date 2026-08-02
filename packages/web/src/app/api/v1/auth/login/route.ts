@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 
 const users: Record<string, any> = {
-  'admin@almokhtabar.com': {
+  '+201012345678': {
     id: '1',
     email: 'admin@almokhtabar.com',
-    phone: '+966501234567',
+    phone: '+201012345678',
     firstNameAr: 'مدير',
     lastNameAr: 'النظام',
     firstNameEn: 'Admin',
@@ -15,10 +15,10 @@ const users: Record<string, any> = {
     password: 'Admin@123',
     status: 'ACTIVE',
   },
-  'patient@example.com': {
+  '+201098765432': {
     id: '2',
     email: 'patient@example.com',
-    phone: '+966509876543',
+    phone: '+201098765432',
     firstNameAr: 'أحمد',
     lastNameAr: 'محمد',
     firstNameEn: 'Ahmed',
@@ -41,12 +41,12 @@ export async function POST(request: Request) {
     const { email, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ message: 'البريد الإلكتروني وكلمة المرور مطلوبان' }, { status: 400 });
+      return NextResponse.json({ message: 'البيانات مطلوبة' }, { status: 400 });
     }
 
     const user = users[email];
     if (!user || user.password !== password) {
-      return NextResponse.json({ message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' }, { status: 401 });
+      return NextResponse.json({ message: 'البيانات غير صحيحة' }, { status: 401 });
     }
 
     if (user.status !== 'ACTIVE') {
