@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { AuthProvider } from '@/lib/contexts/auth-context';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -83,6 +84,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   const otherLocaleLabel = currentLocale === 'ar' ? 'English' : 'العربية';
 
   return (
+    <AuthProvider>
     <div className="min-h-screen flex" dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
       {/* Left Panel - Brand (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 overflow-hidden">
@@ -184,5 +186,6 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         </footer>
       </div>
     </div>
+    </AuthProvider>
   );
 }
