@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useParams } from 'next/navigation';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import {
   FlaskConical,
   LayoutDashboard,
@@ -73,14 +74,14 @@ interface User {
   };
 }
 
-const patientNavItems = [
-  { href: '/ar/patient', label: 'لوحة التحكم', icon: LayoutDashboard },
-  { href: '/ar/patient/tests', label: 'التحاليل', icon: TestTube2 },
-  { href: '/ar/patient/orders', label: 'طلباتي', icon: FileText },
-  { href: '/ar/patient/reports', label: 'التقارير', icon: Activity },
-  { href: '/ar/patient/appointments', label: 'المواعيد', icon: Calendar },
-  { href: '/ar/patient/appointments/book', label: 'حجز موعد', icon: Calendar },
-  { href: '/ar/patient/billing', label: 'الفواتير', icon: CreditCard },
+const patientNavItems = (locale: string) => [
+  { href: `/${locale}/patient`, label: 'لوحة التحكم', icon: LayoutDashboard },
+  { href: `/${locale}/patient/tests`, label: 'التحاليل', icon: TestTube2 },
+  { href: `/${locale}/patient/orders`, label: 'طلباتي', icon: FileText },
+  { href: `/${locale}/patient/reports`, label: 'التقارير', icon: Activity },
+  { href: `/${locale}/patient/appointments`, label: 'المواعيد', icon: Calendar },
+  { href: `/${locale}/patient/appointments/book`, label: 'حجز موعد', icon: Calendar },
+  { href: `/${locale}/patient/billing`, label: 'الفواتير', icon: CreditCard },
 ];
 
 interface AdminNavSection {
@@ -92,104 +93,104 @@ const adminNavSections: AdminNavSection[] = [
   {
     title: 'الرئيسية',
     items: [
-      { href: '/ar/admin', label: 'لوحة التحكم التنفيذية', icon: LayoutDashboard },
-      { href: '/ar/admin/analytics', label: 'التحليلات', icon: BarChart3 },
-      { href: '/ar/admin/revenue', label: 'تحليل الإيرادات', icon: DollarSign },
+      { href: '/admin', label: 'لوحة التحكم التنفيذية', icon: LayoutDashboard },
+      { href: '/admin/analytics', label: 'التحليلات', icon: BarChart3 },
+      { href: '/admin/revenue', label: 'تحليل الإيرادات', icon: DollarSign },
     ],
   },
   {
     title: 'العمليات',
     items: [
-      { href: '/ar/admin/appointments', label: 'المواعيد', icon: Calendar },
-      { href: '/ar/admin/patients', label: 'المرضى', icon: Users },
-      { href: '/ar/admin/doctors', label: 'الأطباء', icon: Stethoscope },
-      { href: '/ar/admin/staff', label: 'طاقم العمل', icon: UserCog },
-      { href: '/ar/admin/reception', label: 'الاستقبال', icon: UserPlus },
-      { href: '/ar/admin/branches', label: 'الفروع', icon: Building2 },
-      { href: '/ar/admin/departments', label: 'الأقسام', icon: ClipboardList },
+      { href: '/admin/appointments', label: 'المواعيد', icon: Calendar },
+      { href: '/admin/patients', label: 'المرضى', icon: Users },
+      { href: '/admin/doctors', label: 'الأطباء', icon: Stethoscope },
+      { href: '/admin/staff', label: 'طاقم العمل', icon: UserCog },
+      { href: '/admin/reception', label: 'الاستقبال', icon: UserPlus },
+      { href: '/admin/branches', label: 'الفروع', icon: Building2 },
+      { href: '/admin/departments', label: 'الأقسام', icon: ClipboardList },
     ],
   },
   {
     title: 'المختبر',
     items: [
-      { href: '/ar/admin/tests', label: 'التحاليل', icon: TestTube2 },
-      { href: '/ar/admin/packages', label: 'الحزم', icon: Package },
-      { href: '/ar/admin/results', label: 'النتائج', icon: FileCheck },
-      { href: '/ar/admin/reports', label: 'التقارير', icon: FileText },
-      { href: '/ar/admin/inventory', label: 'المخزون', icon: Archive },
+      { href: '/admin/tests', label: 'التحاليل', icon: TestTube2 },
+      { href: '/admin/packages', label: 'الحزم', icon: Package },
+      { href: '/admin/results', label: 'النتائج', icon: FileCheck },
+      { href: '/admin/reports', label: 'التقارير', icon: FileText },
+      { href: '/admin/inventory', label: 'المخزون', icon: Archive },
     ],
   },
   {
     title: 'المالية',
     items: [
-      { href: '/ar/admin/accounting', label: 'المحاسبة', icon: Calculator },
-      { href: '/ar/admin/payroll', label: 'الرواتب', icon: Wallet },
-      { href: '/ar/admin/insurance', label: 'التأمين', icon: Shield },
+      { href: '/admin/accounting', label: 'المحاسبة', icon: Calculator },
+      { href: '/admin/payroll', label: 'الرواتب', icon: Wallet },
+      { href: '/admin/insurance', label: 'التأمين', icon: Shield },
     ],
   },
   {
     title: 'الشراكات والتسويق',
     items: [
-      { href: '/ar/admin/partners', label: 'الشركاء', icon: Users },
-      { href: '/ar/admin/marketing', label: 'التسويق', icon: Megaphone },
-      { href: '/ar/admin/seo', label: 'تحسين محركات البحث', icon: SearchIcon },
-      { href: '/ar/admin/cms', label: 'إدارة المحتوى', icon: Globe },
-      { href: '/ar/admin/media', label: 'مكتبة الوسائط', icon: Image },
-      { href: '/ar/admin/blog', label: 'المدونة', icon: BookOpen },
-      { href: '/ar/admin/offers', label: 'العروض', icon: Tag },
-      { href: '/ar/admin/coupons', label: 'الكوبونات', icon: Percent },
+      { href: '/admin/partners', label: 'الشركاء', icon: Users },
+      { href: '/admin/marketing', label: 'التسويق', icon: Megaphone },
+      { href: '/admin/seo', label: 'تحسين محركات البحث', icon: SearchIcon },
+      { href: '/admin/cms', label: 'إدارة المحتوى', icon: Globe },
+      { href: '/admin/media', label: 'مكتبة الوسائط', icon: Image },
+      { href: '/admin/blog', label: 'المدونة', icon: BookOpen },
+      { href: '/admin/offers', label: 'العروض', icon: Tag },
+      { href: '/admin/coupons', label: 'الكوبونات', icon: Percent },
     ],
   },
   {
     title: 'الاتصالات',
     items: [
-      { href: '/ar/admin/notifications', label: 'الإشعارات', icon: BellIcon },
-      { href: '/ar/admin/emails', label: 'البريد الإلكتروني', icon: Mail },
-      { href: '/ar/admin/sms', label: 'الرسائل النصية', icon: MessageSquare },
-      { href: '/ar/admin/whatsapp', label: 'واتساب', icon: Phone },
+      { href: '/admin/notifications', label: 'الإشعارات', icon: BellIcon },
+      { href: '/admin/emails', label: 'البريد الإلكتروني', icon: Mail },
+      { href: '/admin/sms', label: 'الرسائل النصية', icon: MessageSquare },
+      { href: '/admin/whatsapp', label: 'واتساب', icon: Phone },
     ],
   },
   {
     title: 'النظام',
     items: [
-      { href: '/ar/admin/roles', label: 'الأدوار', icon: Key },
-      { href: '/ar/admin/permissions', label: 'الصلاحيات', icon: Lock },
-      { href: '/ar/admin/audit', label: 'سجلات التدقيق', icon: ScrollText },
-      { href: '/ar/admin/activity', label: 'سجل النشاط', icon: Activity },
-      { href: '/ar/admin/api-monitor', label: 'مراقبة API', icon: Wifi },
-      { href: '/ar/admin/server', label: 'مراقبة الخادم', icon: Server },
-      { href: '/ar/admin/security', label: 'مركز الأمان', icon: ShieldCheck },
-      { href: '/ar/admin/settings', label: 'الإعدادات', icon: Settings },
+      { href: '/admin/roles', label: 'الأدوار', icon: Key },
+      { href: '/admin/permissions', label: 'الصلاحيات', icon: Lock },
+      { href: '/admin/audit', label: 'سجلات التدقيق', icon: ScrollText },
+      { href: '/admin/activity', label: 'سجل النشاط', icon: Activity },
+      { href: '/admin/api-monitor', label: 'مراقبة API', icon: Wifi },
+      { href: '/admin/server', label: 'مراقبة الخادم', icon: Server },
+      { href: '/admin/security', label: 'مركز الأمان', icon: ShieldCheck },
+      { href: '/admin/settings', label: 'الإعدادات', icon: Settings },
     ],
   },
   {
     title: 'الذكاء الاصطناعي',
     items: [
-      { href: '/ar/admin/ai', label: 'لوحة AI', icon: Brain },
+      { href: '/admin/ai', label: 'لوحة AI', icon: Brain },
     ],
   },
 ];
 
-const receptionNavItems = [
-  { href: '/ar/reception', label: 'لوحة الاستقبال', icon: LayoutDashboard },
-  { href: '/ar/reception/queue', label: 'قائمة الانتظار', icon: Users },
-  { href: '/ar/reception/walk-ins', label: 'المرضى المترددين', icon: UserPlus },
-  { href: '/ar/reception/insurance', label: 'التأمين', icon: Shield },
-  { href: '/ar/reception/transfers', label: 'النقل بين الفروع', icon: ArrowRightLeft },
-  { href: '/ar/reception/home-visits', label: 'الزيارات المنزلية', icon: Home },
-  { href: '/ar/reception/emergency', label: 'الحالات الطارئة', icon: AlertTriangle },
-  { href: '/ar/reception/display', label: 'شاشة الانتظار', icon: Monitor },
+const receptionNavItems = (locale: string) => [
+  { href: `/${locale}/reception`, label: 'لوحة الاستقبال', icon: LayoutDashboard },
+  { href: `/${locale}/reception/queue`, label: 'قائمة الانتظار', icon: Users },
+  { href: `/${locale}/reception/walk-ins`, label: 'المرضى المترددين', icon: UserPlus },
+  { href: `/${locale}/reception/insurance`, label: 'التأمين', icon: Shield },
+  { href: `/${locale}/reception/transfers`, label: 'النقل بين الفروع', icon: ArrowRightLeft },
+  { href: `/${locale}/reception/home-visits`, label: 'الزيارات المنزلية', icon: Home },
+  { href: `/${locale}/reception/emergency`, label: 'الحالات الطارئة', icon: AlertTriangle },
+  { href: `/${locale}/reception/display`, label: 'شاشة الانتظار', icon: Monitor },
 ];
 
-const doctorNavItems = [
-  { href: '/ar/doctor', label: 'لوحة التحكم', icon: LayoutDashboard },
-  { href: '/ar/doctor/schedule', label: 'الجدول اليومي', icon: Calendar },
-  { href: '/ar/doctor/queue', label: 'قائمة الانتظار', icon: Users },
-  { href: '/ar/doctor/patients', label: 'المرضى', icon: Users },
-  { href: '/ar/doctor/orders', label: 'الطلبات', icon: FileText },
-  { href: '/ar/doctor/reports', label: 'التقارير', icon: Activity },
-  { href: '/ar/doctor/prescriptions', label: 'الوصفات', icon: FileText },
-  { href: '/ar/doctor/settings', label: 'الإعدادات', icon: Settings },
+const doctorNavItems = (locale: string) => [
+  { href: `/${locale}/doctor`, label: 'لوحة التحكم', icon: LayoutDashboard },
+  { href: `/${locale}/doctor/schedule`, label: 'الجدول اليومي', icon: Calendar },
+  { href: `/${locale}/doctor/queue`, label: 'قائمة الانتظار', icon: Users },
+  { href: `/${locale}/doctor/patients`, label: 'المرضى', icon: Users },
+  { href: `/${locale}/doctor/orders`, label: 'الطلبات', icon: FileText },
+  { href: `/${locale}/doctor/reports`, label: 'التقارير', icon: Activity },
+  { href: `/${locale}/doctor/prescriptions`, label: 'الوصفات', icon: FileText },
+  { href: `/${locale}/doctor/settings`, label: 'الإعدادات', icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -199,6 +200,8 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const params = useParams();
+  const locale = (params.locale as string) || 'ar';
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -206,22 +209,29 @@ export default function DashboardLayout({
   const [showProfile, setShowProfile] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark';
+    }
+    return false;
+  });
 
   useEffect(() => {
     const stored = localStorage.getItem('user');
     if (stored) {
       setUser(JSON.parse(stored));
     } else {
-      router.push('/ar/login');
+      router.push(`/${locale}/login`);
     }
-  }, []);
+  }, [locale, router]);
 
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
 
@@ -252,11 +262,11 @@ export default function DashboardLayout({
   }, [searchQuery]);
 
   const navItems = user?.role === 'PATIENT'
-    ? patientNavItems
+    ? patientNavItems(locale)
     : user?.role === 'DOCTOR'
-    ? doctorNavItems
+    ? doctorNavItems(locale)
     : user?.role === 'RECEPTIONIST'
-    ? receptionNavItems
+    ? receptionNavItems(locale)
     : null;
 
   const isAdmin = !user?.role || (user?.role !== 'PATIENT' && user?.role !== 'DOCTOR' && user?.role !== 'RECEPTIONIST');
@@ -265,7 +275,7 @@ export default function DashboardLayout({
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    router.push('/ar/login');
+    router.push(`/${locale}/login`);
   };
 
   const getInitials = () => {
@@ -310,11 +320,12 @@ export default function DashboardLayout({
             {!collapsed && (
               <div className="space-y-0.5">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href || (item.href !== '/ar/admin' && pathname?.startsWith(item.href) && item.href.split('/').length > 3);
+                  const fullHref = `/${locale}${item.href}`;
+                  const isActive = pathname === fullHref || (item.href !== '/admin' && pathname?.startsWith(fullHref));
                   return (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={fullHref}
                       className={`sidebar-item ${isActive ? 'active' : ''} ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                       title={!sidebarOpen ? item.label : undefined}
                     >
@@ -331,10 +342,10 @@ export default function DashboardLayout({
     </nav>
   );
 
-  const renderFlatNav = (items: typeof patientNavItems) => (
+  const renderFlatNav = (items: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[]) => (
     <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">
       {items.map((item) => {
-        const isActive = pathname === item.href || (item.href !== '/ar/patient' && item.href !== '/ar/doctor' && item.href !== '/ar/reception' && pathname?.startsWith(item.href));
+        const isActive = pathname === item.href || (item.href !== `/${locale}/patient` && item.href !== `/${locale}/doctor` && item.href !== `/${locale}/reception` && pathname?.startsWith(item.href));
         return (
           <Link
             key={item.href}
@@ -351,7 +362,8 @@ export default function DashboardLayout({
   );
 
   return (
-    <div className={`flex min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <AuthGuard locale={locale}>
+      <div className={`flex min-h-screen ${darkMode ? 'dark' : ''}`}>
       <aside
         className={`sidebar transition-all duration-300 ${
           sidebarOpen ? 'w-64' : 'w-20'
@@ -429,11 +441,12 @@ export default function DashboardLayout({
                       {section.title}
                     </div>
                     {section.items.map((item) => {
-                      const isActive = pathname === item.href;
+                      const fullHref = `/${locale}${item.href}`;
+                      const isActive = pathname === fullHref;
                       return (
                         <Link
                           key={item.href}
-                          href={item.href}
+                          href={fullHref}
                           onClick={() => setMobileSidebarOpen(false)}
                           className={`sidebar-item ${isActive ? 'active' : ''}`}
                         >
@@ -584,6 +597,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }

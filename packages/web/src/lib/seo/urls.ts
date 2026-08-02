@@ -106,9 +106,6 @@ export const redirectRules: Redirect[] = [
   // Trailing slash normalization
   { source: '/:path*/', destination: '/:path*', permanent: true },
 
-  // WWW normalization
-  { source: '/(.*)', destination: '/:path*', permanent: true }, // www handled in middleware
-
   // Old result check page
   { source: '/check-results', destination: '/:locale/results', permanent: true },
   { source: '/get-results', destination: '/:locale/results', permanent: true },

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { siteConfig } from '@/lib/seo/config';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -256,7 +257,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-surface-50 font-sans antialiased selection:bg-brand-200 selection:text-brand-900">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
