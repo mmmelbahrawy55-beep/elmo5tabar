@@ -1,10 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "next build",
+  "buildCommand": "npm run build --workspace=@al-mokhtabar/web",
   "installCommand": "npm install",
-  "functions": {
-    "api/**/*.ts": {
-      "maxDuration": 30
-    }
-  }
+  "outputDirectory": "packages/web/.next"
 }

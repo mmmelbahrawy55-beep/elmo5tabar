@@ -105,6 +105,9 @@ export function middleware(request: NextRequest) {
       const url = new URL(restPath || '/' + search, request.url);
       return NextResponse.redirect(url, 301);
     }
+    // Bare path without locale prefix (e.g. /register) — redirect to default locale
+    const url = new URL(`/${defaultLocale}${pathname}` + search, request.url);
+    return NextResponse.redirect(url, 302);
   } else if (!locales.includes(locale)) {
     const detected = getLocaleFromAcceptLanguage(request.headers.get('accept-language'));
     const url = new URL(`/${detected}${pathname}` + search, request.url);
