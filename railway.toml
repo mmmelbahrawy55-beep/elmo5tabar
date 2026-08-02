@@ -1,0 +1,11 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd packages/backend && npm install && npx prisma generate && npx nest build"
+watchPatterns = ["packages/backend/src/**"]
+
+[deploy]
+startCommand = "cd packages/backend && npx prisma migrate deploy && node dist/main.js"
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
