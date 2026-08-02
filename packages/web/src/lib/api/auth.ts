@@ -36,7 +36,15 @@ class AuthClient {
     };
     if (this.accessToken) headers['Authorization'] = `Bearer ${this.accessToken}`;
 
-    const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    let response: Response;
+    try {
+      response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    } catch (err: any) {
+      if (err.name === 'TypeError' && err.message?.includes('fetch')) {
+        throw new Error('الخادم غير متاح حالياً. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.');
+      }
+      throw new Error('حدث خطأ في الاتصال بالخادم.');
+    }
 
     if (response.status === 401 && this.refreshToken) {
       const refreshed = await this.refresh();

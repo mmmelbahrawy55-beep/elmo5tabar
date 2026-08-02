@@ -93,7 +93,7 @@ export default function HomePage() {
                   <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <Link
-                  href="/ar/tests"
+                  href="/ar/patient/tests"
                   className="btn-secondary border-white/20 bg-white/10 text-white hover:bg-white/20 text-base px-8 py-4"
                 >
                   تصفح التحاليل

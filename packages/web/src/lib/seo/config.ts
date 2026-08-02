@@ -54,7 +54,7 @@ export const siteConfig = {
     logo: '/images/logo.svg',
     logoWidth: 200,
     logoHeight: 60,
-    favicon: '/favicon.ico',
+    favicon: '/favicon.svg',
     appleTouchIcon: '/apple-touch-icon.png',
     robotsTxt: true,
     sitemapSize: 50000,
