@@ -136,9 +136,10 @@ class AuthClient {
   getOAuthUrl(provider: string) {
     const state = crypto.randomUUID();
     sessionStorage.setItem('oauth_state', state);
-    return `${API_BASE}/auth/oauth/${provider}?state=${state}&redirectUri=${encodeURIComponent(
-      window.location.origin + '/auth/callback/' + provider
-    )}`;
+    const locale = window.location.pathname.split('/')[1] || 'ar';
+    const redirectUri = window.location.origin + '/' + locale + '/callback/' + provider;
+    sessionStorage.setItem('oauth_redirect_uri', redirectUri);
+    return `${window.location.origin}/${locale}/oauth/consent/${provider}?state=${state}`;
   }
 
   async forgotPassword(email: string) {
