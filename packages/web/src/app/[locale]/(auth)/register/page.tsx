@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface FormData {
@@ -135,6 +135,8 @@ export default function RegisterPage() {
   const t = useTranslations('auth.register');
   const { register } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -255,7 +257,7 @@ export default function RegisterPage() {
             تم إرسال رمز التحقق إلى <span className="font-semibold text-surface-700 dark:text-surface-200">{emailForVerification}</span>. تحقق من بريدك الإلكتروني وأكمل التسجيل.
           </p>
           <Link
-            href="/login"
+            href={`/${locale}/login`}
             className="inline-flex items-center gap-2 w-full py-3.5 bg-gradient-to-l from-brand-600 to-brand-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30 transition-all duration-300 justify-center"
           >
             الذهاب لتسجيل الدخول
@@ -500,7 +502,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-surface-500 dark:text-surface-400">
         لديك حساب بالفعل؟{' '}
-        <Link href="/login" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-semibold transition-colors">
+        <Link href={`/${locale}/login`} className="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-semibold transition-colors">
           سجّل الدخول
         </Link>
       </p>

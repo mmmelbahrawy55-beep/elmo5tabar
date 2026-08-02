@@ -101,13 +101,7 @@ export function middleware(request: NextRequest) {
   const { locale, restPath } = getLocaleFromPath(pathname);
 
   if (locale === defaultLocale) {
-    if (pathname.startsWith(`/${defaultLocale}/`) || pathname === `/${defaultLocale}`) {
-      const url = new URL(restPath || '/' + search, request.url);
-      return NextResponse.redirect(url, 301);
-    }
-    // Bare path without locale prefix (e.g. /register) — redirect to default locale
-    const url = new URL(`/${defaultLocale}${pathname}` + search, request.url);
-    return NextResponse.redirect(url, 302);
+    // Keep locale prefix for default locale — Next.js [locale] routes need it
   } else if (!locales.includes(locale)) {
     const detected = getLocaleFromAcceptLanguage(request.headers.get('accept-language'));
     const url = new URL(`/${detected}${pathname}` + search, request.url);
@@ -119,13 +113,13 @@ export function middleware(request: NextRequest) {
 
   const currentLocale = locales.includes(locale) ? locale : defaultLocale;
   for (const loc of locales) {
-    const href = `${siteConfig.url}${loc === defaultLocale ? restPath : `/${loc}${restPath}`}`;
+    const href = `${siteConfig.url}/${loc}${restPath}`;
     response.headers.append('Link', `<${href}>; rel="alternate"; hreflang="${loc}"`);
   }
-  response.headers.append('Link', `<${siteConfig.url}${restPath}>; rel="alternate"; hreflang="x-default"`);
+  response.headers.append('Link', `<${siteConfig.url}/${currentLocale}${restPath}>; rel="alternate"; hreflang="x-default"`);
 
   // ─── 8. Canonical header ───
-  const canonicalPath = currentLocale === defaultLocale ? restPath : `/${currentLocale}${restPath}`;
+  const canonicalPath = `/${currentLocale}${restPath}`;
   response.headers.set('Link', `<${siteConfig.url}${canonicalPath}>; rel="canonical"`);
   response.headers.set('x-locale', currentLocale);
 

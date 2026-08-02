@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface Toast {
@@ -58,6 +58,8 @@ export default function LoginPage() {
   const t = useTranslations('auth.login');
   const { login, loginWithOTP } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
 
   const [mode, setMode] = useState<'password' | 'otp'>('password');
   const [email, setEmail] = useState('');
@@ -255,7 +257,7 @@ export default function LoginPage() {
               </div>
               <span className="text-sm text-surface-600 dark:text-surface-400 group-hover:text-surface-800 dark:group-hover:text-surface-200 transition-colors">تذكرني</span>
             </label>
-            <Link href="/forgot-password" className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium transition-colors">
+            <Link href={`/${locale}/forgot-password`} className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium transition-colors">
               نسيت كلمة المرور؟
             </Link>
           </div>
@@ -385,7 +387,7 @@ export default function LoginPage() {
       {/* Register link */}
       <p className="mt-6 text-center text-sm text-surface-500 dark:text-surface-400">
         ليس لديك حساب؟{' '}
-        <Link href="/register" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-semibold transition-colors">
+        <Link href={`/${locale}/register`} className="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-semibold transition-colors">
           أنشئ حساباً جديداً
         </Link>
       </p>
