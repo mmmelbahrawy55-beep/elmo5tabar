@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/api/auth';
 
@@ -12,8 +11,14 @@ interface Toast {
 }
 
 export default function TwoFactorPage() {
-  const t = useTranslations('auth.twoFactor');
   const router = useRouter();
+
+  const t = (key: string): string => {
+    const tr: Record<string, string> = {
+      title: 'التحقق بخطوتين', subtitle: 'اختر طريقة التحقق المناسبة', setupFailed: 'فشل الإعداد', backupCodeRequired: 'أدخل رمز الاسترداد', twoFactorEnabled: 'تم تفعيل التحقق بخطوتين', verifyFailed: 'فشل التحقق', otpRequired: 'أدخل رمز OTP', backupCodesCopied: 'تم نسخ أكواد الاسترداد', backupCodesTitle: 'أكواد الاسترداد', backupCodesDescription: 'احفظ هذه الأكواد في مكان آمن', copyCodes: 'نسخ الأكواد', downloadCodes: 'تنزيل الأكواد', continueToDashboard: 'المتابعة للوحة التحكم', smsMethod: 'رسالة SMS', smsDescription: 'استلم رمز التحقق عبر رسالة نصية', emailMethod: 'البريد الإلكتروني', emailDescription: 'استلم رمز التحقق عبر البريد الإلكتروني', totpMethod: 'تطبيق المصادقة', totpDescription: 'استخدم تطبيق Google Authenticator أو ما شابه', trustThisDevice: 'الوثوق بهذا الجهاز لمدة 30 يوماً', settingUp: 'جاري الإعداد...', setupButton: 'إعداد التحقق', scanQrCode: 'امسح رمز QR باستخدام تطبيق المصادقة', manualEntry: 'أو أدخل المفتاح يدوياً', codeSentTo: 'تم إرسال الرمز إلى', yourPhone: 'هاتفك', yourEmail: 'بريدك الإلكتروني', useOTP: 'استخدم رمز OTP', useBackupCode: 'استخدم رمز الاسترداد', backupCodePlaceholder: 'أدخل رمز الاسترداد', verifying: 'جاري التحقق...', verifyButton: 'تحقق', backToSetup: 'العودة للإعداد', recoveryOptions: 'خيارات الاسترداد',
+    };
+    return tr[key] || key;
+  };
 
   const [method, setMethod] = useState<'sms' | 'email' | 'totp'>('totp');
   const [loading, setLoading] = useState(false);

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -132,11 +131,36 @@ function AnimatedSelect({ label, value, onChange, options, error, icon, required
 }
 
 export default function RegisterPage() {
-  const t = useTranslations('auth.register');
   const { register } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
+
+  const t = (key: string): string => {
+    const translations: Record<string, string> = {
+      firstNameArRequired: 'الاسم الأول مطلوب',
+      lastNameArRequired: 'اسم العائلة مطلوب',
+      genderRequired: 'الجنس مطلوب',
+      dateOfBirthRequired: 'تاريخ الميلاد مطلوب',
+      emailRequired: 'البريد الإلكتروني مطلوب',
+      emailInvalid: 'البريد الإلكتروني غير صالح',
+      phoneRequired: 'رقم الهاتف مطلوب',
+      phoneInvalid: 'رقم الهاتف غير صالح',
+      passwordRequired: 'كلمة المرور مطلوبة',
+      passwordMinLength: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+      confirmPasswordRequired: 'تأكيد كلمة المرور مطلوب',
+      passwordsDoNotMatch: 'كلمتا المرور غير متطابقتين',
+      termsRequired: 'يجب الموافقة على شروط الاستخدام',
+      privacyRequired: 'يجب الموافقة على سياسة الخصوصية',
+      hipaaRequired: 'يجب الموافقة على تفويض حماية البيانات الصحية',
+      registrationFailed: 'فشل التسجيل',
+      verificationEmailSent: 'تم إرسال رمز التحقق',
+      verificationEmailSentDescription: 'تم إرسال رمز التحقق إلى {email}. تحقق من بريدك الإلكتروني وأكمل التسجيل.',
+      goToLogin: 'الذهاب لتسجيل الدخول',
+      passwordStrength: 'قوة كلمة المرور',
+    };
+    return translations[key] || key;
+  };
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -55,11 +54,45 @@ function AnimatedInput({ label, type = 'text', value, onChange, error, icon, dir
 }
 
 export default function LoginPage() {
-  const t = useTranslations('auth.login');
   const { login, loginWithOTP } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'ar';
+
+  const t = (key: string): string => {
+    const translations: Record<string, string> = {
+      email: 'البريد الإلكتروني',
+      emailRequired: 'البريد الإلكتروني مطلوب',
+      emailInvalid: 'البريد الإلكتروني غير صالح',
+      password: 'كلمة المرور',
+      passwordRequired: 'كلمة المرور مطلوبة',
+      passwordMinLength: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+      emailOrPhoneRequired: 'البريد الإلكتروني أو رقم الهاتف مطلوب',
+      loginSuccess: 'تم تسجيل الدخول بنجاح',
+      loginFailed: 'فشل تسجيل الدخول',
+      otpSent: 'تم إرسال رمز OTP',
+      otpFailed: 'فشل إرسال رمز OTP',
+      otpCodeRequired: 'رمز OTP مطلوب',
+      otpVerifyFailed: 'فشل التحقق من رمز OTP',
+      twoFactorCodeRequired: 'كود التحقق مطلوب',
+      twoFactorVerifyFailed: 'فشل التحقق بخطوتين',
+      biometricNotSupported: 'البصمة غير مدعومة في هذا الجهاز',
+      biometricInitiating: 'جاري تهيئة تسجيل الدخول بالبصمة',
+      biometricFailed: 'فشل تسجيل الدخول بالبصمة',
+      sendingOtp: 'جاري الإرسال...',
+      sendOtp: 'إرسال الرمز',
+      enterOtp: 'أدخل رمز التحقق',
+      verifyOtp: 'تحقق من الرمز',
+      verifying: 'جاري التحقق...',
+      verify: 'تحقق',
+      changeEmailOrPhone: 'تغيير البريد الإلكتروني أو رقم الهاتف',
+      twoFactorTitle: 'التحقق بخطوتين',
+      twoFactorDescription: 'أدخل الرمز المكون من 6 أرقام المرسل إلى جهازك',
+      cancel: 'إلغاء',
+      attemptsRemaining: 'لديك {count} محاولات متبقية',
+    };
+    return translations[key] || key;
+  };
 
   const [mode, setMode] = useState<'password' | 'otp'>('password');
   const [email, setEmail] = useState('');
@@ -266,7 +299,7 @@ export default function LoginPage() {
             <div className="p-3 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-xl">
               <p className="text-sm text-warning-700 dark:text-warning-300 flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                {t('attemptsRemaining', { count: attemptsRemaining })}
+                {`لديك ${attemptsRemaining} محاولات متبقية`}
               </p>
             </div>
           )}
