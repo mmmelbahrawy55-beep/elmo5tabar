@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useParams } from 'next/navigation';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { AuthProvider } from '@/lib/contexts/auth-context';
 import {
   FlaskConical,
   LayoutDashboard,
@@ -65,13 +66,11 @@ interface User {
   id: string;
   email: string;
   role: string;
-  profile?: {
-    firstNameAr: string;
-    lastNameAr: string;
-    firstNameEn?: string;
-    lastNameEn?: string;
-    avatar?: string;
-  };
+  firstNameAr: string;
+  lastNameAr: string;
+  firstNameEn?: string;
+  lastNameEn?: string;
+  avatar?: string;
 }
 
 const patientNavItems = (locale: string) => [
@@ -279,11 +278,9 @@ export default function DashboardLayout({
   };
 
   const getInitials = () => {
-    if (user?.profile) {
-      const f = user.profile.firstNameAr?.[0] || '';
-      const l = user.profile.lastNameAr?.[0] || '';
-      return `${f}${l}`;
-    }
+    const f = user?.firstNameAr?.[0] || '';
+    const l = user?.lastNameAr?.[0] || '';
+    if (f || l) return `${f}${l}`;
     return user?.email?.[0]?.toUpperCase() || 'U';
   };
 
@@ -362,8 +359,9 @@ export default function DashboardLayout({
   );
 
   return (
-    <AuthGuard locale={locale}>
-      <div className={`flex min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <AuthProvider>
+      <AuthGuard locale={locale}>
+      <div className="flex min-h-screen">
       <aside
         className={`sidebar transition-all duration-300 ${
           sidebarOpen ? 'w-64' : 'w-20'
@@ -552,7 +550,7 @@ export default function DashboardLayout({
                 </div>
                 <div className="hidden md:block text-right">
                   <div className="text-sm font-medium text-surface-900 dark:text-white">
-                    {user?.profile?.firstNameAr} {user?.profile?.lastNameAr}
+                      {user?.firstNameAr} {user?.lastNameAr}
                   </div>
                   <div className="text-xs text-surface-500">{roleLabel(user?.role || '')}</div>
                 </div>
@@ -563,7 +561,7 @@ export default function DashboardLayout({
                 <div className="absolute left-0 top-full mt-2 w-64 rounded-xl border border-surface-100 dark:border-surface-800 bg-white dark:bg-surface-900 shadow-elevated animate-in z-50">
                   <div className="p-3 border-b border-surface-100 dark:border-surface-800">
                     <p className="text-sm font-medium text-surface-900 dark:text-white">
-                      {user?.profile?.firstNameAr} {user?.profile?.lastNameAr}
+                    {user?.firstNameAr} {user?.lastNameAr}
                     </p>
                     <p className="text-xs text-surface-500 mt-0.5">{user?.email}</p>
                     <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 text-[10px] font-medium">
@@ -599,5 +597,6 @@ export default function DashboardLayout({
       </div>
       </div>
     </AuthGuard>
+    </AuthProvider>
   );
 }

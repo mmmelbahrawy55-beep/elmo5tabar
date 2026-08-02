@@ -143,7 +143,15 @@ export default function LoginPage() {
         setShow2FAModal(true);
       } else {
         addToast(t('loginSuccess'), 'success');
-        router.push(`/${locale}/dashboard`);
+        const role = result.user?.role;
+        const redirectMap: Record<string, string> = {
+          PATIENT: `/${locale}/patient`,
+          DOCTOR: `/${locale}/doctor`,
+          ADMIN: `/${locale}/admin`,
+          SUPER_ADMIN: `/${locale}/admin`,
+          RECEPTIONIST: `/${locale}/reception`,
+        };
+        router.push(redirectMap[role] || `/${locale}/patient`);
       }
     } catch (err: any) {
       const msg = err.message || t('loginFailed');
@@ -178,7 +186,7 @@ export default function LoginPage() {
       const { authClient } = await import('@/lib/api/auth');
       await authClient.verifyOTP(otpCode, otpEmailOrPhone);
       addToast(t('loginSuccess'), 'success');
-      router.push(`/${locale}/dashboard`);
+      router.push(`/${locale}/patient`);
     } catch (err: any) {
       addToast(err.message || t('otpVerifyFailed'));
     } finally {
@@ -194,7 +202,7 @@ export default function LoginPage() {
       await authClient.verify2FA(twoFactorCode);
       setShow2FAModal(false);
       addToast(t('loginSuccess'), 'success');
-      router.push(`/${locale}/dashboard`);
+      router.push(`/${locale}/patient`);
     } catch (err: any) {
       addToast(err.message || t('twoFactorVerifyFailed'));
     } finally {

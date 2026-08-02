@@ -770,7 +770,7 @@ function HomeVisitSection() {
               ))}
             </div>
             <Link
-               href={`/${locale}/book`}
+               href={`/${locale}/patient/appointments/book`}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               احجز فحص منزلي
@@ -905,7 +905,7 @@ function BookingCTASection() {
 // ============================================================
 function ContactSection() {
   return (
-    <Section id="تواصل-معنا" className="py-20 lg:py-28">
+    <Section id="تواصل معنا" className="py-20 lg:py-28">
       <Container>
         <motion.div
           initial="hidden"
@@ -993,24 +993,38 @@ function ContactSection() {
 // 12. FOOTER
 // ============================================================
 function PremiumFooter() {
-  const columns = [
-    {
-      title: 'المختبر',
-      links: ['من نحن', 'الفروع', 'الوظائف', 'الأخبار', 'تواصل معنا'],
-    },
-    {
-      title: 'الخدمات',
-      links: ['تحليل الدم', 'التحاليل الكيميائية', 'التحاليل الهرمونية', 'البكتريولوجيا', 'المناعة'],
-    },
-    {
-      title: 'المرضى',
-      links: ['حجز موعد', 'تصفح التحاليل', 'طلباتي', 'تقاريري', 'الفواتير'],
-    },
-    {
-      title: 'الدعم',
-      links: ['الأسئلة الشائعة', 'الشروط والأحكام', 'سياسة الخصوصية', 'الإبلاغ عن مشكلة'],
-    },
-  ];
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'ar';
+
+  const footerLinks: Record<string, { label: string; href: string }[]> = {
+    'المختبر': [
+      { label: 'من نحن', href: '#' },
+      { label: 'الفروع', href: '#' },
+      { label: 'الوظائف', href: '#' },
+      { label: 'الأخبار', href: '#' },
+      { label: 'تواصل معنا', href: '#تواصل معنا' },
+    ],
+    'الخدمات': [
+      { label: 'تحليل الدم', href: '#' },
+      { label: 'التحاليل الكيميائية', href: '#' },
+      { label: 'التحاليل الهرمونية', href: '#' },
+      { label: 'البكتريولوجيا', href: '#' },
+      { label: 'المناعة', href: '#' },
+    ],
+    'المرضى': [
+      { label: 'حجز موعد', href: `/${locale}/patient/appointments/book` },
+      { label: 'تصفح التحاليل', href: `/${locale}/patient/tests` },
+      { label: 'طلباتي', href: `/${locale}/patient/appointments` },
+      { label: 'تقاريري', href: `/${locale}/patient/tests` },
+      { label: 'الفواتير', href: '#' },
+    ],
+    'الدعم': [
+      { label: 'الأسئلة الشائعة', href: '#' },
+      { label: 'الشروط والأحكام', href: `/${locale}/terms` },
+      { label: 'سياسة الخصوصية', href: `/${locale}/privacy` },
+      { label: 'الإبلاغ عن مشكلة', href: '#' },
+    ],
+  };
 
   return (
     <footer className="bg-[#023E8A] text-white">
@@ -1043,14 +1057,14 @@ function PremiumFooter() {
           </div>
 
           {/* Link Columns */}
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-bold text-white mb-4">{col.title}</h4>
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title}>
+              <h4 className="text-sm font-bold text-white mb-4">{title}</h4>
               <ul className="space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-white/50 hover:text-white transition-colors">
-                      {link}
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="text-sm text-white/50 hover:text-white transition-colors">
+                      {link.label}
                     </a>
                   </li>
                 ))}

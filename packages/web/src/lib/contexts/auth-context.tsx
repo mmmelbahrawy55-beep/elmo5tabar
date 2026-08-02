@@ -25,11 +25,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (authClient.isAuthenticated) {
         const u = await authClient.getMe();
         setUser(u);
+        localStorage.setItem('user', JSON.stringify(u));
       } else {
         setUser(null);
+        localStorage.removeItem('user');
       }
     } catch {
       setUser(null);
+      localStorage.removeItem('user');
     }
   }, []);
 
@@ -56,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     await authClient.logout();
     setUser(null);
+    localStorage.removeItem('user');
   };
 
   return (

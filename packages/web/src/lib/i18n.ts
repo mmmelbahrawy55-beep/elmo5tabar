@@ -1,9 +1,15 @@
-import { useTranslations as useNextIntlTranslations } from 'next-intl';
+'use client';
+
+const translations: Record<string, Record<string, string>> = {};
 
 export function useTranslations() {
-  const t = useNextIntlTranslations();
   return (key: string, fallback?: string): string => {
-    const value = t(key);
-    return value === key && fallback ? fallback : value;
+    return fallback || key;
+  };
+}
+
+export function getTranslations(locale: string) {
+  return (key: string, fallback?: string): string => {
+    return fallback || key;
   };
 }

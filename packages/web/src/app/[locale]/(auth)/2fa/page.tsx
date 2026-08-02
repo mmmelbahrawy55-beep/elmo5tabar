@@ -101,7 +101,7 @@ export default function TwoFactorPage() {
       try {
         await authClient.verify2FA(backupCode);
         addToast(t('twoFactorEnabled'), 'success');
-        router.push(`/${locale}/dashboard`);
+        router.push(`/${locale}/patient`);
       } catch (err: any) {
         addToast(err.message || t('verifyFailed'));
       } finally {
@@ -121,7 +121,7 @@ export default function TwoFactorPage() {
           setShowBackupCodes(true);
         } else {
           addToast(t('twoFactorEnabled'), 'success');
-          router.push(`/${locale}/dashboard`);
+          router.push(`/${locale}/patient`);
         }
       } catch (err: any) {
         addToast(err.message || t('verifyFailed'));
@@ -195,7 +195,7 @@ export default function TwoFactorPage() {
             <button
               onClick={() => {
                 addToast(t('twoFactorEnabled'), 'success');
-                router.push(`/${locale}/dashboard`);
+                router.push(`/${locale}/patient`);
               }}
               className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
             >
