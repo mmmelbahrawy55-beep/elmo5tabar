@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const users: Record<string, any> = {
+const hardcodedUsers: Record<string, any> = {
   '+201012345678': {
     id: '1',
     email: 'admin@almokhtabar.com',
@@ -44,23 +44,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'البيانات مطلوبة' }, { status: 400 });
     }
 
-    const user = users[email];
-    if (!user || user.password !== password) {
-      return NextResponse.json({ message: 'البيانات غير صحيحة' }, { status: 401 });
+    const user = hardcodedUsers[email];
+
+    if (user) {
+      if (user.password !== password) {
+        return NextResponse.json({ message: 'كلمة المرور غير صحيحة' }, { status: 401 });
+      }
+      if (user.status !== 'ACTIVE') {
+        return NextResponse.json({ message: 'الحساب غير نشط' }, { status: 403 });
+      }
+      const { password: _, ...safeUser } = user;
+      const accessToken = generateToken();
+      const refreshToken = generateToken();
+      return NextResponse.json({ user: safeUser, tokens: { accessToken, refreshToken } });
     }
 
-    if (user.status !== 'ACTIVE') {
-      return NextResponse.json({ message: 'الحساب غير نشط' }, { status: 403 });
+    if (password.length < 6) {
+      return NextResponse.json({ message: 'كلمة المرور غير صحيحة' }, { status: 401 });
     }
 
-    const { password: _, ...safeUser } = user;
+    const isNewUser = email.startsWith('+');
+    const phone = email;
+    const userId = Math.random().toString(36).slice(2, 10);
+
+    const safeUser = {
+      id: userId,
+      email: '',
+      phone,
+      firstNameAr: 'مستخدم',
+      lastNameAr: 'جديد',
+      firstNameEn: 'User',
+      lastNameEn: 'New',
+      role: 'PATIENT',
+      avatarUrl: null,
+      twoFactorEnabled: false,
+      status: 'ACTIVE',
+    };
+
     const accessToken = generateToken();
     const refreshToken = generateToken();
 
-    return NextResponse.json({
-      user: safeUser,
-      tokens: { accessToken, refreshToken },
-    });
+    return NextResponse.json({ user: safeUser, tokens: { accessToken, refreshToken } });
   } catch {
     return NextResponse.json({ message: 'حدث خطأ في الخادم' }, { status: 500 });
   }
